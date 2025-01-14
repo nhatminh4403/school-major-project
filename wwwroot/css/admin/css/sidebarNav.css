@@ -1,0 +1,55 @@
+.sidebar__nav-item .arrow {
+    font-size: 14px;
+    color: #666;
+    transition: transform 0.3s ease;
+    margin-left: auto;
+}
+
+.arrow {
+    border-color: rgba(255, 255, 255, 0.75);
+    border-width: 0 3px 3px 0;
+    border-style: solid;
+    padding: 3px;
+    transition: transform 0.3s;
+}
+
+.right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+/* Subnav Styling */
+.subNav {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+    overflow: hidden;
+    max-height: 0;
+    background: #222;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+}
+
+.subNav li {
+    padding-left: 20px;
+}
+
+.subNav a {
+    padding: 10px;
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.subNav a:hover {
+    color: #fff;
+}
+
+.subNav a.sidebar__nav-link {
+    color: rgba(255, 255, 255, 0.75);
+    background: #28282d;
+}
+
+/* Arrow rotation when active */
+.sidebar__nav-item.active .arrow {
+    transform: rotate(45deg);
+}

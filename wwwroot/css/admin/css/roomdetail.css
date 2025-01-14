@@ -1,0 +1,233 @@
+    /* General Styling */
+    /* Seat Section Container */
+.seat-section {
+    padding: 20px;
+}
+
+.seat-section__container {
+    margin-bottom: 40px;
+    padding: 20px;
+    background-color: #101013de;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.seat-section__title {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: white;
+    text-transform: uppercase;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 10px;
+}
+
+/* Seat Item Styling */
+.seat-section__items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    /* Khoảng cách giữa các ghế */
+    justify-content: center;
+    /* Căn đều giữa các ghế */
+}
+
+.seat-item {
+    width: calc(16.666% - 15px);
+    /* Chia đều thành 6 ghế mỗi hàng */
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    /* Căn giữa nội dung bên trong */
+}
+
+.seat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.seat-item__info p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.seat-item__image {
+    max-width: 100%;
+    height: auto;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+/* Seat Item Actions */
+.seat-item__actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+    /* Căn giữa các nút */
+}
+
+.seat-item__actions .btn {
+    padding: 8px 12px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.seat-item__actions .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.seat-item__actions .btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.seat-item__actions .btn-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.seat-item__actions .btn-danger:hover {
+    background-color: #b02a37;
+}
+
+.main__table-btn--delete {
+    background-color: #2b2b31;
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .seat-item {
+        width: calc(25% - 15px);
+        /* 4 ghế mỗi hàng trên màn hình nhỏ hơn */
+    }
+}
+
+@media (max-width: 768px) {
+    .seat-item {
+        width: calc(33.333% - 15px);
+        /* 3 ghế mỗi hàng trên tablet */
+    }
+}
+
+@media (max-width: 576px) {
+    .seat-item {
+        width: calc(50% - 15px);
+        /* 2 ghế mỗi hàng trên mobile */
+    }
+}
+
+@media (max-width: 360px) {
+    .seat-item {
+        width: 100%;
+        /* 1 ghế mỗi hàng trên màn hình rất nhỏ */
+    }
+}
+
+.schedule-selector {
+    background-color: #101013de;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.schedule-selector form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.schedule-selector label {
+    color: #fff;
+    font-weight: 500;
+    font-size: 16px;
+    margin: 0;
+}
+
+.schedule-selector select {
+    background-color: #2b2b31;
+    border: 1px solid #3b3b41;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 6px;
+    min-width: 200px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.schedule-selector select:hover {
+    border-color: #007bff;
+}
+
+.schedule-selector select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.schedule-selector option {
+    background-color: #2b2b31;
+    color: #fff;
+    padding: 10px;
+}
+
+.schedule-selector .btn-primary {
+    background-color: #007bff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.schedule-selector .btn-primary:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.schedule-selector .btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .schedule-selector form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .schedule-selector select {
+        width: 100%;
+    }
+
+    .schedule-selector .btn-primary {
+        width: 100%;
+    }
+}
+
+.seat-item[data-status="true"] {
+    background-color: #ff4d4d20;
+    border: 1px solid #ff4d4d;
+    color: #fff;
+}
+
+.seat-item[data-status="false"] .seat-item__info span[th\\:text="${item.status}"]
+{
+    background-color: #2f80ed;
+    color: #fff;
+}
