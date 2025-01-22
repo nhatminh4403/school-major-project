@@ -23,7 +23,10 @@ namespace school_major_project.Models
         [DisplayName("Điểm tích lũy")]
         public long pointSaving { get; set; } = 0;
 
-
         public bool isStudent { get; set; } = false;
+        public ICollection<Rating>? Ratings { get; set; }
+        public ICollection<Receipt>? Receipts { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
+        public ICollection<PromotionUser> Promotion { get; set; }
     }
 }

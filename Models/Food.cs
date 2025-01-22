@@ -29,5 +29,6 @@ namespace school_major_project.Models
             get; set;
         }
 
+        public ICollection<Receipt>? Receipt { get; set; }
     }
 }

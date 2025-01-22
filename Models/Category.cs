@@ -14,5 +14,7 @@ namespace school_major_project.Models
         [Required]
         [DisplayName("Tên")]
         public string? CategoryDescription { get; set; }
+
+        public ICollection<FilmCategory> filmCategories { get; set; }
     }
 }

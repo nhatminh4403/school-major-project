@@ -35,5 +35,12 @@ namespace school_major_project.Models
         [DisplayName("Giờ chiếu")]
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime StartTime { get; set; }
+
+        [Required]
+        public int CountryId { get; set; }
+
+        public ICollection<Rating>? Rating { get; set; }
+        public ICollection<Schedule>? Schedules { get; set; }
+        public ICollection<FilmCategory> FilmCategories { get; set; }
     }
 }

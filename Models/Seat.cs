@@ -22,5 +22,16 @@ namespace school_major_project.Models
 
         [Required]
         public string? SeatImage { get; set; }
+
+        [Required]
+        public int RoomId { get; set; }
+        [Required]
+        public int SeatTypeId { get; set; }
+
+        [ForeignKey(nameof(RoomId))]
+        public virtual Room Room { get; set; }
+
+        [ForeignKey(nameof(SeatTypeId))]
+        public virtual SeatType SeatType { get; set; }
     }
 }

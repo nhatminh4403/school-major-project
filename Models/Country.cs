@@ -14,5 +14,7 @@ namespace school_major_project.Models
         [Required]
         [DisplayName("Tên quốc gia")]
         public string? Name { get; set; }
+
+        public ICollection<Film>? films { get; set; }
     }
 }

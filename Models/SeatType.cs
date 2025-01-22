@@ -22,5 +22,7 @@ namespace school_major_project.Models
         [Required]
         [DisplayName("Điểm thưởng")]
         public int? pointGiving { get; set; }
+
+        public ICollection<Seat>? Seats { get; set; }
     }
 }

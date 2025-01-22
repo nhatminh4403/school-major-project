@@ -20,5 +20,6 @@ namespace school_major_project.Models
         [DisplayName("Địa chỉ trên Map")]
         private string? Map { get; set; }
 
+        public virtual ICollection<Room>? Rooms { get; set; }
     }
 }
