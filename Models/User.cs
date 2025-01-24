@@ -27,6 +27,6 @@ namespace school_major_project.Models
         public ICollection<Rating>? Ratings { get; set; }
         public ICollection<Receipt>? Receipts { get; set; }
         public ICollection<Comment>? Comments { get; set; }
-        public ICollection<PromotionUser> Promotion { get; set; }
+        public ICollection<Promotion> Promotions { get; set; }
     }
 }

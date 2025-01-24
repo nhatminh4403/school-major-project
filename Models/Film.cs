@@ -41,6 +41,6 @@ namespace school_major_project.Models
 
         public ICollection<Rating>? Rating { get; set; }
         public ICollection<Schedule>? Schedules { get; set; }
-        public ICollection<FilmCategory> FilmCategories { get; set; }
+        public ICollection<Category> Categories { get; set; }
     }
 }

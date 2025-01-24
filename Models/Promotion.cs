@@ -31,6 +31,6 @@ namespace school_major_project.Models
         [DisplayName("Điểm để đổi")]
         public int RedemptionPoint { get; set; }
 
-        public ICollection<PromotionUser> promotionUsers { get; set; }
+        public ICollection<User> Users { get; set; }
     }
 }
