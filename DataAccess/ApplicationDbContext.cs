@@ -9,12 +9,12 @@ namespace school_major_project.DataAccess
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        public DbSet<User> users { get; set; }
-        public DbSet<Role> roles { get; set; }
-        public DbSet<Film> films { get; set; }
-        public DbSet<Category> categories { get; set; }
-        public DbSet<Country> countries { get; set; }
-        public DbSet<Comment> comments { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Film> Films { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Country> Countries { get; set; }
+        public DbSet<Comment> Comments { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<Room> Rooms { get; set; }
