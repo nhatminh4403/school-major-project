@@ -24,6 +24,7 @@ namespace school_major_project.DataAccess
         public DbSet<Receipt> Receipts { get; set; }
         public DbSet<ReceiptDetail> ReceiptDetails { get; set; }
         public DbSet<Blog> Blogs { get; set; }
-
+        public DbSet<Food> Foods { get; set; }
+        public DbSet<SeatType> SeatTypes { get; set; }
     }
 }
