@@ -31,7 +31,7 @@ namespace school_major_project.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     age = table.Column<int>(type: "int", nullable: false),
                     birthday = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     pointSaving = table.Column<long>(type: "bigint", nullable: false),

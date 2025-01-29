@@ -42,9 +42,9 @@ builder.Services.AddHostedService<ExpiredItemCleanupService>();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
-    option.LoginPath = $"/Identity/Account/Login";
-    option.LogoutPath = $"/Identity/Account/Logout";
-    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    option.LoginPath = $"/Identity/Pages/Account/Login";
+    option.LogoutPath = $"/Identity/Pages/Account/Logout";
+    option.AccessDeniedPath = $"/Identity/Pages/Account/AccessDenied";
 });
 
 
@@ -62,13 +62,16 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapControllers();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 app.Run();

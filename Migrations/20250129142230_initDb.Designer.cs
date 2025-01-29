@@ -12,7 +12,7 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250129135420_initDb")]
+    [Migration("20250129142230_initDb")]
     partial class initDb
     {
         /// <inheritdoc />
@@ -678,7 +678,6 @@ namespace school_major_project.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("PhoneNumberConfirmed")

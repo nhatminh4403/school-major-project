@@ -12,7 +12,7 @@ namespace school_major_project.Models
 
         [DataType(DataType.PhoneNumber)]
         [DisplayName("Số điện thoại")]
-        public string PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; }
 
         [DisplayName("Tuổi")]
         public int age { get; set; }

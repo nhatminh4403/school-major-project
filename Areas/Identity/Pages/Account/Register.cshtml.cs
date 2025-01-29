@@ -117,7 +117,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
 
             [DataType(DataType.PhoneNumber)]
             [DisplayName("Số điện thoại")]
-            public string PhoneNumber { get; set; }
+            public string? PhoneNumber { get; set; }
             public string? Roles { get; set; }
 
 
@@ -156,8 +156,12 @@ namespace school_major_project.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-                user.FullName = Input.FullName;
-                user.PhoneNumber = Input.PhoneNumber;
+                user.FullName = string.IsNullOrEmpty(Input.FullName)
+                           ? GenerateRandomName()
+                           : Input.FullName;
+                user.PhoneNumber = string.IsNullOrEmpty(Input.PhoneNumber)
+                           ? null
+                           : Input.FullName;
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
@@ -226,6 +230,22 @@ namespace school_major_project.Areas.Identity.Pages.Account
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
             return (IUserEmailStore<User>)_userStore;
+        }
+        private string GenerateRandomName()
+        {
+            // Get current timestamp
+            var now = DateTime.Now;
+
+            // Create a more readable format
+            var random = new Random();
+            var randomLetters = new string(Enumerable.Range(0, 3)
+                .Select(_ => (char)random.Next('A', 'Z'))
+                .ToArray());
+            string milSec = DateTime.Now.Millisecond.ToString();
+            // Format: User_[MMdd]_[HHmmss]_[3 random letters]
+            var uniqueName = $"User_{milSec}";
+
+            return uniqueName;
         }
     }
 }
