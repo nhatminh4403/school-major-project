@@ -42,9 +42,9 @@ builder.Services.AddHostedService<ExpiredItemCleanupService>();
 
 builder.Services.ConfigureApplicationCookie(option =>
 {
-    option.LoginPath = $"/Identity/Pages/Account/Login";
-    option.LogoutPath = $"/Identity/Pages/Account/Logout";
-    option.AccessDeniedPath = $"/Identity/Pages/Account/AccessDenied";
+    option.LoginPath = $"/Identity/Account/Login";
+    option.LogoutPath = $"/Identity/Account/Logout";
+    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
 
 

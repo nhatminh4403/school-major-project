@@ -1,8 +1,120 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@section Styles{
+    <style>
+        .flex-form {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 50px;
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
+            gap: 5px;
+        }
+
+        .type-country {
+            margin-right: 20px;
+            color: #31d7a9;
+            z-index: 1;
+        }
+
+        .list {
+            color: black;
+        }
+
+        .current {
+            color: black;
+        }
+
+        .thumb-country {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            -webkit-box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .thumn-country img {
+            width: 100%;
+        }
+    </style>
+}
+<!-- ==========Preloader========== -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
 </div>
+<!-- ==========Preloader========== -->
+<section class="banner-section">
+    <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/banner/banner011.jpg" style="background-image: url('/imgs/img/banner/banner011.jpg');"></div>
+    <div class="container">
+        <div class="banner-content">
+            <h1 class="title cd-headline clip">
+                <span class="d-block">Đặt vé xem phim</span>
+                <span class="color-theme cd-words-wrapper p-0 m-0" style="width: 271.888px;">
+                    <b class="is-visible pb-3"></b>
+                    <b class="is-hidden pb-3">Tiện lợi</b>
+                    <b class="is-hidden pb-3">Đáng tin cậy</b>
+                    <b class="is-hidden pb-3">Thư giãn</b>
+                    <b class="is-hidden pb-3">Nhanh chóng</b>
+                </span>
+            </h1>
+        </div>
+    </div>
+</section>
+
+<section class="search-ticket-section padding-top pt-lg-0">
+    <div class="container">
+        <div class="search-tab bg_img" data-background="/imgs/img/ticket/ticket-bg01.jpg" style="background-image:url('/imgs/img/ticket/ticket-bg01.jpg');">
+            <div class="row align-items-center mb--20">
+                <div class="col-lg-6 mb-20">
+                    <div class="search-ticket-header">
+                        <h6 class="category">Chào mừng đến với ba anh em</h6>
+                        <h3 class="title">Bạn đang tìm kiếm phim gì nè?</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-area">
+                <div class="tab-item active">
+                    <div class="flex-form">
+                        <form class="ticket-search-form" action="#" method="get">
+                            <div class="form-group large">
+                                <div action="/films/search" method="get">
+                                    <input type="text" name="keyword" @* th:value="${keyword}"  *@placeholder="Tìm kiếm phim" required="">
+                                    <button type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <form>
+                            <div class="form-group flex-center">
+                                <div class="thumb-country">
+                                    <img src="~/imgs/img/ticket/city.png" alt="ticket" />
+                                </div>
+                                <span class="type type-country">Quốc gia: </span>
+                                <select class="select-bar" onchange="handleCountryChange(this)">
+                                    <option value="" disabled selected>Chọn quốc gia</option>
+                                    @* <option th:each="country : ${countries}" th:value="${country.getId()}" th:text="${country.name}"></option> *@
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

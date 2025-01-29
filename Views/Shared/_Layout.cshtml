@@ -1,51 +1,243 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using school_major_project.Models
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - school_major_project</title>
+    <title>@ViewData["Title"] - Ba Anh Em - Online Ticket Booking Website</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/css/jquery.animatedheadline.css" />
+    <link rel="stylesheet" href="~/css/css/all.min.css/" />
+    <link rel="stylesheet" href="~/css/css/flaticon.css" />
+    <link rel="stylesheet" href="~/css/css/magnific-popup.css" />
+    <link rel="stylesheet" href="~/css/css/owl.carousel.min.css" />
+    <link rel="stylesheet" href="~/css/css/nice-select.css" />
+    <link rel="stylesheet" href="~/css/css/contact.css" />
+    <link rel="stylesheet" href="~/css/css/main.css" />
+    <link rel="stylesheet" href="~/css/css/userprofile.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/school_major_project.styles.css" asp-append-version="true" />
+    <link href="~/imgs/img/movie/cake2.png" rel="shortcut icon" type="image/x-icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .btn__logout {
+            background-image: -webkit-linear-gradient(169deg, #5560ff 17%, #aa52a1 63%, #ff4343 100%);
+            padding: 10px 49px;
+            font-weight: 600;
+            border-radius: 25px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+            .btn__logout:hover {
+                box-shadow: 0px 10px 15px 0px rgba(59, 55, 188, 0.5);
+            }
+
+            .btn__logout:focus,
+            .btn__logout:active {
+                border: none;
+                outline: none;
+            }
+
+        .mt-50 {
+            margin-top: 50px;
+        }
+    </style>
+
+    @RenderSection("Styles", required: false)
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">school_major_project</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+    <div class="overlay"></div>
+    <a href="#0" class="scrollToTop" style="z-index: 1">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <header class="header-section">
+        <div class="container">
+            <div class="header-wrapper">
+                <div class="logo">
+                    <a href="/">
+                        <img src="~/imgs/img//logo/logo1.png" alt="Logo" />
+                    </a>
+                </div>
+
+                <ul class="menu">
+                    <li>
+                        <a href="/" class="active on_item" id="1">Trang chủ</a>
+                    </li>
+                    <li>
+                        <a href="#" class="on_item" id="2">Phim</a>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="#0" class="on_item" id="3">Thể loại</a>
+                        <ul class="submenu">
+                            <li>
+                                empty for now
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-children">
+                        <a href="#0" class="on_item" id="4"> Trang </a>
+                        <ul class="submenu">
+                            <li>
+                                empty for now (4 pages)
+                            </li>
+                        </ul>
+                    </li>
+                    @if (!SignInManager.IsSignedIn(User))
+                    {
+                        <li class="header-button pr-0">
+                            <a id="register" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="header-button pr-0">
+                            <a id="login" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
                         </li>
-                        
-                    </ul>
-                    <partial name="_LoginPartial" />
+                    }
+                    else
+                    {
+                        <li>
+                            <a href="/" class=" on_item" id="5"> Tài khoản </a>
+                            <ul class="submenu">
+                                <li>empty for now</li>
+                                <li>empty for now</li>
+                            </ul>
+                        </li>
+                        <li class="header-button pr-0">
+                            <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout">
+                                <button id="logout" type="submit" class="btn__logout">Logout</button>
+                            </form>
+                        </li>
+
+                    }
+
+                </ul>
+                <div class="header-bar d-lg-none">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
-        </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="footer-section mt-50">
         <div class="container">
-            &copy; 2024 - school_major_project - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="newslater-container bg_img" data-background="/imgs/img/newslater/newslater-bg01.jpg">
+                <div class="newslater-wrapper">
+                    <h5 class="cate">
+                        Đăng kí Ba Anh Em
+                    </h5>
+                    <h3 class="title">Nhận ngay nhiều voucher hấp dẫn đừng bỏ lỡ!</h3>
+                    <form class="newslater-form">
+                        <input type="text" placeholder="Địa chỉ email của bạn" />
+                        <button type="submit">Đăng kí</button>
+                    </form>
+                    <p> Chúng tôi rất tôn trọng quyền riêng tư của bạn, chúng tôi sẽ không bao giờ chia sẻ thông tin của bạn </p>
+                </div>
+
+            </div>
+            @* &copy; 2024 - school_major_project - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a> *@
+        </div>
+        <div class="container">
+            <div class="footer-top">
+                <div class="logo">
+                    <a href="/">
+                        <img src="~/imgs/img/logo/logo1.png" width="185px" alt="footer" />
+                    </a>
+                </div>
+                <ul class="social-icons">
+                    <li>
+                        <a href="#0">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#0" class="active">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#0">
+                            <i class="fab fa-pinterest-p"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#0">
+                            <i class="fab fa-google"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#0">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="footer-bottom">
+                <div class="footer-bottom-area">
+                    <div class="left">
+                        <p>
+                            Copyright © 2024.All Rights Reserved By <a href="#0">Ba Anh Em </a>
+                        </p>
+                    </div>
+                    <ul class="links">
+                        <li>
+                            <a href="#">Về chúng tôi </a>
+                        </li>
+                        <li>
+                            <a href="#0">Terms Of Use</a>
+                        </li>
+                        <li>
+                            <a href="#0">Chính sách quyền riêng tư</a>
+                        </li>
+                        <li>
+                            <a href="#0">FAQ</a>
+                        </li>
+                        <li>
+                            <a href="#0">Phản hồi</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/js/modernizr-3.6.0.min.js"></script>
+    <script src="~/js/js/plugins.js"></script>
+    <script src="~/js/js/heandline.js"></script>
+    <script src="~/js/js/isotope.pkgd.min.js"></script>
+    <script src="~/js/js/magnific-popup.min.js"></script>
+    <script src="~/js/js/owl.carousel.min.js"></script>
+    <script src="~/js/js/wow.min.js"></script>
+    <script src="~/js/js/countdown.min.js"></script>
+    <script src="~/js/js/odometer.min.js"></script>
+    <script src="~/js/js/viewport.jquery.js"></script>
+    <script src="~/js/js/nice-select.js"></script>
+    <script src="~/js/js/seat.js"></script>
+    <script src="~/js/js/app.js"></script>
+    <script src="~/js/js/main.js"></script>
+    <script src="~/js/js/ocr.js"></script>
+    <script src="~/js/js/qrcode.js"></script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
