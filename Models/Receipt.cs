@@ -26,7 +26,7 @@ namespace school_major_project.Models
 
         [Required]
         public string UserId { get; set; }
-        [ForeignKey("UserID")]
+        [ForeignKey("UserId")]
         public virtual User GetUser { get; set; }
     }
 }

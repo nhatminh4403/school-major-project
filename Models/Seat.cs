@@ -15,7 +15,7 @@ namespace school_major_project.Models
         public string? SeatNumber { get; set; }
         [Required]
         [DisplayName("Giá")]
-        public decimal SeatPrice { get; set; }
+        public int SeatPrice { get; set; }
         [DisplayName("Tình trạng ghế")]
         [Required]
         public bool Status { get; set; }

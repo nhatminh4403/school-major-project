@@ -19,7 +19,7 @@ namespace school_major_project.Models
         public DateTime dateComment { get; set; }
 
         [Required]
-        public int blogId { get; set; }
+        public int BlogId { get; set; }
         [Required]
         public string UserId { get; set; }
         [ForeignKey("UserId")]

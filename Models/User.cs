@@ -6,7 +6,6 @@ namespace school_major_project.Models
 {
     public class User : IdentityUser
     {
-        [Required]
         [StringLength(50)]
         [DisplayName("Họ và tên")]
         public string FullName { get; set; }

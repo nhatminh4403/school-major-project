@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace school_major_project.Models
@@ -25,16 +26,19 @@ namespace school_major_project.Models
         [Required]
         public int ReceiptId { get; set; }
         [Required]
+        public int SeatId { get; set; }
+        [Required]
         public int ScheduleId { get; set; }
         [ForeignKey(nameof(ReceiptId))]
+        [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
         public virtual Receipt Receipt { get; set; }
 
         [ForeignKey(nameof(ScheduleId))]
+        [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
         public virtual Schedule Schedule { get; set; }
 
-        [Required]
-        public int SeatId { get; set; }
-        [ForeignKey("SeatId")]
+        [ForeignKey(nameof(SeatId))]  // Changed to use nameof for consistency
+        [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
         public virtual Seat Seat { get; set; }
     }
 }
