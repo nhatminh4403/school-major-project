@@ -3714,6 +3714,8 @@ input[type="submit"] {
 
 .search-ticket-header {
     text-transform: uppercase;
+    position:relative;
+    user-select:none;
 }
 
 .search-ticket-header .category {

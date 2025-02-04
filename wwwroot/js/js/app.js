@@ -30,6 +30,6 @@
         function handleCountryChange(selectElement) {
              const countryId = selectElement.value;
              if (countryId) {
-                window.location.href = `/films/by-country?countryId=${countryId}`;
+                window.location.href = `/Films/by-country/${countryId}`;
              }
         }
