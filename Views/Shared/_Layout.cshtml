@@ -23,6 +23,7 @@
     <link rel="stylesheet" href="~/css/css/contact.css" />
     <link rel="stylesheet" href="~/css/css/main.css" />
     <link rel="stylesheet" href="~/css/css/userprofile.css" />
+    <link href="~/css/css/odometer.css" rel="stylesheet" />
     <link href="~/css/css/animate.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/school_major_project.styles.css" asp-append-version="true" />
@@ -101,10 +102,10 @@
                     @if (!SignInManager.IsSignedIn(User))
                     {
                         <li class="header-button pr-0">
-                            <a id="register" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
+                            <a id="register" asp-area="Identity" asp-page="/Account/AuthenticationModel" asp-route-register="true">Đăng ký</a>
                         </li>
                         <li class="header-button pr-0">
-                            <a id="login" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+                            <a id="login" asp-area="Identity" asp-page="/Account/AuthenticationModel" asp-route-login="true">Đăng nhập</a>
                         </li>
                     }
                     else
