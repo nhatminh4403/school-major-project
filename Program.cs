@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.GlobalServices;
 using school_major_project.Services;
@@ -47,8 +47,19 @@ builder.Services.ConfigureApplicationCookie(option =>
     option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
 
-
-
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddAreaPageRoute(
+        areaName: "Identity", 
+        pageName: "/Account/Login", 
+        route: "dang-nhap" 
+    );
+    options.Conventions.AddAreaPageRoute(
+       areaName: "Identity",
+       pageName: "/Account/Register",
+       route: "dang-ky"
+   );
+});
 
 var app = builder.Build();
 
@@ -74,4 +85,5 @@ app.UseEndpoints(endpoints =>
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 });
+
 app.Run();

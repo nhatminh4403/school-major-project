@@ -1,11 +1,9 @@
 ﻿<!DOCTYPE html>
-
 <html>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link href="~/css/css/test.css" rel="stylesheet" />
 
     <!-- FontAwesome 6.2.0 CSS -->
     <link rel="stylesheet"
@@ -14,15 +12,57 @@
           crossorigin="anonymous"
           referrerpolicy="no-referrer" />
 
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/css/jquery.animatedheadline.css" />
+    <link rel="stylesheet" href="~/css/css/all.min.css/" />
+    <link rel="stylesheet" href="~/css/css/flaticon.css" />
+    <link rel="stylesheet" href="~/css/css/magnific-popup.css" />
+    <link rel="stylesheet" href="~/css/css/owl.carousel.min.css" />
+    <link rel="stylesheet" href="~/css/css/nice-select.css" />
+    <link rel="stylesheet" href="~/css/css/contact.css" />
+    <link rel="stylesheet" href="~/css/css/main.css" />
+
+    <link href="~/css/css/odometer.css" rel="stylesheet" />
+    <link href="~/css/css/animate.css" rel="stylesheet" />
+    <link rel="shortcut icon" type="image/x-icon" href="~/imgs/img/movie/cake2.png" />
+
     @RenderSection("Styles", required: false)
 
     <title>@ViewBag.Title</title>
 </head>
-<body style ="background-image: url( /imgs/img/account/account-bg.jpg);">
+<body>
+    <div class="preloader">
+        <div class="preloader-inner">
+            <div class="preloader-icon">
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
 
+    <section class="account-section bg_img" data-background="/imgs/img/account/account-bg.jpg">
         @RenderBody()
+    </section>
 
-
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/js/jquery-3.3.1.min.js"></script>
+    <script src="~/js/js/modernizr-3.6.0.min.js"></script>
+    <script src="~/js/js/plugins.js"></script>
+    <script src="~/js/js/heandline.js"></script>
+    <script src="~/js/js/isotope.pkgd.min.js"></script>
+    <script src="~/js/js/magnific-popup.min.js"></script>
+    <script src="~/js/js/owl.carousel.min.js"></script>
+    <script src="~/js/js/wow.min.js"></script>
+    <script src="~/js/js/countdown.min.js"></script>
+    <script src="~/js/js/odometer.min.js"></script>
+    <script src="~/js/js/viewport.jquery.js"></script>
+    <script src="~/js/js/nice-select.js"></script>
+    <script src="~/js/js/seat.js"></script>
+    <script src="~/js/js/app.js"></script>
+    <script src="~/js/js/main.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
