@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ICountry
+    public interface ICountryRepository
     {
         Task<IEnumerable<Country>> GetAllAsync();
         Task<Country> GetByIdAsync(int id);

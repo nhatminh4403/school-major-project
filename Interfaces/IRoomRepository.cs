@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IRoom
+    public interface IRoomRepository
     {
         Task<IEnumerable<Room>> GetAllRoomAsync();
         Task<Room> GetByIdAsync(int id);

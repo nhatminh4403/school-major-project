@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IBlog
+    public interface IBlogRepository
     {
         Task<IEnumerable<Blog>> GetAllAsync();
         Task<Blog> GetByIdAsync(int id);

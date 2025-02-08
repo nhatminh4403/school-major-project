@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.ModelServices
 {
-    public class CountryService : ICountry
+    public class CountryService : ICountryRepository
     {
         private readonly ApplicationDbContext _context;
         public CountryService(ApplicationDbContext context)

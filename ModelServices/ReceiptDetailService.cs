@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.ModelServices
 {
-    public class ReceiptDetailService : IReceiptDetails
+    public class ReceiptDetailService : IReceiptDetailsRepository
     {
         private readonly ApplicationDbContext _context;
         public ReceiptDetailService(ApplicationDbContext context)

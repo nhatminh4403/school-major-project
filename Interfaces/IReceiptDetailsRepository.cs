@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IReceiptDetails
+    public interface IReceiptDetailsRepository
     {
         Task<IEnumerable<ReceiptDetail>> GetAllAsync();
         Task<ReceiptDetail> GetByIdAsync(int id);

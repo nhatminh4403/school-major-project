@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ISchedule
+    public interface IScheduleRepository
     {
         Task<IEnumerable<Schedule>> GetAllAsync();
         Task<Schedule> GetByIdAsync(int id);

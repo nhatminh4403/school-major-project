@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class CommentService : IComment
+    public class CommentService : ICommentRepository
     {
         private readonly ApplicationDbContext _context;
         public CommentService(ApplicationDbContext context)

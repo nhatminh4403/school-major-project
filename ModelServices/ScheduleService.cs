@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.ModelServices
 {
-    public class ScheduleService : ISchedule
+    public class ScheduleService : IScheduleRepository
     {
         private readonly ApplicationDbContext _dbContext;
         public ScheduleService(ApplicationDbContext dbContext)

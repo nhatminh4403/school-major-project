@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class BlogService : IBlog
+    public class BlogService : IBlogRepository
     {
         private readonly ApplicationDbContext _context;
         public BlogService( ApplicationDbContext context)

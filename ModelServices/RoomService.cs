@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.ModelServices
 {
-    public class RoomService : IRoom
+    public class RoomService : IRoomRepository
     {
         private readonly ApplicationDbContext _context;
         public RoomService(ApplicationDbContext context)

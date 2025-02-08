@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IFood
+    public interface IFoodRepository
     {
         Task<IEnumerable<Food>> GetAllAsync();
         Task<Food> GetByIdAsync(int id);

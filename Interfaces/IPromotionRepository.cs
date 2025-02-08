@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IPromotion
+    public interface IPromotionRepository
     {
         Task<IEnumerable<Promotion>> GetAllAsync();
         Task<Promotion> GetByIdAsync(int id);

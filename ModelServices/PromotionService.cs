@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class PromotionService : IPromotion
+    public class PromotionService : IPromotionRepository
     {
         private readonly ApplicationDbContext _context;
         public PromotionService(ApplicationDbContext context)

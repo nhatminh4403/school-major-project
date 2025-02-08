@@ -20,22 +20,22 @@ builder.Services.AddIdentity<User, IdentityRole>()
 
 builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<IFilm, FilmService>();
-builder.Services.AddScoped<ICategory, CategoryService>();
-builder.Services.AddScoped<ISeatType, SeatTypeSerivce>();
-builder.Services.AddScoped<IReceipt, ReceiptService>();
-builder.Services.AddScoped<ICinema, CinemaService>();
-builder.Services.AddScoped<IRoom, RoomService>();
-builder.Services.AddScoped<IReceiptDetails,ReceiptDetailService>();
-builder.Services.AddScoped<ISchedule, ScheduleService>();
-builder.Services.AddScoped<ISeat, SeatService>();
-builder.Services.AddScoped<ICountry, CountryService>();
-builder.Services.AddScoped<ISeat, SeatService>();
-builder.Services.AddScoped<IBlog, BlogService>();
-builder.Services.AddScoped<IComment, CommentService>();
-builder.Services.AddScoped<IRating, RatingService>();
-builder.Services.AddScoped<IFood, FoodService>();
-builder.Services.AddScoped<IPromotion, PromotionService>();
+builder.Services.AddScoped<IFilmRepository, FilmService>();
+builder.Services.AddScoped<ICategoryRepository, CategoryService>();
+builder.Services.AddScoped<ISeatTypeRepository, SeatTypeSerivce>();
+builder.Services.AddScoped<IReceiptRepository, ReceiptService>();
+builder.Services.AddScoped<ICinemaRepository, CinemaService>();
+builder.Services.AddScoped<IRoomRepository, RoomService>();
+builder.Services.AddScoped<IReceiptDetailsRepository,ReceiptDetailService>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleService>();
+builder.Services.AddScoped<ISeatRepository, SeatService>();
+builder.Services.AddScoped<ICountryRepository, CountryService>();
+builder.Services.AddScoped<ISeatRepository, SeatService>();
+builder.Services.AddScoped<IBlogRepository, BlogService>();
+builder.Services.AddScoped<ICommentRepository, CommentService>();
+builder.Services.AddScoped<IRatingRepository, RatingService>();
+builder.Services.AddScoped<IFoodRepository, FoodService>();
+builder.Services.AddScoped<IPromotionRepository, PromotionService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<ExpiredItemCleanupService>();

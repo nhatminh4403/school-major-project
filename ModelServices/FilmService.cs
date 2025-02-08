@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class FilmService : IFilm
+    public class FilmService : IFilmRepository
     {
         private readonly ApplicationDbContext _context;
         public FilmService(ApplicationDbContext context)
@@ -38,6 +38,24 @@ namespace school_major_project.Services
                 _context.Films.Remove(film);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<List<string>> GetActorsListByFilmId(int filmId)
+        {
+            List<string> ActorsList;
+            Film film = await GetByIdAsync(filmId);
+            if(film.Actors == null)
+            {
+                return new List<string>();
+            }
+
+            ActorsList = new List<string>(film.Actors.Split(',').Select(x => x.Trim()).ToArray());
+            
+            return ActorsList;
+        }
+
+        public async Task<Film> GetByName(string name)
+        {
+            return await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).FirstOrDefaultAsync(p => p.Name == name);
         }
     }
 }

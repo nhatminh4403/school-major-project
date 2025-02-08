@@ -3,7 +3,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Interfaces
 {
-    public interface ICinema
+    public interface ICinemaRepository
     {
         Task<IEnumerable<Cinema>> GetAllAsync();
         Task<Cinema> GetByIdAsync(int id);

@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class CategoryService : ICategory
+    public class CategoryService : ICategoryRepository
     {
         private readonly ApplicationDbContext _context;
         public CategoryService(ApplicationDbContext context)

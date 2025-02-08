@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class CinemaService : ICinema
+    public class CinemaService : ICinemaRepository
     {
         private readonly ApplicationDbContext _context;
         public CinemaService(ApplicationDbContext context)

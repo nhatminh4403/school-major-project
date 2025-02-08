@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class RatingService : IRating
+    public class RatingService : IRatingRepository
     {
         private readonly ApplicationDbContext _context;
         public RatingService(ApplicationDbContext context)
@@ -38,6 +38,11 @@ namespace school_major_project.Services
                 _context.Ratings.Remove(rating);
                 await _context.SaveChangesAsync();
             }
+        }
+        public async Task<bool> HasUserRated(string userId, int filmId)
+        {
+            return await _context.Ratings
+         .AnyAsync(r => r.FilmId == filmId && r.UserId == userId);
         }
     }
 }

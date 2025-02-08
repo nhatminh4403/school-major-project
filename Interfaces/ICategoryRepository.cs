@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ICategory
+    public interface ICategoryRepository
     {
         Task<IEnumerable<Category>> GetAllAsync();
         Task<Category> GetByIdAsync(int id);

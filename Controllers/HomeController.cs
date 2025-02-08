@@ -9,21 +9,21 @@ namespace school_major_project.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IFilm _ifilm;
-        private readonly ICountry _icountry;
+        private readonly IFilmRepository _filmRepository;
+        private readonly ICountryRepository _countryRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public HomeController(IFilm ifilm,ApplicationDbContext applicationDbContext,ICountry country)
+        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country)
         {
-            _icountry = country;
+            _countryRepository = country;
             _applicationDbContext = applicationDbContext;           
-            _ifilm = ifilm;
+            _filmRepository = ifilm;
         }
 
         public async Task<IActionResult> Index(int page =1,int pageSize = 6)
         {
-            var films = await _ifilm.GetAllAsync();
+            var films = await _filmRepository.GetAllAsync();
             var totalFilms = films.Count();
-            var countries = await _icountry.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
             var paging = _applicationDbContext.Films.Skip((page - 1) * pageSize).Take(pageSize).ToList();
             FilmPagingViewModel viewModel = new FilmPagingViewModel
             {

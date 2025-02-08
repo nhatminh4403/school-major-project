@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ISeatType
+    public interface ISeatTypeRepository
     {
         Task<IEnumerable<SeatType>> GetAllSeatTypeAsync();
         Task<SeatType> GetByIdAsync(int id);

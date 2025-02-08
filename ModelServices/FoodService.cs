@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.Services
 {
-    public class FoodService : IFood
+    public class FoodService : IFoodRepository
     {
         private readonly ApplicationDbContext _context;
         public FoodService(ApplicationDbContext context)

@@ -2,7 +2,7 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IComment
+    public interface ICommentRepository
     {
         Task<IEnumerable<Comment>> GetAllAsync();
         Task<Comment> GetByIdAsync(int id);

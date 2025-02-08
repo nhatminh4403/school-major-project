@@ -5,7 +5,7 @@ using school_major_project.Models;
 
 namespace school_major_project.ModelServices
 {
-    public class SeatService : ISeat
+    public class SeatService : ISeatRepository
     {
         private readonly ApplicationDbContext _context;
         public SeatService(ApplicationDbContext context)
