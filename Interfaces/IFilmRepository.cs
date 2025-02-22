@@ -1,4 +1,5 @@
-﻿using school_major_project.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using school_major_project.Models;
 
 namespace school_major_project.Interfaces
 {
@@ -12,5 +13,8 @@ namespace school_major_project.Interfaces
 
         Task<Film> GetByName(string name);
         Task<List<string>> GetActorsListByFilmId(int filmId);
+
+        Task<Film> GetByNameFuzzy(string searchName);
+        
     }
 }

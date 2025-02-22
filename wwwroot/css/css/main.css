@@ -8047,7 +8047,7 @@ span::after {
 
             .account-area .account-form .form-group.checkgroup input::after,
             .account-area .account-form .form-group.checkgroup .checkbox-wrapper input::after {
-                bottom: -21px;
+                bottom: -10px;
                 width: 15px;
                 height: 15px;
                 border-radius: 50%;

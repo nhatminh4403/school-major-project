@@ -10,6 +10,5 @@ namespace school_major_project.ViewModel
         public IEnumerable<Category> AllCategories { get; set; }
         public int numberOfRating { get; set; }
         public IEnumerable<string> ListOfActors { get; set; }
-        public Rating Rating { get; set; }
     }
 }

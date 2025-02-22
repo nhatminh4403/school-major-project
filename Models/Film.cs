@@ -27,9 +27,11 @@ namespace school_major_project.Models
 
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Thời lượng phim phải là số dương")]
-        public int? FilmDuration { get; set; }
+        public int FilmDuration { get; set; }
         [Required]
         public string? Actors { get; set; }
+        [Required]
+        public string Quality { get; set; }
 
         [Required]
         [DisplayName("Giờ chiếu")]

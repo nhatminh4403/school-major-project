@@ -1,90 +1,355 @@
-﻿@model IEnumerable<school_major_project.Models.Film>
+﻿@using school_major_project.ViewModel
+@using school_major_project.HelperClass
+@model FilmPagingViewModel
 
 @{
     ViewData["Title"] = "AllFilms";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int visiblePages = 5; // Số trang hiển thị
+    int startPage = Math.Max(1, Model.CurrentPage - visiblePages / 2);
+    int endPage = Math.Min(Model.TotalPages, startPage + visiblePages - 1);
 }
 
-<h1>AllFilms</h1>
+@section Styles {
+    <style>
+        .flex-form {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 50px;
+        }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PosterUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TrailerUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DirectorName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Language)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FilmRated)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FilmDuration)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Actors)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartTime)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PosterUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrailerUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DirectorName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Language)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FilmRated)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FilmDuration)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Actors)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0;
+            gap: 5px;
+        }
+
+        .type-country {
+            margin-right: 20px;
+            color: #31d7a9;
+            z-index: 1;
+        }
+
+        .list {
+            color: black;
+        }
+
+        .current {
+            color: black;
+        }
+
+        .thumb-country {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            z-index: 1;
+            overflow: hidden;
+            margin-right: 10px;
+            -webkit-box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+        }
+
+            .thumb-country img {
+                width: 100%;
+            }
+    </style>
 }
-    </tbody>
-</table>
+
+<!-- ==========Preloader========== -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+
+<section class="banner-section">
+    <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/banner/banner02.jpg"
+         style="background-image: url('/imgs/img/banner/banner02.jpg');"></div>
+
+</section>
+
+<section class="search-ticket-section padding-top pt-lg-0">
+    <div class="container">
+        <div class="search-tab bg_img" data-background="/imgs/img/ticket/ticket-bg01.jpg"
+             style="background-image: url('/imgs/img/banner/ticket-bg01.jpg');">
+            <div class="row align-items-center mb--20">
+                <div class="col-lg-6 mb-20">
+                    <div class="search-ticket-header">
+                        <h6 class="category">welcome to Ba Anh Em</h6>
+                        <h3 class="title">Bạn đang tìm phim gì nè?</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-area">
+                <div class="tab-item active">
+                    <div class="flex-form">
+                        <form class="ticket-search-form" action="#" method="get">
+                            <div class="form-group large">
+                                <div action="/films/search" method="get">
+                                    <input type="text" name="keyword" @* th:value="${keyword}"  *@placeholder="Tìm kiếm phim" required="">
+                                    <button type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <form>
+                            <div class="form-group flex-center">
+                                <div class="thumb-country">
+                                    <img src="~/imgs/img/ticket/city.png" alt="ticket" />
+                                </div>
+                                <span class="type type-country">Quốc gia: </span>
+                                <select class="select-bar" onchange="handleCountryChange(this)">
+                                    <option value="" disabled selected>Chọn quốc gia</option>
+                                    @foreach (var item in Model.Countries)
+                                    {
+                                        <option value="@item.Id">@item.Name</option>
+                                    }
+                                    @* <option th:each="country : ${countries}" th:value="${country.getId()}" th:text="${country.name}"></option> *@
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<section class="movie-section padding-bottom" style="margin-top: 60px">
+    <div class="container">
+        <div class="row flex-wrap-reverse justify-content-center">
+            <div class="col-lg-12 mb-50 mb-lg-0">
+                <div class="filter-tab tab">
+                    <div class="filter-area">
+                        <div class="filter-main">
+                            <div class="left">
+                                <div class="item">
+                                    <span class="show">Hiển thị:</span>
+                                </div>
+                            </div>
+
+                            <ul class="grid-button tab-menu">
+                                <li class="active">
+                                    <i class="fas fa-th"></i>
+                                </li>
+                                <li>
+                                    <i class="fas fa-bars"></i>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="tab-area">
+                        <div class="tab-item active">
+                            <div class="row mb-10 justify-content-center">
+                                @{
+                                    if (Model.Films == null)
+                                    {
+                                        <h2>
+                                            Hiện tại trống
+                                        </h2>
+                                    }
+                                    else
+                                    {
+                                        foreach (var item in Model.Films)
+                                        {
+                                            <div class="col-sm-6 col-lg-4">
+                                                <div class="movie-grid">
+                                                    <div class="movie-thumb c-thumb">
+                                                        <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
+                                                            <img src="@item.PosterUrl" alt="movie">
+                                                        </a>
+                                                    </div>
+                                                    <div class="movie-content bg-one">
+                                                        <h5 class="title m-0">
+                                                            <a href="">@item.Name</a>
+                                                        </h5>
+                                                        <ul class="movie-rating-percent">
+                                                            <li>
+                                                                <div class="thumb">
+                                                                    <img src="~/imgs/img/movie/tomato.png" alt="movie">
+                                                                </div>
+                                                                <span class="content">88%</span>
+                                                            </li>
+                                                            <li>
+                                                                <div class="thumb">
+                                                                    <img src="~/imgs/img/movie/cake.png" alt="movie">
+                                                                </div>
+                                                                <span class="content">88%</span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+
+                            </div>
+
+                        </div>
+
+                        <div class="tab-item">
+                            <div class="movie-area mb-10">
+                                @foreach (var item in Model.Films)
+                                {
+                                    <div class="movie-list">
+                                        <div class="movie-thumb c-thumb">
+                                            <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
+                                                <img src="@item.PosterUrl" alt="movie">
+                                               class="w-100 bg_img h-100"
+                                               data-background="@item.PosterUrl">
+                                                <img class="d-sm-none"
+                                                     src="@item.PosterUrl"
+                                                     alt="movie" />
+                                            </a>
+                                        </div>
+
+                                        <div class="movie-content bg-one">
+                                            <h5 class="title">
+                                                <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">@item.Name</a>
+                                            </h5>
+                                            <p class="duration">
+                                                @{
+
+                                                    int? durationInMinutes = item.FilmDuration;
+                                                    int? hours = durationInMinutes / 60;
+                                                    int? minutes = durationInMinutes % 60;
+                                                    string durationText = durationInMinutes == 0 ? "--" : $"{durationInMinutes / 60} giờ {durationInMinutes % 60} phút ({item.FilmDuration} phút)";
+                                                }
+                                                @durationText | @item.Quality
+                                            </p>
+
+                                            <div class="movie-tags">
+                                                @if (item.Categories == null)
+                                                {
+                                                    <p>NaN</p>
+                                                }
+                                                else
+                                                {
+                                                    foreach (var category in item.Categories)
+                                                    {
+                                                        <a href=""> @category.CategoryDescription</a>
+                                                    }
+                                                }
+
+                                            </div>
+                                            <div class="release">
+                                                <span>Ngày khởi chiếu : </span>
+                                                @if (item.StartTime == null)
+                                                {
+                                                    <a href="#">Chưa có ngày chiếu</a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#0"> @item.StartTime</a>
+
+                                                }
+
+                                            </div>
+                                            <div class="movie-tags">
+                                                <a href="#0">@item.Language</a>
+                                            </div>
+                                            <ul class="movie-rating-percent">
+                                                <li>
+                                                    <div class="thumb">
+                                                        <img src="/imgs/img/movie/tomato.png"
+                                                             alt="movie" />
+                                                    </div>
+                                                    <span class="content">88%</span>
+                                                </li>
+                                                <li>
+                                                    <div class="thumb">
+                                                        <img src="/imgs/img/movie/cake.png"
+                                                             alt="movie" />
+                                                    </div>
+                                                    <span class="content">88%</span>
+                                                </li>
+                                            </ul>
+                                            <div class="book-area">
+                                                <div class="book-ticket">
+                                                    <div class="react-item">
+                                                        <a href="#0">
+                                                            <div class="thumb">
+                                                                <img src="/imgs/img/icons/heart.png"
+                                                                     alt="icons" />
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                    <div class="react-item mr-auto">
+                                                        <a href="#0">
+                                                            <div class="thumb">
+                                                                <img src="/imgs/img/icons/book.png"
+                                                                     alt="icons" />
+                                                            </div>
+                                                            <span>
+                                                                <a href="">Đặt vé</a> @* "@{
+                                                                                                                / films / film - details /{ id} (id =${ film.id})
+                                                            }" *@
+                                                            </span>
+                                                        </a>
+                                                    </div>
+                                                    <div class="react-item">
+                                                        <a href="#0"
+                                                           class="popup-video">
+                                                            <div class="thumb">
+                                                                <img src="/imgs/img/icons/play-button.png"
+                                                                     alt="icons" />
+                                                            </div>
+                                                            <span>
+                                                                Xem
+                                                                trailer
+                                                            </span>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="pagination-area text-center">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <a asp-controller="Films"
+                               asp-action="AllFilms"
+                               asp-route-page="@(Model.CurrentPage - 1)"
+                               class="prev-next">Previous</a>
+                        }
+
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <a asp-controller="Films"
+                               asp-action="AllFilms"
+                               asp-route-page="@i"
+                               class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <a asp-controller="Films"
+                               asp-action="AllFilms"
+                               asp-route-page="@(Model.CurrentPage + 1)"
+                               class="prev-next">Next</a>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+

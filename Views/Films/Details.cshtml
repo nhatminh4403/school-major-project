@@ -1,79 +1,386 @@
-﻿@model school_major_project.Models.Film
+﻿@using school_major_project.ViewModel
+@using Microsoft.AspNetCore.Identity
+@model FilmDetailVM
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết phim";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    Film film = Model.Film;
+    var user = await UserManager.GetUserAsync(User);
+
 }
 
-<h1>Details</h1>
+@section Styles {
+    <style>
+        .rating-stars {
+            display: flex;
+        }
 
-<div>
-    <h4>Film</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PosterUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PosterUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TrailerUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TrailerUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DirectorName)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DirectorName)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Language)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Language)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FilmRated)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FilmRated)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FilmDuration)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FilmDuration)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Actors)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Actors)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StartTime)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StartTime)
-        </dd>
-    </dl>
+            .rating-stars i {
+                font-size: 24px;
+                color: #223c6e;
+                cursor: pointer;
+            }
+
+            .rating-stars .selected {
+                color: #f1481f;
+            }
+
+        .star-flex {
+            display: flex;
+            gap: 5px;
+        }
+
+        .movie-review-item {
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+        }
+
+        .flex-rating {
+            display: flex;
+            gap: 10px;
+        }
+
+        .review {
+            display: flex;
+            gap: 3px;
+        }
+    </style>
+}
+
+<!-- Preloader -->
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<!-- Banner Section -->
+<section class="details-banner bg_img" data-background="@Model.Film.PosterUrl" style="background-image: url('/imgs/img/banner/banner03.jpg')">
+    <div class="container">
+        <div class="details-banner-wrapper">
+            <div class="details-banner-thumb">
+                <img src="@film.PosterUrl" alt="movie" />
+                @{
+                    // Extract video ID from youtu.be link
+                    string videoId = film.TrailerUrl.Substring(film.TrailerUrl.LastIndexOf("/") + 1);
+                    // Construct standard YouTube embed URL
+                    string watchUrl = $"https://www.youtube.com/watch?v={videoId}";
+                }
+                @if (film.TrailerUrl.Contains("youtube.com"))
+                {
+                    @* <iframe width="660px" height="415px" src="@film.TrailerUrl" frameborder="0" allowfullscreen></iframe> *@
+                    <a href="@Model.Film.TrailerUrl" class="video-popup">
+                        <img src="/imgs/img/movie/video-button.png" alt="movie" />
+                    </a>
+                }
+                else
+                {
+                    @* <iframe width="660px" height="415px" src="@embedUrl" frameborder="0" allowfullscreen></iframe> *@
+                    <a href="@watchUrl" class="video-popup">
+                        <img src="/imgs/img/movie/video-button.png" alt="movie" />
+                    </a>
+                }
+               
+            </div>
+            <div class="details-banner-content offset-lg-3">
+                <h3 class="title">@film.Name</h3>
+                <div class="tags">
+                    <a href="#0">@Model.Film.Language</a>
+                </div>
+
+                @if (Model.AllCategories != null)
+                {
+                    <div>
+                        @foreach (var item in Model.AllCategories)
+                        {
+                            <a class="button mr-3" href="#0">@item.CategoryDescription</a>
+                        }
+                    </div>
+                }
+
+                <div class="social-and-duration">
+                    <div class="duration-area">
+                        <div class="item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>@(film.StartTime != null ? film.StartTime : "Chưa có ngày chiếu")</span>
+                        </div>
+                        <div class="item">
+                            @{
+                                int? durationInMinutes = Model.Film.FilmDuration;
+                                string durationText = durationInMinutes == 0 ? "--" :
+                                $"{durationInMinutes / 60} giờ {durationInMinutes % 60} phút ({Model.Film.FilmDuration} phút)";
+                            }
+                            <i class="far fa-clock"></i><span>@durationText</span>
+                        </div>
+                    </div>
+                    <ul class="social-share">
+                        <li><a href="#0"><i class="fab fa-facebook-f"></i></a></li>
+                        <li><a href="#0"><i class="fab fa-twitter"></i></a></li>
+                        <li><a href="#0"><i class="fab fa-pinterest-p"></i></a></li>
+                        <li><a href="#0"><i class="fab fa-linkedin-in"></i></a></li>
+                        <li><a href="#0"><i class="fab fa-google-plus-g"></i></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Book Section -->
+<section class="book-section bg-one">
+    <div class="container">
+        <div class="book-wrapper offset-lg-3">
+            <div class="left-side">
+                <div class="item">
+                    <div class="item-header">
+                        <div class="thumb">
+                            <img src="/imgs/img/movie/tomato2.png" alt="movie" />
+                        </div>
+                        <div class="counter-area">
+                            <span class="counter-item odometer odometer-auto-theme" data-odometer-final="88">
+                                <div class="odometer-inside">
+                                    <span class="odometer-digit">
+                                        <span class="odometer-digit-spacer">8</span><span class="odometer-digit-inner">
+                                            <span class="odometer-ribbon">
+                                                <span class="odometer-ribbon-inner">
+                                                    <span class="odometer-value">8</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span><span class="odometer-digit">
+                                        <span class="odometer-digit-spacer">8</span><span class="odometer-digit-inner">
+                                            <span class="odometer-ribbon">
+                                                <span class="odometer-ribbon-inner">
+                                                    <span class="odometer-value">8</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                    <p>tomatometer</p>
+                </div>
+                <div class="item">
+                    <div class="item-header">
+                        <div class="thumb">
+                            <img src="/imgs/img/movie/cake2.png" alt="movie" />
+                        </div>
+                        <div class="counter-area">
+                            <span class="counter-item odometer odometer-auto-theme" data-odometer-final="88">
+                                <div class="odometer-inside">
+                                    <span class="odometer-digit">
+                                        <span class="odometer-digit-spacer">8</span><span class="odometer-digit-inner">
+                                            <span class="odometer-ribbon">
+                                                <span class="odometer-ribbon-inner">
+                                                    <span class="odometer-value">8</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span><span class="odometer-digit">
+                                        <span class="odometer-digit-spacer">8</span><span class="odometer-digit-inner">
+                                            <span class="odometer-ribbon">
+                                                <span class="odometer-ribbon-inner">
+                                                    <span class="odometer-value">8</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </div>
+                            </span>
+                        </div>
+                    </div>
+                    <p>audience Score</p>
+                </div>
+                <!-- Rating Items -->
+                <div class="item">
+                    <div class="item-header">
+                        <h5 class="title"></h5>
+                        @if (Model.averageRating > 0)
+                        {
+                            <div class="rated">
+                                @for (int i = 1; i <= Model.averageRating; i++)
+                                {
+                                    <i class="fas fa-heart" style="margin-left:3px;"></i>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="rated rate-it" style="margin-left:10px;">
+                                @for (int i = 0; i < 5; i++)
+                                {
+                                    <i class="fas fa-heart"></i>
+                                }
+                            </div>
+                        }
+                    </div>
+                    <p>Users Rating</p>
+                </div>
+            </div>
+            <a href="@Url.Action("Index", "Schedules", new { id = film.Id })" class="custom-button">Đặt vé</a>
+        </div>
+    </div>
+</section>
+
+<!-- Movie Details Section -->
+<section class="movie-details-section padding-top padding-bottom">
+    <div class="container">
+        <div class="row justify-content-center flex-wrap-reverse mb--50">
+            <div class="col-lg-12 mb-50">
+                <div class="movie-details" style="margin-top: 36px">
+                    <h3 class="title">Trailer chi tiết</h3>
+                    <div class="details-photos">
+                        @{ 
+                        @*   // Extract video ID from youtu.be link *@
+                        @*     string videoId = film.TrailerUrl.Substring(film.TrailerUrl.LastIndexOf("/") + 1); *@
+                            // Construct standard YouTube embed URL *@
+                            string embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                         }
+                        @if (film.TrailerUrl.Contains("youtube.com"))
+                        {
+                            <iframe width="660px" height="415px" src="@film.TrailerUrl" frameborder="0" allowfullscreen></iframe>
+
+                        }
+                        else
+                        {
+                            <iframe width="660px" height="415px" src="@embedUrl" frameborder="0" allowfullscreen></iframe>
+                        }
+                    </div>
+
+                    <!-- Summary and Reviews Tab -->
+                    <div class="tab summery-review">
+                        <ul class="tab-menu">
+                            <li class="active">tóm tắt</li>
+                            <li>đánh giá <span>@Model.numberOfRating</span></li>
+                        </ul>
+
+                        <div class="tab-area">
+                            <!-- Summary Tab -->
+                            <div class="tab-item active">
+                                <div class="item">
+                                    <h5 class="sub-title">Mô tả</h5>
+                                    <p>@film.Description</p>
+                                </div>
+                                <div class="item">
+                                    <h5 class="sub-title">Đạo diễn</h5>
+                                    <p>@film.DirectorName</p>
+                                </div>
+
+                                <!-- Actors Section -->
+                                <div class="item">
+                                    <div class="header">
+                                        <h5 class="sub-title">Diễn viên</h5>
+                                        <div class="navigation">
+                                            <div class="cast-prev"><i class="flaticon-double-right-arrows-angles"></i></div>
+                                            <div class="cast-next"><i class="flaticon-double-right-arrows-angles"></i></div>
+                                        </div>
+                                    </div>
+                                    <div class="casting-slider owl-carousel">
+                                        @foreach (var actor in Model.ListOfActors)
+                                        {
+                                            <div class="cast-item">
+                                                <div class="cast-thumb">
+                                                    <a href="#0">
+                                                        <img class="owl-lazy" data-src="/imgs/img/cast/cast00.jpg" alt="cast" />
+                                                    </a>
+                                                </div>
+                                                <div class="cast-content">
+                                                    <h6 class="cast-title"><a href="#0">@actor</a></h6>
+                                                    <span class="cate">actor</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reviews Tab -->
+                            <div class="tab-item">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    if (!ViewBag.HasRated)
+                                    {
+                                        <div class="leave-comment">
+                                            <h5 class="title">Để lại bình luận</h5>
+                                            <form asp-action="RatingByFilm" asp-controller="Rating" class="rating-form" method="post">
+                                                <input type="hidden" name="filmId" value="@Model.Film.Id" />
+                                                <input type="hidden" id="rating" name="star" value="0" />
+
+                                                <div class="form-group">
+                                                    <div class="rating-stars star-flex">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fas fa-heart" id="star@(i)" onclick="rate(@i)"></i>
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <textarea placeholder="Viết cảm nghĩ của bạn" name="content" required></textarea>
+                                                </div>
+                                                <div class="form-group">
+                                                    <input type="submit" value="Comment" onclick="return validateForm()" />
+                                                </div>
+                                            </form>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div style="font-size: 32px;font-weight: bold;">
+                                            BẠN ĐÃ ĐÁNH GIÁ BỘ PHIM NÀY
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div style="font-size: 32px;font-weight: bold;">
+                                        <h3>Bạn cần đăng nhập để có thể bình luận.</h3>
+                                    </div>
+                                }
+
+                                <!-- Display Existing Reviews -->
+                                @foreach (var rating in Model.AllRatings)
+                                {
+                                    <div class="movie-review-item">
+                                        <div class="flex-rating">
+                                            <div class="movie-review-info">
+                                                <div>
+                                                    <span class="reply-date">@rating.RatingDate</span>
+                                                </div>
+                                                <h6 class="subtitle">
+                                                    <a href="#0">@rating.User.FullName</a>
+                                                </h6>
+                                            </div>
+                                            <div class="movie-review-content">
+                                                <div class="review">
+                                                    @for (int i = 1; i <= rating.Star; i++)
+                                                    {
+                                                        <span><i class="flaticon-favorite-heart-button"></i></span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <p class="rating-content">@rating.RatingContent</p>
+                                    </div>
+                                    
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <!-- Add your scripts here -->
+}

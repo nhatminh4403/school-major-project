@@ -1,9 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using school_major_project.Models
+@using school_major_project.ViewModel
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 @{
     var user = await UserManager.GetUserAsync(User);
+
 }
 
 
@@ -36,6 +38,13 @@
 
     
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+        }
+
         .btn__logout {
             background-image: -webkit-linear-gradient(169deg, #5560ff 17%, #aa52a1 63%, #ff4343 100%);
             padding: 10px 49px;
@@ -83,7 +92,7 @@
                         <a href="/" class="active on_item" id="1">Trang chủ</a>
                     </li>
                     <li>
-                        <a href="#" class="on_item" id="2">Phim</a>
+                        <a  asp-controller="Films" asp-action="AllFilms" asp-route-page="1" class="on_item" id="2">Phim</a>
                     </li>
                     <li class="menu-item-has-children">
                         <a href="#0" class="on_item" id="3">Thể loại</a>

@@ -36,34 +36,29 @@ namespace school_major_project.Controllers
         }
 
         // GET: Films
-        [Route("phim/tat-ca-phim/trang-{page:int?}")]
-        public async Task<IActionResult> AllFilms(int page = 1, int pageSize = 6)
+        [Route("/tat-ca-phim/")]
+        [Route("/tat-ca-phim/trang-{page}")]
+        public async Task<IActionResult> AllFilms(int? page = 1, int pageSize = 6)
         {
             var films = await _filmRepository.GetAllAsync();
             var totalFilms = films.Count();
             var countries = await _countryRepository.GetAllAsync();
-            var filmspaging = _context.Films.Include(p=>p.Categories).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var filmspaging = _context.Films.Include(p=>p.Categories).Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
             FilmPagingViewModel viewModel = new FilmPagingViewModel
             {
                 Films = filmspaging,
-                CurrentPage = page,
+                CurrentPage = page ?? 1,
                 TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
                 Countries = countries
             };
             return View(viewModel);
         }
 
-        [Route("phim/chi-tiet-phim/{name}")]
-        public async Task<IActionResult> Details(string name)
+        [Route("/chi-tiet-phim/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            if (string.IsNullOrEmpty(name))
-            {
-                return NotFound();
-            }
 
-            name = UrlHelper.ToUrlSlug(name);
-
-            var film = await _filmRepository.GetByName(name);
+            var film = await _filmRepository.GetByIdAsync(id);
             if (film == null)
             {
                 return NotFound();
@@ -73,31 +68,35 @@ namespace school_major_project.Controllers
 
             double avg = await _context.Ratings
                    .Where(r => r.FilmId == film.Id)
-                   .Select(r => (double?)r.Star) // Chuyển về nullable tránh lỗi
-                   .DefaultIfEmpty(0)
-                   .AverageAsync() ?? 0;
+                   .Select(r => r.Star) 
+                   .DefaultIfEmpty()
+                   .AverageAsync();
 
             var currentUser = await _userManager.GetUserAsync(User);
             var hasRated = currentUser != null &&
                            await _ratingRepository.HasUserRated(currentUser.Id, film.Id);
+
+            var ratings = await _context.Ratings
+                .Where(r => r.FilmId == film.Id)
+                .Include(r => r.User)
+                .OrderByDescending(r => r.RatingDate)
+                .ToListAsync();
 
             ViewBag.HasRated = hasRated;
             FilmDetailVM viewmodel = new FilmDetailVM
             {
                 Film = film,
                 AllCategories = film.Categories.ToList(),
-                AllRatings = film.Rating.ToList(),
+                AllRatings = ratings,
                 ListOfActors =actors,
-                averageRating = Math.Round(avg,1),
+                averageRating = avg,
                 numberOfRating= film.Rating.Count(),
-                Rating = new Rating()
             };
 
             return View(viewmodel);
         }
 
         
-
         private bool FilmExists(int id)
         {
             return _context.Films.Any(e => e.Id == id);

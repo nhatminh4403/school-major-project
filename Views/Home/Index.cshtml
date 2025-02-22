@@ -1,5 +1,6 @@
 ﻿@using school_major_project.ViewModel
 @model FilmPagingViewModel
+@using school_major_project.HelperClass
 @{
     ViewData["Title"] = "Home Page";
     int visiblePages = 5; // Số trang hiển thị
@@ -79,7 +80,7 @@
                     <b class="is-hidden pb-3">Thư giãn</b>
                     <b class="is-hidden pb-3">Nhanh chóng</b>
                 </span>
-            </h1>
+            </h1>   
         </div>
     </div>
 </section>
@@ -154,7 +155,7 @@
                                     <div class="col-sm-6 col-lg-4">
                                         <div class="movie-grid">
                                             <div class="movie-thumb c-thumb">
-                                                <a href="#">
+                                                <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
                                                     <img src="@item.PosterUrl" alt="movie">
                                                 </a>
                                             </div>

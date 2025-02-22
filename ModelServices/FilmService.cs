@@ -39,6 +39,13 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Film> GetByNameFuzzy(string searchName)
+        {
+            return await _context.Films
+                .FirstOrDefaultAsync(f =>
+                    EF.Functions.Like(f.Name.ToLower(), $"%{searchName.ToLower()}%")
+                );
+        }
         public async Task<List<string>> GetActorsListByFilmId(int filmId)
         {
             List<string> ActorsList;
