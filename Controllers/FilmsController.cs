@@ -15,7 +15,7 @@ using school_major_project.ViewModel;
 
 namespace school_major_project.Controllers
 {
-    [Route("phim")]
+    
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -54,21 +54,70 @@ namespace school_major_project.Controllers
             return View(viewModel);
         }
 
-        [Route("/chi-tiet-phim/{id}")]
-        public async Task<IActionResult> Details(int id)
-        {
+        //[Route("/chi-tiet-phim/{id}")]
+        //public async Task<IActionResult> Details(int id)
+        //{
 
-            var film = await _filmRepository.GetByIdAsync(id);
-            if (film == null)
+        //    var film = await _filmRepository.GetByIdAsync(id);
+        //    if (film == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    List<string> actors = await _filmRepository.GetActorsListByFilmId(film.Id);
+
+        //    double avg = await _context.Ratings
+        //           .Where(r => r.FilmId == film.Id)
+        //           .Select(r => r.Star) 
+        //           .DefaultIfEmpty()
+        //           .AverageAsync();
+
+        //    var currentUser = await _userManager.GetUserAsync(User);
+        //    var hasRated = currentUser != null &&
+        //                   await _ratingRepository.HasUserRated(currentUser.Id, film.Id);
+
+        //    var ratings = await _context.Ratings
+        //        .Where(r => r.FilmId == film.Id)
+        //        .Include(r => r.User)
+        //        .OrderByDescending(r => r.RatingDate)
+        //        .ToListAsync();
+
+        //    ViewBag.HasRated = hasRated;
+        //    FilmDetailVM viewmodel = new FilmDetailVM
+        //    {
+        //        Film = film,
+        //        AllCategories = film.Categories.ToList(),
+        //        AllRatings = ratings,
+        //        ListOfActors =actors,
+        //        averageRating = avg,
+        //        numberOfRating= film.Rating.Count(),
+        //    };
+
+        //    return View(viewmodel);
+        //}
+
+        [Route("/chi-tiet-phim/{name}")]
+        public async Task<IActionResult> Details(string name)
+        {
+            Console.WriteLine(name);
+            if (string.IsNullOrEmpty(name))
             {
                 return NotFound();
             }
+
+            var allFilms= await _filmRepository.GetAllAsync();
+
+            var film = allFilms.FirstOrDefault(f =>
+      f.Name.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
+
+            if (film == null)
+                return NotFound();
 
             List<string> actors = await _filmRepository.GetActorsListByFilmId(film.Id);
 
             double avg = await _context.Ratings
                    .Where(r => r.FilmId == film.Id)
-                   .Select(r => r.Star) 
+                   .Select(r => r.Star)
                    .DefaultIfEmpty()
                    .AverageAsync();
 
@@ -88,15 +137,42 @@ namespace school_major_project.Controllers
                 Film = film,
                 AllCategories = film.Categories.ToList(),
                 AllRatings = ratings,
-                ListOfActors =actors,
+                ListOfActors = actors,
                 averageRating = avg,
-                numberOfRating= film.Rating.Count(),
+                numberOfRating = film.Rating.Count(),
             };
 
             return View(viewmodel);
         }
 
-        
+        [Route("/tim-kiem-phim/tu-khoa={searchname}")]
+        [Route("/tim-kiem-phim/tu-khoa={searchname}/trang-{page}")]
+        public async Task<IActionResult> SearchByName(string searchname, int? page = 1, int pageSize = 6)
+        {
+            var films = await _filmRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
+            var categories = await _categoryRepository.GetAllAsync();   
+
+            if (!string.IsNullOrEmpty(searchname))
+            {
+                string normalizedName = StringHelper.RemoveDiacritics(searchname).ToLower();
+                films =  films.Where(f => StringHelper.RemoveDiacritics(f.Name).ToLower().Contains(normalizedName)).ToList();
+            }
+            var filmspaging = films.Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
+            var totalFilms = films.Count();
+            var filmVM = new FilmVM
+            {
+                Films = filmspaging,
+                Categories = categories,
+                Countries = countries,
+                CurrentPage = page ?? 1,
+                
+                TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
+            };
+            ViewBag.KeyWord = searchname;
+            ViewBag.Quantity = films.Count();
+            return View(filmVM);
+        }
         private bool FilmExists(int id)
         {
             return _context.Films.Any(e => e.Id == id);

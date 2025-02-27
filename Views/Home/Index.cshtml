@@ -101,7 +101,7 @@
                     <div class="flex-form">
                         <form class="ticket-search-form" action="#" method="get">
                             <div class="form-group large">
-                                <div action="/films/search" method="get">
+                                <div action="/films/searchbyname" method="get">
                                     <input type="text" name="keyword" @* th:value="${keyword}"  *@placeholder="Tìm kiếm phim" required="">
                                     <button type="submit">
                                         <i class="fas fa-search"></i>
@@ -155,7 +155,7 @@
                                     <div class="col-sm-6 col-lg-4">
                                         <div class="movie-grid">
                                             <div class="movie-thumb c-thumb">
-                                                <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
+                                                <a asp-action="Details" asp-controller="Films" asp-route-name="@item.Name.RemoveDiacritics()">
                                                     <img src="@item.PosterUrl" alt="movie">
                                                 </a>
                                             </div>

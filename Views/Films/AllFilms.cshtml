@@ -1,6 +1,6 @@
-﻿@using school_major_project.ViewModel
-@using school_major_project.HelperClass
-@model FilmPagingViewModel
+﻿    @using school_major_project.ViewModel
+    @using school_major_project.HelperClass
+    @model FilmPagingViewModel
 
 @{
     ViewData["Title"] = "AllFilms";
@@ -8,6 +8,10 @@
     int visiblePages = 5; // Số trang hiển thị
     int startPage = Math.Max(1, Model.CurrentPage - visiblePages / 2);
     int endPage = Math.Min(Model.TotalPages, startPage + visiblePages - 1);
+
+    var searchRouteValues = new { controller = "Films", action = "SearchByName", searchname = "" };
+    var searchUrl = Url.Action("SearchByName", "Films", searchRouteValues);
+}
 }
 
 @section Styles {
@@ -82,17 +86,17 @@
                 <div class="col-lg-6 mb-20">
                     <div class="search-ticket-header">
                         <h6 class="category">welcome to Ba Anh Em</h6>
-                        <h3 class="title">Bạn đang tìm phim gì nè?</h3>
+                        <h3 class="title">Bạn đang tìm phim gì nè?dsadasda</h3>
                     </div>
                 </div>
             </div>
             <div class="tab-area">
                 <div class="tab-item active">
                     <div class="flex-form">
-                        <form class="ticket-search-form" action="#" method="get">
+                        <form class="ticket-search-form" onsubmit="handleSearch(event)">
                             <div class="form-group large">
-                                <div action="/films/search" method="get">
-                                    <input type="text" name="keyword" @* th:value="${keyword}"  *@placeholder="Tìm kiếm phim" required="">
+                                <div>
+                                    <input type="text" name="searchname" placeholder="Tìm kiếm phim" required value="searchname">
                                     <button type="submit">
                                         <i class="fas fa-search"></i>
                                     </button>
@@ -163,7 +167,7 @@
                                             <div class="col-sm-6 col-lg-4">
                                                 <div class="movie-grid">
                                                     <div class="movie-thumb c-thumb">
-                                                        <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
+                                                        <a asp-action="Details" asp-controller="Films" asp-route-name="@item.Name.RemoveDiacritics()">
                                                             <img src="@item.PosterUrl" alt="movie">
                                                         </a>
                                                     </div>
@@ -202,10 +206,10 @@
                                 {
                                     <div class="movie-list">
                                         <div class="movie-thumb c-thumb">
-                                            <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">
+                                            <a asp-action="Details" asp-controller="Films" asp-route-name="@item.Name.RemoveDiacritics()">
                                                 <img src="@item.PosterUrl" alt="movie">
-                                               class="w-100 bg_img h-100"
-                                               data-background="@item.PosterUrl">
+                                                class="w-100 bg_img h-100"
+                                                data-background="@item.PosterUrl">
                                                 <img class="d-sm-none"
                                                      src="@item.PosterUrl"
                                                      alt="movie" />
@@ -214,7 +218,7 @@
 
                                         <div class="movie-content bg-one">
                                             <h5 class="title">
-                                                <a asp-action="Details" asp-controller="Films" asp-route-id="@item.Id">@item.Name</a>
+                                                <a asp-action="Details" asp-controller="Films" asp-route-name="@item.Name.RemoveDiacritics()">@item.Name</a>
                                             </h5>
                                             <p class="duration">
                                                 @{
@@ -291,8 +295,8 @@
                                                             </div>
                                                             <span>
                                                                 <a href="">Đặt vé</a> @* "@{
-                                                                                                                / films / film - details /{ id} (id =${ film.id})
-                                                            }" *@
+                                                                                                                    / films / film - details /{ id} (id =${ film.id})
+                                                                }" *@
                                                             </span>
                                                         </a>
                                                     </div>
@@ -352,4 +356,14 @@
         </div>
     </div>
 </section>
-
+@section Scripts {
+    <script>
+                function handleSearch(event) {
+            event.preventDefault();
+            const searchTerm = event.target.searchname.value.trim();
+            if (searchTerm) {
+                window.location.href = `/tim-kiem-phim/tu-khoa=${searchTerm}/trang-1`;
+            }
+        }
+    </script>
+}

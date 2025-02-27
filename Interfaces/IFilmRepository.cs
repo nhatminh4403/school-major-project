@@ -14,7 +14,6 @@ namespace school_major_project.Interfaces
         Task<Film> GetByName(string name);
         Task<List<string>> GetActorsListByFilmId(int filmId);
 
-        Task<Film> GetByNameFuzzy(string searchName);
         
     }
 }

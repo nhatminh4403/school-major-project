@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.HelperClass;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 
@@ -39,13 +40,7 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<Film> GetByNameFuzzy(string searchName)
-        {
-            return await _context.Films
-                .FirstOrDefaultAsync(f =>
-                    EF.Functions.Like(f.Name.ToLower(), $"%{searchName.ToLower()}%")
-                );
-        }
+
         public async Task<List<string>> GetActorsListByFilmId(int filmId)
         {
             List<string> ActorsList;
