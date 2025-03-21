@@ -103,7 +103,7 @@
                                     <img src="~/imgs/img/ticket/city.png" alt="ticket" />
                                 </div>
                                 <span class="type type-country">Quốc gia: </span>
-                                <select class="select-bar" onchange="handleCountryChange(this)">
+                                <select class="select-bar" onchange="handleChange(this)">
                                     <option value="" disabled selected>Chọn quốc gia</option>
                                     @foreach (var item in Model.Countries)
                                     {

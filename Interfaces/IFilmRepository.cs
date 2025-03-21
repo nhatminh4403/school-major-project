@@ -14,6 +14,8 @@ namespace school_major_project.Interfaces
         Task<Film> GetByName(string name);
         Task<List<string>> GetActorsListByFilmId(int filmId);
 
-        
+        Task<IEnumerable<Film>> GetFilmsByCountryAsync(int countryId);
+        //Task<IEnumerable<Film>> GetFilmsByCountry(string name);
+
     }
 }

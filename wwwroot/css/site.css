@@ -20,3 +20,13 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.scroll-sub-menu {
+    max-height:250px;
+    overflow:scroll;
+}
+.img-poster {
+    width: 750px;
+    height: 361px;
+    object-fit: cover;
+}

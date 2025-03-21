@@ -7,14 +7,17 @@ using System.Diagnostics;
 
 namespace school_major_project.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IFilmRepository _filmRepository;
+        private readonly ICategoryRepository _categoryRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country)
+        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country, 
+            ICategoryRepository categoryRepository) : base(applicationDbContext)
         {
             _countryRepository = country;
+            _categoryRepository = categoryRepository;
             _applicationDbContext = applicationDbContext;           
             _filmRepository = ifilm;
         }
@@ -33,7 +36,7 @@ namespace school_major_project.Controllers
                 Countries = countries
             };
 
-            
+            ViewBag.HeaderCategories = _categoryRepository.GetAllAsync();
             return View(viewModel);
         }
 

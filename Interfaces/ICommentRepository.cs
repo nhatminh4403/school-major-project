@@ -9,5 +9,7 @@ namespace school_major_project.Interfaces
         Task AddAsync(Comment comment);
         Task UpdateAsync(Comment comment);
         Task DeleteAsync(int id);
+
+        Task<IEnumerable<Comment>> GetCommentsByBlogIdAsync(int blogId);
     }
 }

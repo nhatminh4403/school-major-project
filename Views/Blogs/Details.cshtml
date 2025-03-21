@@ -1,0 +1,203 @@
+﻿@model school_major_project.Models.Blog
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+@using school_major_project.HelperClass
+
+@{
+    ViewData["Title"] = "Chi tiết bài viết ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = await UserManager.GetUserAsync(User);
+}
+
+
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+
+
+
+<section class="main-page-header speaker-banner bg_img" data-background="/imgs/img/banner/banner07.jpg"
+         style="background-image: url('/imgs/img/banner/banner07.jpg');">
+    <div class="container">
+        <div class="speaker-banner-content">
+            <h2 class="title">bài blog</h2>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"> Trang chủ </a>
+                </li>
+                <li>
+                    <a href="/blogs"> Bài viết </a>
+                </li>
+                <li>Chi tiết bài viết</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+
+<section class="blog-section padding-top padding-bottom">
+    <div class="container">
+        <div class="row justify-content-center mb-30-none">
+            <div class="col-lg-12 mb-50 mb-lg-0">
+                <article>
+                    <div class="post-item post-details">
+                        <div class="post-thumb">
+                            <img class="img-poster" src="@Model.BlogPoster" alt="blog">
+                        </div>
+                        <div class="post-content">
+                            <div class="post-meta text-center">
+                                <div class="item">
+                                    <a href="#0">
+                                        <i class="flaticon-conversation"></i>
+                                        <span>@Model?.comments?.Count()</span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div class="entry-content p-0">
+                                    <div class="left">
+                                        <span class="date">
+                                            @Model.BlogCreatedDate
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="post-header">
+                                    <h4 class="m-title">
+                                        @Model.BlogTitle
+                                    </h4>
+                                    <p t>
+                                        @Model.BlogContent
+                                    </p>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="blog-comment">
+                        <h5 class="title">bình luận</h5>
+                        @if (Model.comments.Count == 0)
+                        {
+                            <p>Chưa có bình luận nào nào.</p>
+                        }
+                        else
+                        {
+                            <!-- Kiểm tra nếu blog.comments rỗng -->
+                            <ul class="comment-area">
+                                @foreach (var comment in Model.comments)
+                                {
+                                    <li>
+                                        <div class="blog-thumb-info">
+                                            <span>@comment.dateComment</span>
+                                            <h6 class="title">
+                                                <a href="#0">@comment.User.FullName</a>
+                                            </h6>
+                                        </div>
+                                        <div class="blog-content">
+                                            <p>@comment.content</p>
+                                        </div>
+                                        @if (User.IsInRole("Admin") || User.IsInRole("Customer"))
+                                        {
+                                            @if (comment.UserId == user.Id)
+                                            {
+                                                <div>
+                                                    <form asp-action="DeleteConfirmed" asp-controller="Blogs" asp-route-id="@comment.Id" asp-route-title="@Model.BlogTitle.RemoveDiacritics()" style="display: inline;">
+                                                        <input type="hidden" asp-for="@comment.Id" value="" />
+                                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc không ?')">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            }
+
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <div>
+                                <div class="leave-comment">
+                                    <h5 class="title">Để lại bình luận của bạn</h5>
+                                   
+                                    <form asp-action="CreateComment" asp-controller="Blogs" id="commentForm" method="post">
+                                        <input type="hidden" value="@Model.Id" name="blogId" />
+                                        @Html.AntiForgeryToken()
+                                        <div class="form-group">
+                                            <textarea placeholder="Viết cảm nghĩ của bạn" id="commentContent" name="content" required></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="submit" value="Comment">
+                                        </div>
+                                    </form>
+
+
+
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                <h3>Bạn cần đăng nhập để có thể bình luận.</h3>
+                            </div>
+                        }
+
+
+                    </div>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+                $("#commentForm").submit(function (event) {
+            event.preventDefault();
+            let title = "@Model.BlogTitle.RemoveDiacritics()";
+            let commentContent = $("#commentContent").val();
+
+            if (commentContent.trim() === "") {
+                $("#commentMessage").html("<p style='color:red;'>Nội dung không được để trống.</p>");
+                return;
+            }
+
+            $.ajax({
+                url: "/blogs/blog/" + title + "/comment",
+                type: "POST",
+                data: {
+                    content: commentContent,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (response) {
+                    console.log("Success:", response);
+                    $("#commentMessage").html("<p style='color:green;'>" + response.message + "</p>");
+                    $("#commentContent").val("");
+
+                },
+                error: function (xhr) {
+                    console.log("Error status:", xhr.status);
+                    console.log("Error response:", xhr.responseText);
+
+                    let errorMessage = "Có lỗi xảy ra!";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    $("#commentMessage").html("<p style='color:red;'>" + errorMessage + "</p>");
+                }
+            });
+        });
+    </script>
+}
+

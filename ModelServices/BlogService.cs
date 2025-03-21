@@ -16,9 +16,15 @@ namespace school_major_project.Services
         {
             return await _context.Blogs.Include(p=> p.comments).ToListAsync();
         }
+
         public async Task<Blog> GetByIdAsync(int id)
         {
+         
             return await _context.Blogs.Include(p => p.comments).FirstOrDefaultAsync(p => p.Id == id);
+        }
+        public async Task<Blog> GetByNameAsync(string title_name)
+        {
+            return await _context.Blogs.Include(p => p.comments).FirstOrDefaultAsync(p => p.BlogTitle == title_name);
         }
         public async Task AddAsync(Blog blog)
         {

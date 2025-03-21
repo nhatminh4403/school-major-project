@@ -1,0 +1,75 @@
+﻿@model IEnumerable<school_major_project.Models.Blog>
+@using school_major_project.HelperClass
+@{
+    ViewData["Title"] = "Bài viết";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="preloader">
+    <div class="preloader-inner">
+        <div class="preloader-icon">
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+<!-- ==========Preloader========== -->
+<section class="main-page-header speaker-banner bg_img" data-background="/imgs/img/banner/banner07.jpg"
+         style="background-image: url('/imgs/img/banner/banner07.jpg');">
+    <div class="container">
+        <div class="speaker-banner-content">
+            <h2 class="title">Bài viết</h2>
+            <ul class="breadcrumb">
+                <li>
+                    <a href="/"> Trang chủ </a>
+                </li>
+                <li>
+                    <a href="/blogs"> Blog </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="blog-section padding-top padding-bottom">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-12 mb-50 mb-lg-0">
+                @foreach (var blog in Model)
+                {
+                    <article>
+                        <div class="post-item">
+                            <div class="post-thumb">
+                                <a asp-controller="Blogs" asp-action="Details" asp-route-title="@blog.BlogTitle.RemoveDiacritics()">
+                                    <img class="img-poster" src="@blog.BlogPoster" alt="@blog.BlogTitle" />
+                                </a>
+                            </div>
+                            <div class="post-content">
+                                <div class="post-header">
+                                    <h4 class="title">
+                                        <a asp-controller="Blogs" asp-action="Details" asp-route-title="@blog.BlogTitle.RemoveDiacritics()">@blog.BlogTitle</a>
+                                    </h4>
+                                    <div class="meta-post">
+                                        <a href="#0" class="mr-4">
+                                            <i class="flaticon-conversation"></i>
+                                            <span>@blog?.comments.Count()</span> Bình luận
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="entry-content">
+                                    <div class="left">
+                                        <span class="date">@blog.BlogCreatedDate</span>
+                                    </div>
+                                    <a asp-controller="Blogs" asp-action="Details" asp-route-title="@blog.BlogTitle.RemoveDiacritics()" class="buttons">Đọc thêm<i class="flaticon-right"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                }
+
+
+            </div>
+        </div>
+    </div>
+
+</section>

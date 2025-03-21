@@ -40,5 +40,10 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Comment>> GetCommentsByBlogIdAsync(int blogId)
+        {
+            return await _context.Comments.Include(p => p.User).Include(p => p.Blog).Where(p => p.BlogId == blogId).ToListAsync();
+        }
     }
 }

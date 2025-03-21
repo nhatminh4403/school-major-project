@@ -5,7 +5,8 @@
 @inject UserManager<User> UserManager
 @{
     var user = await UserManager.GetUserAsync(User);
-
+    var model = ViewData["LayoutViewModel"] as BaseFilmVM;
+    // var categories = ViewBag.HeaderCategories as IEnumerable<Category>;
 }
 
 
@@ -96,17 +97,38 @@
                     </li>
                     <li class="menu-item-has-children">
                         <a href="#0" class="on_item" id="3">Thể loại</a>
-                        <ul class="submenu">
+                        <ul class="submenu scroll-sub-menu">
+                            @if (model?.Categories != null)
+                            {
+                                foreach (var category in model.Categories)
+                                {
+                                    <li>
+                                        <a asp-controller="Films" asp-action="FilmByCategory" asp-route-id="@category.Id" asp-route-page="1">@category.CategoryDescription</a>
+                                    </li>
+                                }
+                            }
+                            else {
                             <li>
-                                empty for now
+                                <a href="#">empty for now</a>
                             </li>
+                            }
+                            
                         </ul>
                     </li>
                     <li class="menu-item-has-children">
                         <a href="#0" class="on_item" id="4"> Trang </a>
                         <ul class="submenu">
                             <li>
-                                empty for now (4 pages)
+                                <a asp-controller="Blogs" asp-action="Index">bài viết</a>
+                            </li>
+                            <li>
+                                <a href="#">Liên hệ</a>
+                            </li>
+                            <li>
+                                <a href="#">Về chúng tôi</a>
+                            </li>
+                            <li>
+                                <a href="#">Khuyến mãi</a>
                             </li>
                         </ul>
                     </li>

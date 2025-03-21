@@ -40,6 +40,11 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<Film>> GetFilmsByCountryAsync(int countryId)
+        {
+            var filmsByCountry = await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).Where(p => p.CountryId == countryId).ToListAsync();
+            return filmsByCountry;
+        }
 
         public async Task<List<string>> GetActorsListByFilmId(int filmId)
         {

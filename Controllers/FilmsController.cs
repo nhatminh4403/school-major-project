@@ -15,7 +15,7 @@ using school_major_project.ViewModel;
 
 namespace school_major_project.Controllers
 {
-    
+
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -24,8 +24,8 @@ namespace school_major_project.Controllers
         private readonly ICountryRepository _countryRepository;
         private readonly IRatingRepository _ratingRepository;
         private readonly UserManager<User> _userManager;
-        public FilmsController(ApplicationDbContext context, IFilmRepository filmRepository, ICategoryRepository categoryRepository, 
-            ICountryRepository countryRepository,IRatingRepository ratingRepository,UserManager<User> userManager)
+        public FilmsController(ApplicationDbContext context, IFilmRepository filmRepository, ICategoryRepository categoryRepository,
+            ICountryRepository countryRepository, IRatingRepository ratingRepository, UserManager<User> userManager)
         {
             _context = context;
             _filmRepository = filmRepository;
@@ -43,7 +43,7 @@ namespace school_major_project.Controllers
             var films = await _filmRepository.GetAllAsync();
             var totalFilms = films.Count();
             var countries = await _countryRepository.GetAllAsync();
-            var filmspaging = _context.Films.Include(p=>p.Categories).Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
+            var filmspaging = _context.Films.Include(p => p.Categories).Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
             FilmPagingViewModel viewModel = new FilmPagingViewModel
             {
                 Films = filmspaging,
@@ -54,47 +54,27 @@ namespace school_major_project.Controllers
             return View(viewModel);
         }
 
-        //[Route("/chi-tiet-phim/{id}")]
-        //public async Task<IActionResult> Details(int id)
-        //{
+        [Route("/phim-theo-quoc-gia-{id}/trang-{page}")]
+        public async Task<IActionResult> FilmsByCountry(int id, int? page = 1, int pageSize = 6)
+        {
+            var films = await _filmRepository.GetFilmsByCountryAsync(id);
+            var totalFilms = films.Count();
+            var countries = await _countryRepository.GetAllAsync();
+            var filmsPaging = films.Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
+            FilmPagingViewModel viewModel = new FilmPagingViewModel
+            {
+                Films = filmsPaging,
+                CurrentPage = page ?? 1,
+                TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
+                Countries = countries
+            };
+            Country country = await _countryRepository.GetByIdAsync(id);
+            ViewBag.CountryName = country.Name;
+            ViewBag.CountryId = country.Id;
+            ViewBag.Quantity = totalFilms;
 
-        //    var film = await _filmRepository.GetByIdAsync(id);
-        //    if (film == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    List<string> actors = await _filmRepository.GetActorsListByFilmId(film.Id);
-
-        //    double avg = await _context.Ratings
-        //           .Where(r => r.FilmId == film.Id)
-        //           .Select(r => r.Star) 
-        //           .DefaultIfEmpty()
-        //           .AverageAsync();
-
-        //    var currentUser = await _userManager.GetUserAsync(User);
-        //    var hasRated = currentUser != null &&
-        //                   await _ratingRepository.HasUserRated(currentUser.Id, film.Id);
-
-        //    var ratings = await _context.Ratings
-        //        .Where(r => r.FilmId == film.Id)
-        //        .Include(r => r.User)
-        //        .OrderByDescending(r => r.RatingDate)
-        //        .ToListAsync();
-
-        //    ViewBag.HasRated = hasRated;
-        //    FilmDetailVM viewmodel = new FilmDetailVM
-        //    {
-        //        Film = film,
-        //        AllCategories = film.Categories.ToList(),
-        //        AllRatings = ratings,
-        //        ListOfActors =actors,
-        //        averageRating = avg,
-        //        numberOfRating= film.Rating.Count(),
-        //    };
-
-        //    return View(viewmodel);
-        //}
+            return View(viewModel);
+        }
 
         [Route("/chi-tiet-phim/{name}")]
         public async Task<IActionResult> Details(string name)
@@ -105,10 +85,10 @@ namespace school_major_project.Controllers
                 return NotFound();
             }
 
-            var allFilms= await _filmRepository.GetAllAsync();
+            var allFilms = await _filmRepository.GetAllAsync();
 
             var film = allFilms.FirstOrDefault(f =>
-      f.Name.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
+                            f.Name.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
 
             if (film == null)
                 return NotFound();
@@ -151,12 +131,12 @@ namespace school_major_project.Controllers
         {
             var films = await _filmRepository.GetAllAsync();
             var countries = await _countryRepository.GetAllAsync();
-            var categories = await _categoryRepository.GetAllAsync();   
+            var categories = await _categoryRepository.GetAllAsync();
 
             if (!string.IsNullOrEmpty(searchname))
             {
                 string normalizedName = StringHelper.RemoveDiacritics(searchname).ToLower();
-                films =  films.Where(f => StringHelper.RemoveDiacritics(f.Name).ToLower().Contains(normalizedName)).ToList();
+                films = films.Where(f => StringHelper.RemoveDiacritics(f.Name).ToLower().Contains(normalizedName)).ToList();
             }
             var filmspaging = films.Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
             var totalFilms = films.Count();
@@ -166,7 +146,7 @@ namespace school_major_project.Controllers
                 Categories = categories,
                 Countries = countries,
                 CurrentPage = page ?? 1,
-                
+
                 TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
             };
             ViewBag.KeyWord = searchname;

@@ -6,8 +6,11 @@ namespace school_major_project.Interfaces
     {
         Task<IEnumerable<Blog>> GetAllAsync();
         Task<Blog> GetByIdAsync(int id);
+        Task<Blog> GetByNameAsync(string title_name);
+
         Task AddAsync(Blog blog);
         Task UpdateAsync(Blog blog);
         Task DeleteAsync(int id);
+        
     }
 }
