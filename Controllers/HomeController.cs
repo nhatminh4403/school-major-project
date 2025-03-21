@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
@@ -13,13 +14,16 @@ namespace school_major_project.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public readonly IEmailService _emailService;
+        private readonly IEmailService _emailService;
+        private readonly UserManager<User> _userManager;
         public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country, IEmailService emailService,
+            UserManager<User> userManager,
             ICategoryRepository categoryRepository) : base(applicationDbContext)
         {
             _countryRepository = country;
             _categoryRepository = categoryRepository;
-            _applicationDbContext = applicationDbContext;           
+            _applicationDbContext = applicationDbContext;
+            _userManager = userManager;
             _filmRepository = ifilm;
             _emailService = emailService;
         }
@@ -37,7 +41,18 @@ namespace school_major_project.Controllers
                 TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
                 Countries = countries
             };
+            if (User.Identity.IsAuthenticated)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user != null)
+                {
+                    if (await _userManager.IsInRoleAsync(user, "Admin"))
+                    {
+                        return RedirectToAction("Index", "Home", new { area = "Admin" });
+                    }
+                }
 
+            }
             ViewBag.HeaderCategories = _categoryRepository.GetAllAsync();
             return View(viewModel);
         }

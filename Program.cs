@@ -90,12 +90,19 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+#pragma warning disable ASP0014
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapRazorPages();
     endpoints.MapControllerRoute(
+        name: "admin",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    endpoints.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
+    
 });
+
 
 app.Run();

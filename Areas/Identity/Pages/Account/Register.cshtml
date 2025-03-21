@@ -126,7 +126,11 @@
                         <div class="form-group text-center">
                             <button id="register-submit" type="submit" class="register-button">ĐĂNG KÝ</button>
                         </div>
-
+                        <div class="form-floating mb-3">
+                            <select asp-for="Input.Roles" asp-items="@Model.Input.RoleList" class="form-control">
+                                <option disabled selected> Chọn Role</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="option">
