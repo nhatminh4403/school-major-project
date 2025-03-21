@@ -16,7 +16,7 @@ using school_major_project.ViewModel;
 namespace school_major_project.Controllers
 {
 
-    public class FilmsController : Controller
+    public class FilmsController : BaseController
     {
         private readonly ApplicationDbContext _context;
         private readonly IFilmRepository _filmRepository;
@@ -25,7 +25,7 @@ namespace school_major_project.Controllers
         private readonly IRatingRepository _ratingRepository;
         private readonly UserManager<User> _userManager;
         public FilmsController(ApplicationDbContext context, IFilmRepository filmRepository, ICategoryRepository categoryRepository,
-            ICountryRepository countryRepository, IRatingRepository ratingRepository, UserManager<User> userManager)
+            ICountryRepository countryRepository, IRatingRepository ratingRepository, UserManager<User> userManager) : base(context)
         {
             _context = context;
             _filmRepository = filmRepository;
@@ -156,6 +156,32 @@ namespace school_major_project.Controllers
         private bool FilmExists(int id)
         {
             return _context.Films.Any(e => e.Id == id);
+        }
+
+        [Route("/phim-theo-the-loai/{name}/trang-{page}")]
+        public async Task<IActionResult> GetFilmsByCategory(string name, int? page = 1, int pageSize = 6)
+        {
+            var countries = await _countryRepository.GetAllAsync();
+            var categories = await _categoryRepository.GetAllAsync();
+
+            var category = categories.FirstOrDefault(c => c.CategoryDescription.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
+            var films = await _filmRepository.GetFilmsByCategoryAsync(category.Id);
+
+            var totalFilms = films.Count();
+            var filmsPaging = films.Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();
+            FilmPagingViewModel viewModel = new FilmPagingViewModel
+            {
+                Films = filmsPaging,
+                CurrentPage = page ?? 1,
+                TotalPages = (int)Math.Ceiling((double)totalFilms / pageSize),
+
+                Countries = countries
+            };
+            //Category category =category;
+            ViewBag.CategoryName = category.CategoryDescription;
+            //ViewBag.CategoryId = category.Id;
+            ViewBag.Quantity = totalFilms;
+            return View(viewModel);
         }
     }
 }

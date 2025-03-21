@@ -12,8 +12,8 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250320063948_initBlogData")]
-    partial class initBlogData
+    [Migration("20250321111713_addCategoryFilm")]
+    partial class addCategoryFilm
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

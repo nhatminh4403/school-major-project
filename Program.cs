@@ -6,6 +6,9 @@ using school_major_project.Interfaces;
 using school_major_project.ModelServices;
 using Microsoft.AspNetCore.Identity;
 using school_major_project.Models;
+
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -46,6 +49,15 @@ builder.Services.ConfigureApplicationCookie(option =>
     option.LogoutPath = $"/Identity/Account/Logout";
     option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
 });
+
+var emailConfig = builder.Configuration.GetSection("EmailSettings");
+builder.Services.AddSingleton<IEmailService>(new EmailService(
+    emailConfig["SmtpServer"],
+    int.Parse(emailConfig["SmtpPort"]),
+    emailConfig["FromEmail"],
+    emailConfig["Username"],
+    emailConfig["Password"]
+));
 
 builder.Services.AddRazorPages(options =>
 {

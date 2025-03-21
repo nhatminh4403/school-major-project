@@ -64,5 +64,11 @@ namespace school_major_project.Services
         {
             return await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).FirstOrDefaultAsync(p => p.Name == name);
         }
+
+        public async Task<IEnumerable<Film>> GetFilmsByCategoryAsync(int categoryId)
+        {
+            var filmsByCategories = await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).Where(p => p.Categories.Any(c => c.Id == categoryId)).ToListAsync();
+            return filmsByCategories;
+        }
     }
 }

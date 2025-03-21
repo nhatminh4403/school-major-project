@@ -16,49 +16,7 @@
 
 @section Styles {
     <style>
-        .flex-form {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .flex-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0;
-            gap: 5px;
-        }
-
-        .type-country {
-            margin-right: 20px;
-            color: #31d7a9;
-            z-index: 1;
-        }
-
-        .list {
-            color: black;
-        }
-
-        .current {
-            color: black;
-        }
-
-        .thumb-country {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            z-index: 1;
-            overflow: hidden;
-            margin-right: 10px;
-            -webkit-box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-        }
-
-            .thumb-country img {
-                width: 100%;
-            }
+        
     </style>
 }
 
@@ -86,7 +44,7 @@
                 <div class="col-lg-6 mb-20">
                     <div class="search-ticket-header">
                         <h6 class="category">welcome to Ba Anh Em</h6>
-                        <h3 class="title">Bạn đang tìm phim gì nè?dsadasda</h3>
+                        <h3 class="title">Bạn đang tìm phim gì nè?</h3>
                     </div>
                 </div>
             </div>
@@ -96,7 +54,7 @@
                         <form class="ticket-search-form" onsubmit="handleSearch(event)">
                             <div class="form-group large">
                                 <div>
-                                    <input type="text" name="searchname" placeholder="Tìm kiếm phim" required value="searchname">
+                                    <input type="text" name="searchname" placeholder="Tìm kiếm phim" required value="">
                                     <button type="submit">
                                         <i class="fas fa-search"></i>
                                     </button>
@@ -294,7 +252,7 @@
                                                                      alt="icons" />
                                                             </div>
                                                             <span>
-                                                                <a href="">Đặt vé</a> @* "@{
+                                                                <a href="#">Đặt vé</a> @* "@{
                                                                                                                     / films / film - details /{ id} (id =${ film.id})
                                                                 }" *@
                                                             </span>
@@ -356,14 +314,3 @@
         </div>
     </div>
 </section>
-@section Scripts {
-    <script>
-                function handleSearch(event) {
-            event.preventDefault();
-            const searchTerm = event.target.searchname.value.trim();
-            if (searchTerm) {
-                window.location.href = `/tim-kiem-phim/tu-khoa=${searchTerm}/trang-1`;
-            }
-        }
-    </script>
-}

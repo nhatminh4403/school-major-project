@@ -1,8 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @using school_major_project.Models
 @using school_major_project.ViewModel
+@using school_major_project.HelperClass
+
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
+
 @{
     var user = await UserManager.GetUserAsync(User);
     var model = ViewData["LayoutViewModel"] as BaseFilmVM;
@@ -103,7 +106,7 @@
                                 foreach (var category in model.Categories)
                                 {
                                     <li>
-                                        <a asp-controller="Films" asp-action="FilmByCategory" asp-route-id="@category.Id" asp-route-page="1">@category.CategoryDescription</a>
+                                        <a asp-controller="Films" asp-action="GetFilmsByCategory" asp-route-name="@category.CategoryDescription.RemoveDiacritics()" asp-route-page="1">@category.CategoryDescription</a>
                                     </li>
                                 }
                             }
@@ -122,10 +125,10 @@
                                 <a asp-controller="Blogs" asp-action="Index">bài viết</a>
                             </li>
                             <li>
-                                <a href="#">Liên hệ</a>
+                                <a href="/lien-he">Liên hệ</a>
                             </li>
                             <li>
-                                <a href="#">Về chúng tôi</a>
+                                <a href="/ve-chung-toi">Về chúng tôi</a>
                             </li>
                             <li>
                                 <a href="#">Khuyến mãi</a>

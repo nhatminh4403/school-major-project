@@ -4,7 +4,7 @@ using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ViewModel;
 using System.Diagnostics;
-
+using System.Net.Mail;
 namespace school_major_project.Controllers
 {
     public class HomeController : BaseController
@@ -13,13 +13,15 @@ namespace school_major_project.Controllers
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ApplicationDbContext _applicationDbContext;
-        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country, 
+        public readonly IEmailService _emailService;
+        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country, IEmailService emailService,
             ICategoryRepository categoryRepository) : base(applicationDbContext)
         {
             _countryRepository = country;
             _categoryRepository = categoryRepository;
             _applicationDbContext = applicationDbContext;           
             _filmRepository = ifilm;
+            _emailService = emailService;
         }
 
         public async Task<IActionResult> Index(int page =1,int pageSize = 6)
@@ -44,7 +46,35 @@ namespace school_major_project.Controllers
         {
             return View();
         }
+        [Route("/ve-chung-toi")]
+        public IActionResult About()
+        {
+            return View();
+        }
 
+        [Route("lien-he")]
+        [HttpGet]
+        public IActionResult Contact()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Contact(ContactViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                await _emailService.SendEmailAsync(
+                    "nhatminh4403@gmail.com",
+                    $"Contact form: {model.Subject}",
+                    $"Name: {model.Name}<br>Email: {model.Email}<br>Message: {model.Message}",
+                    true);
+
+                return RedirectToAction("ThankYou");
+            }
+
+            return View(model);
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

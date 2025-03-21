@@ -56,70 +56,8 @@
     </style>
 }
 
-<!-- ==========Preloader========== -->
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
+@await Component.InvokeAsync("Search")
 
-<section class="banner-section">
-    <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/banner/banner02.jpg"
-         style="background-image: url('/imgs/img/banner/banner02.jpg');"></div>
-
-</section>
-
-<section class="search-ticket-section padding-top pt-lg-0">
-    <div class="container">
-        <div class="search-tab bg_img" data-background="/imgs/img/ticket/ticket-bg01.jpg"
-             style="background-image: url('/imgs/img/banner/ticket-bg01.jpg');">
-            <div class="row align-items-center mb--20">
-                <div class="col-lg-6 mb-20">
-                    <div class="search-ticket-header">
-                        <h6 class="category">welcome to Ba Anh Em</h6>
-                        <h3 class="title">Bạn đang tìm phim gì nè?</h3>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-area">
-                <div class="tab-item active">
-                    <div class="flex-form">
-                        <form class="ticket-search-form" action="/Films/SearchByName" method="get">
-                            <div class="form-group large">
-                                <div method="get">
-                                    <input type="text" name="searchName" placeholder="Tìm kiếm phim" required="">
-                                    <button type="submit">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        <form>
-                            <div class="form-group flex-center">
-                                <div class="thumb-country">
-                                    <img src="~/imgs/img/ticket/city.png" alt="ticket" />
-                                </div>
-                                <span class="type type-country">Quốc gia: </span>
-                                <select class="select-bar" onchange="handleChange(this)">
-                                    <option value="" disabled selected>Chọn quốc gia</option>
-                                    @foreach (var item in Model.Countries)
-                                    {
-                                        <option value="@item.Id">@item.Name</option>
-                                    }
-                                    @* <option th:each="country : ${countries}" th:value="${country.getId()}" th:text="${country.name}"></option> *@
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
 @if (ViewBag.KeyWord != null)
 {
     @if (ViewBag.Quantity > 0)
@@ -377,15 +315,3 @@
 
 }
 
-@section Scripts{
-    <script>
-            function goToPage(page) {
-            const currentSearch = '@ViewBag.KeyWord';
-            if (!currentSearch) {
-                window.location.href = '/';
-                return;
-            }
-            window.location.href = `/tim-kiem-phim/tu-khoa=${encodeURIComponent(currentSearch)}/trang-${page}`;
-        }
-    </script>
-}

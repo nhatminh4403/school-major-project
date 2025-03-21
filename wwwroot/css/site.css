@@ -23,10 +23,53 @@ body {
 
 .scroll-sub-menu {
     max-height:250px;
-    overflow:scroll;
+    overflow-y:scroll;
 }
 .img-poster {
     width: 750px;
     height: 361px;
     object-fit: cover;
 }
+.flex-form {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 50px;
+}
+
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+    gap: 5px;
+}
+
+.type-country {
+    margin-right: 20px;
+    color: #31d7a9;
+    z-index: 1;
+}
+
+.list {
+    color: black;
+}
+
+.current {
+    color: black;
+}
+
+.thumb-country {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    z-index: 1;
+    overflow: hidden;
+    margin-right: 10px;
+    -webkit-box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
+}
+
+    .thumb-country img {
+        width: 100%;
+    }

@@ -10,7 +10,17 @@ namespace school_major_project.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            
+
+            var today = DateTime.Now;
+            migrationBuilder.InsertData(
+                table: "Blogs",
+                columns: new[] { "Id", "BlogTitle", "BlogContent", "BlogCreatedDate", "BlogPoster" },
+                values: new object[,]
+                {
+                { 1, "Xe máy trên 5 năm sẽ phải kiểm định khí thải","Xe máy trên 5 năm sẽ phải kiểm định khí thải\r\nChủ sở hữu xe mô tô, xe gắn máy sản xuất từ 5 năm trở lên bắt buộc phải mang xe đi kiểm định khí thải tại các trung tâm đăng kiểm.\r\n\r\nTheo Thông tư 47/2024 của Bộ Giao thông Vận tải, xe mô tô, xe gắn máy có tuổi đời dưới 5 năm được miễn kiểm định khí thải. Xe từ 5 đến 12 năm tuổi phải kiểm định hai năm một lần, còn xe trên 12 năm tuổi phải kiểm định hàng năm.\r\n",
+                today,"https://bcp.cdnchinhphu.vn/thumb_w/777/334894974524682240/2024/12/16/82-1692853155-khithaixemay-1689138006805856281099-0-0-436-698-crop-16891380152921359861940-17289016068801282848539-17343301831681947437874.jpg"  },
+                }
+                );
 
             migrationBuilder.InsertData(
                 table: "Countries",
@@ -19,6 +29,23 @@ namespace school_major_project.Migrations
                     {
                 { 1,"Việt Nam" }
                     }
+                );
+            migrationBuilder.InsertData(
+                table: "Categories",
+                columns: new[] { "Id", "CategoryDescription" },
+                values: new object[,]
+                {
+                { 1, "Hành động" },
+                { 2, "Kinh dị" },
+                { 3, "Tình cảm" },
+                { 4, "Hoạt hình" },
+                { 5, "Hài" },
+                { 6, "Tâm lý" },
+                { 7, "Phiêu lưu" },
+                { 8, "Viễn tưởng" },
+                { 9, "Thần thoại" },
+                { 10, "Chiến tranh" }
+                }
                 );
             migrationBuilder.InsertData(
                 table: "Films",
