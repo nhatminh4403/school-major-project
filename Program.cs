@@ -13,8 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
- 
-builder.Services.AddDbContext<ApplicationDbContext> (option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<User, IdentityRole>()
        .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -29,7 +29,7 @@ builder.Services.AddScoped<ISeatTypeRepository, SeatTypeSerivce>();
 builder.Services.AddScoped<IReceiptRepository, ReceiptService>();
 builder.Services.AddScoped<ICinemaRepository, CinemaService>();
 builder.Services.AddScoped<IRoomRepository, RoomService>();
-builder.Services.AddScoped<IReceiptDetailsRepository,ReceiptDetailService>();
+builder.Services.AddScoped<IReceiptDetailsRepository, ReceiptDetailService>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleService>();
 builder.Services.AddScoped<ISeatRepository, SeatService>();
 builder.Services.AddScoped<ICountryRepository, CountryService>();
@@ -62,9 +62,9 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddAreaPageRoute(
-        areaName: "Identity", 
-        pageName: "/Account/Login", 
-        route: "dang-nhap" 
+        areaName: "Identity",
+        pageName: "/Account/Login",
+        route: "dang-nhap"
     );
     options.Conventions.AddAreaPageRoute(
        areaName: "Identity",
@@ -96,13 +96,14 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapRazorPages();
     endpoints.MapControllerRoute(
-        name: "admin",
-        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-    
-});
+        name: "Admin",
+        pattern: "admin/{controller=Home}/{action=Index}/{id?}",
+        defaults: new { area = "Admin" });
 
+    endpoints.MapControllerRoute(
+            name: "default",
+            pattern: "{controller=Home}/{action=Index}/{id?}");
+
+});
 
 app.Run();

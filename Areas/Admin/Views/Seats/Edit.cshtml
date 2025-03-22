@@ -1,0 +1,57 @@
+﻿@model school_major_project.Models.Seat
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Seat</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="SeatId" />
+            <div class="form-group">
+                <label asp-for="SeatNumber" class="control-label"></label>
+                <input asp-for="SeatNumber" class="form-control" />
+                <span asp-validation-for="SeatNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatPrice" class="control-label"></label>
+                <input asp-for="SeatPrice" class="form-control" />
+                <span asp-validation-for="SeatPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Status" /> @Html.DisplayNameFor(model => model.Status)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatImage" class="control-label"></label>
+                <input asp-for="SeatImage" class="form-control" />
+                <span asp-validation-for="SeatImage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RoomId" class="control-label"></label>
+                <select asp-for="RoomId" class="form-control" asp-items="ViewBag.RoomId"></select>
+                <span asp-validation-for="RoomId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SeatTypeId" class="control-label"></label>
+                <select asp-for="SeatTypeId" class="form-control" asp-items="ViewBag.SeatTypeId"></select>
+                <span asp-validation-for="SeatTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

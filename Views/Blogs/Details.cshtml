@@ -9,7 +9,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var user = await UserManager.GetUserAsync(User);
 }
-
+@section Styles {
+    <style>
+        .header-section {
+            position: relative;
+        }
+    </style>
+}
 
 <div class="preloader">
     <div class="preloader-inner">
@@ -89,7 +95,7 @@
                         else
                         {
                             <!-- Kiểm tra nếu blog.comments rỗng -->
-                            <ul class="comment-area">
+                            <ul class="comment-area" id="comments-area">
                                 @foreach (var comment in Model.comments)
                                 {
                                     <li>
@@ -127,7 +133,7 @@
                             <div>
                                 <div class="leave-comment">
                                     <h5 class="title">Để lại bình luận của bạn</h5>
-                                   
+
                                     <form asp-action="CreateComment" asp-controller="Blogs" id="commentForm" method="post">
                                         <input type="hidden" value="@Model.Id" name="blogId" />
                                         @Html.AntiForgeryToken()
@@ -163,16 +169,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-                $("#commentForm").submit(function (event) {
+        $("#commentForm").submit(function (event) {
             event.preventDefault();
             let title = "@Model.BlogTitle.RemoveDiacritics()";
             let commentContent = $("#commentContent").val();
-
             if (commentContent.trim() === "") {
                 $("#commentMessage").html("<p style='color:red;'>Nội dung không được để trống.</p>");
                 return;
             }
-
             $.ajax({
                 url: "/blogs/blog/" + title + "/comment",
                 type: "POST",
@@ -184,12 +188,54 @@
                     console.log("Success:", response);
                     $("#commentMessage").html("<p style='color:green;'>" + response.message + "</p>");
                     $("#commentContent").val("");
+                    
+                    // Create a new comment element with the response data
+                    const now = new Date();
+                    const formattedDate = now.toLocaleString('vi-VN', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    const userName = response.userName || "User"; // Use response.userName if available
+                    const commentId = response.commentId || ""; // Use response.commentId if available
+                    const userId = response.userId || ""; // Use response.userId if available
+                    const currentUserId = response.currentUserId || ""; // The current user's ID
+                    const commentDate = response.commentDate || formattedDate;
+                    let newComment = `
+                        <li>
+                            <div class="blog-thumb-info">
+                                <span>${commentDate}</span>
+                                <h6 class="title">
+                                    <a href="#0">${userName}</a>
+                                </h6>
+                            </div>
+                            <div class="blog-content">
+                                <p>${commentContent}</p>
+                            </div>`;
 
+                    // Only add delete button if user is the comment author or admin
+                    if (userId === currentUserId) {
+                        newComment += `
+                            <div>
+                                <form action="/Blogs/DeleteConfirmed/${commentId}?title=${title}" method="post" style="display: inline;">
+                                    <input type="hidden" name="id" value="${commentId}" />
+                                    <input type="hidden" name="__RequestVerificationToken" value="${$('input[name="__RequestVerificationToken"]').val()}" />
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc không ?')">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>`;
+                    }
+
+                    newComment += `</li>`;
+
+                    $("#comments-area").append(newComment);
                 },
                 error: function (xhr) {
                     console.log("Error status:", xhr.status);
                     console.log("Error response:", xhr.responseText);
-
                     let errorMessage = "Có lỗi xảy ra!";
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         errorMessage = xhr.responseJSON.message;

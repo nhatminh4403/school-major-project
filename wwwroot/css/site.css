@@ -73,3 +73,8 @@ body {
     .thumb-country img {
         width: 100%;
     }
+.gradient-text {
+    background: -webkit-linear-gradient(169deg, #5560ff 17%, #aa52a1 63%,#ff4343 70%, #ff4343 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}

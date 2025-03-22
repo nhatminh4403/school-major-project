@@ -7,53 +7,6 @@
     int endPage = Math.Min(Model.TotalPages, startPage + visiblePages - 1);
 }
 
-@section Styles {
-    <style>
-        .flex-form {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            gap: 50px;
-        }
-
-        .flex-center {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0;
-            gap: 5px;
-        }
-
-        .type-country {
-            margin-right: 20px;
-            color: #31d7a9;
-            z-index: 1;
-        }
-
-        .list {
-            color: black;
-        }
-
-        .current {
-            color: black;
-        }
-
-        .thumb-country {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            z-index: 1;
-            overflow: hidden;
-            margin-right: 10px;
-            -webkit-box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.5);
-        }
-
-            .thumb-country img {
-                width: 100%;
-            }
-    </style>
-}
 
 <!-- ==========Preloader========== -->
 @await Component.InvokeAsync("Search")
@@ -63,9 +16,9 @@
     <div class="container">
         <div class="search-result-header text-center padding-top">
             <div class="success-message">
-                <h4 class="title" style="color: #31d7a9;">
+                <h4 class="title gradient-text">
                     Phim thuộc quốc gia
-                    <span style="color: #31d7a9; font-weight: bold;">@ViewBag.CountryName</span>
+                    <span style="font-weight: bold;text-transform:uppercase">"@ViewBag.CountryName"</span>
                 </h4>
             </div>
         </div>
