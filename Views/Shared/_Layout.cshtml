@@ -113,7 +113,7 @@
                             else
                             {
                                 <li>
-                                    <a href="#">empty for now</a>
+                                    <a href="#0">empty for now</a>
                                 </li>
                             }
 
@@ -150,7 +150,7 @@
                     else
                     {
                         <li>
-                            <a href="/" class=" on_item" id="5"> Tài khoản </a>
+                            <a href="#0" class=" on_item" id="5"> Tài khoản </a>
                             <ul class="submenu">
                                 <li><a href="/tai-khoan/chi-tiet-tai-khoan">Tài khoản</a></li>
                                 <li><a href="/tai-khoan/lich-su-dat-ve">Lịch sử đặt vé</a></li>
@@ -340,11 +340,11 @@
         }(window, document, "script", "subiz", "acsadgnruqpvzqeqzezv")
     </script>
     <script>
-            document.getElementById('logoutLink').addEventListener('click', function (event) {
+        document.getElementById('logoutLink').addEventListener('click', function (event) {
                 event.preventDefault();
                 document.getElementById('logoutForm').submit();
-            });
-
+        });
+        
     </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -368,7 +368,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 
 
-    <script src="~/js/js/ocr.js"></script>
     <script src="~/js/js/qrcode.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

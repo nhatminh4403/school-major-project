@@ -1,8 +1,145 @@
-﻿
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết tài khoản";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = await UserManager.GetUserAsync(User);
+}
+@section Styles {
+    <link href="~/css/css/profile.css" rel="stylesheet" />
+    <style>
+        .header-section {
+            position: relative;
+        }
+
+        .banner-section {
+            padding: 80px 0 !important;
+        }
+    </style>
 }
 
-<h1>Details</h1>
+
+@{
+    await Html.RenderPartialAsync("_Preloader");
+    await Html.RenderPartialAsync("_Banner");
+}
+
+<section class="profile-section">
+    <div class="container">
+        <div class="profile-wrapper">
+            <div class="profile-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="profile-header-info">
+                    <h2 class="text-white" style="margin-bottom: 20px">@user.FullName</h2>
+                    <p class="text-white">@user.Email</p>
+                </div>
+                <div class="profile-header-point">
+                    <p class="text-white" style="margin-bottom: 20px">Điểm tích lũy:</p>
+                    @if (user.pointSaving != null)
+                    {
+                        <h2 class="text-white"> @user.pointSaving</h2>
+                    }
+                    else
+                    {
+                        <h2 class="text-white">
+                            0
+                        </h2>
+                    }
+                    @* <h2 class="text-white" th:text="${user.pointSaving != null ? user.pointSaving : 0}"></h2> *@
+                </div>
+            </div>
+            <div class="profile-content" style="display: flex; gap: 20px;">
+                <div class="profile-info" style="flex: 0.6;">
+                    <div class="info-item">
+                        <div class="info-label">Tên đăng nhập</div>
+                        <div class="info-value">@user.UserName</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Số điện thoại</div>
+                        @if (user.PhoneNumber != null)
+                        {
+                            <div class="info-value">@user.PhoneNumber</div>
+                        }
+                        else
+                        {
+                            <div class="info-value">Chưa cập nhật</div>
+                        }
+                        @* <div class="info-value" th:text="${user.phone != null ? user.phone : 'Chưa cập nhật'}"> *@
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Ngày sinh</div>
+                        <div class="info-value">
+                        </div>
+                        @if (user.birthday != null)
+                        {
+                            <div class="info-value">@user.birthday</div>
+                        }
+                        else
+                        {
+                            <div class="info-value"> Chưa cập nhật</div>
+                        }
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Tuổi</div>
+                        @if (user.age != null)
+                        {
+                            <div class="info-value">@user.age</div>
+                        }
+                        else
+                        {
+                            <div class="info-value"> Chưa cập nhật</div>
+                        }
+                        @* <div class="info-value" th:text="${user.age != null ? user.age : 'Chưa cập nhật'}">
+                    </div> *@
+                    </div>
+                    <div class="text-center">
+                        <a href="/tai-khoan/chinh-sua-tai-khoan" class="edit-button">
+                            Chỉnh sửa thông tin
+                        </a>
+                    </div>
+                </div>
+
+                <div class="scroll-container" style="">
+                    @if (user.Promotions == null || user.Promotions.Count() == 0)
+                    {
+                        <h2>Hiện tại chưa có khuyến mãi</h2>
+                    }
+                    else
+                    {
+                        <div class="promotion-section__container">
+                            @foreach (var promotion in user.Promotions)
+                            {
+                                <div class="promotion-item">
+                                    <div class="promotion-item__info">
+                                        <img src="~/imgs/img/Percentage.png" alt=" % Image" class="promotion-item__image" />
+                                        <p><strong>Mã khuyến mãi:</strong> @promotion.Code</p>
+                                        <p><strong>Mô tả:</strong> @promotion.Description</p>
+                                        <p>
+                                            <strong>Giá trị khuyến mãi:</strong>
+                                            @((promotion.DiscountRate * 100).ToString("0") + "%")
+                                        </p>
+                                        @if (promotion.RedemptionPoint != null)
+                                        {
+                                            <p><strong>Điểm để đổi:</strong> @promotion.RedemptionPoint</p>
+                                        }
+                                        @if (promotion.RedemptionPoint != null)
+                                        {
+                                            <p>
+                                                <strong>Thời gian khuyến mãi:</strong> <br>
+                                                @promotion.StartDate.ToString("dd/MM/yyyy") - @promotion.EndDate.ToString("dd/MM/yyyy")
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                            })
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
 

@@ -1,0 +1,122 @@
+﻿.profile-content {
+    display: flex;
+    flex-wrap: wrap; /* Đảm bảo không bị tràn trên màn hình nhỏ */
+    gap: 20px; /* Khoảng cách giữa các container */
+}
+
+.profile-info {
+    flex: 1; /* Chiếm 50% nếu có đủ không gian */
+    min-width: 300px; /* Đảm bảo không bị thu nhỏ quá mức */
+}
+
+.scroll-container {
+    flex: 1.4;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 16px;
+    position: relative;
+}
+
+    .scroll-container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 10px;
+        padding: 2px;
+        background: linear-gradient(310deg, #5560ff 17%, #aa52a1 63%, #ff4343 100%);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+    }
+
+.promotion-item {
+    flex: 0 0 auto;
+    color: black;
+    width: calc(100% /2);
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    min-height: 400px;
+}
+
+    .promotion-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+.promotion-item__info p {
+    margin: 5px 0;
+    font-size: 0.9em;
+    text-align: left;
+}
+
+.promotion-item__image {
+    max-width: 50%;
+    height: auto;
+    margin: 10px 0;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.promotion-section__container {
+    display: flex;
+    gap: 10px; /* Khoảng cách giữa các phần tử */
+    align-items: center;
+    overflow-x: scroll;
+    ;
+    padding: 10px 0;
+}
+
+.promotion-item__actions .btn {
+    padding: 8px 12px;
+    font-size: 0.9em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .promotion-item {
+        width: calc(25% - 15px);
+        /* 4 ghế mỗi hàng trên màn hình nhỏ hơn */
+    }
+}
+
+@media (max-width: 768px) {
+    .promotion-item {
+        width: calc(33.333% - 15px);
+        /* 3 ghế mỗi hàng trên tablet */
+    }
+}
+
+@media (max-width: 576px) {
+    .promotion-item {
+        width: calc(50% - 15px);
+        /* 2 ghế mỗi hàng trên mobile */
+    }
+}
+
+@media (max-width: 360px) {
+    .promotion-item {
+        width: 100%;
+        /* 1 ghế mỗi hàng trên màn hình rất nhỏ */
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-content {
+        flex-direction: column; /* Xếp chồng các container */
+    }
+
+    .promotion-item {
+        width: 200px; /* Giảm kích thước trên màn hình nhỏ */
+    }
+}

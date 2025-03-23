@@ -1,0 +1,319 @@
+﻿.edit-profile-section {
+    padding: 70px 0;
+    background: #001232;
+}
+
+.edit-profile-wrapper {
+    background: #032055;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.edit-profile-title {
+    color: #31d7a9;
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    position: relative;
+}
+
+    .edit-profile-title:after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60px;
+        height: 3px;
+        background: #31d7a9;
+        border-radius: 3px;
+    }
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-label {
+    display: block;
+    color: #31d7a9;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(49, 215, 169, 0.2);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    color: white !important;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #31d7a9;
+    box-shadow: 0 0 0 3px rgba(49, 215, 169, 0.1);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.error-message {
+    color: #ff4646;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+.alert {
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.alert-success {
+    background: rgba(49, 215, 169, 0.1);
+    border: 1px solid #31d7a9;
+    color: #31d7a9;
+}
+
+.alert-danger {
+    background: rgba(255, 70, 70, 0.1);
+    border: 1px solid #ff4646;
+    color: #ff4646;
+}
+
+.btn-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.btn {
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn--primary {
+    background: #31d7a9;
+    color: #ffffff;
+}
+
+    .btn--primary:hover {
+        background: #28c498;
+        transform: translateY(-2px);
+    }
+
+.btn-secondary {
+    background: transparent;
+    color: #31d7a9;
+    border: 2px solid #31d7a9;
+}
+
+    .btn-secondary:hover {
+        background: rgba(49, 215, 169, 0.1);
+        transform: translateY(-2px);
+    }
+
+/* Avatar upload section */
+.avatar-upload {
+    position: relative;
+    max-width: 200px;
+    margin: 0 auto 30px;
+}
+
+.avatar-edit {
+    position: absolute;
+    right: 12px;
+    z-index: 1;
+    top: 10px;
+}
+
+    .avatar-edit input {
+        display: none;
+    }
+
+    .avatar-edit label {
+        display: inline-block;
+        width: 34px;
+        height: 34px;
+        margin-bottom: 0;
+        border-radius: 100%;
+        background: #31d7a9;
+        border: 1px solid transparent;
+        cursor: pointer;
+        font-weight: normal;
+        transition: all .2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .avatar-edit label:hover {
+            background: #28c498;
+        }
+
+.avatar-preview {
+    width: 200px;
+    height: 200px;
+    position: relative;
+    border-radius: 100%;
+    border: 6px solid #31d7a9;
+    box-shadow: 0 0 20px rgba(49, 215, 169, 0.2);
+}
+
+    .avatar-preview > div {
+        width: 100%;
+        height: 100%;
+        border-radius: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+.preview-container {
+    margin: 20px 0;
+}
+
+#imagePreview {
+    max-width: 100%;
+    max-height: 500px;
+    display: none;
+}
+
+.banner-content {
+    max-width: 950px;
+}
+
+div.form-label {
+    user-select: none;
+}
+
+.edit-profile-wrapper {
+    background: #032055;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+    max-width: 1200px; /* Tăng max-width để chứa 2 cột */
+    margin: 0 auto;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia làm 2 cột bằng nhau */
+    gap: 40px;
+    align-items: start;
+}
+
+.profile-info {
+    padding-right: 20px;
+}
+
+.scan-section {
+    padding-left: 20px;
+    border-left: 1px solid rgba(49, 215, 169, 0.2);
+}
+
+.scan-title {
+    color: #31d7a9;
+    font-size: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.preview-container {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.preview-wrapper {
+    border: 3px solid #31d7a9;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.scan-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    .scan-section {
+        border-left: none;
+        border-top: 1px solid rgba(49, 215, 169, 0.2);
+        padding-left: 0;
+        padding-top: 30px;
+    }
+
+    .profile-info {
+        padding-right: 0;
+    }
+}
+
+.custom-checkbox {
+    appearance: none;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 2px solid #31d7a9;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+    .custom-checkbox:checked {
+        background-color: #31d7a9;
+    }
+
+        .custom-checkbox:checked::before {
+            content: '✓';
+            position: absolute;
+            color: #fff;
+            font-size: 14px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+    .custom-checkbox:hover {
+        border-color: #28c498;
+    }
+
+.form-control[readonly] {
+    background: rgba(255, 255, 255, 0.05);
+    cursor: not-allowed;
+}
+
+/*.preview-container {
+    display: none;
+}
+    .preview-container.active {
+        display: block;*/ /* Will show when this class is added */
+    /*}*/
