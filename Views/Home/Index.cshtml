@@ -2,7 +2,7 @@
 @model FilmPagingViewModel
 @using school_major_project.HelperClass
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang Chủ";
     int visiblePages = 5; // Số trang hiển thị
     int startPage = Math.Max(1, Model.CurrentPage - visiblePages / 2);
     int endPage = Math.Min(Model.TotalPages, startPage + visiblePages - 1);
@@ -58,14 +58,9 @@
     </style>
 }
 <!-- ==========Preloader========== -->
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
+@{
+    await Html.RenderPartialAsync("_Preloader");
+}
 <!-- ==========banner========== -->
 <section class="banner-section" style="padding:150px 0 200px">
     <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/banner/banner011.jpg" style="background-image: url('/imgs/img/banner/banner011.jpg');"></div>

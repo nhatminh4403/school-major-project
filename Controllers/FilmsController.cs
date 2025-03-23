@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,7 +16,7 @@ using school_major_project.ViewModel;
 
 namespace school_major_project.Controllers
 {
-
+    
     public class FilmsController : BaseController
     {
         private readonly ApplicationDbContext _context;

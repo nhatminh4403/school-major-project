@@ -116,6 +116,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+                    Console.WriteLine($"returnUrl: {returnUrl}");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)

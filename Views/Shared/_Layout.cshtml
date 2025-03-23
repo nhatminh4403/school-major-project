@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="~/css/css/nice-select.css" />
     <link rel="stylesheet" href="~/css/css/contact.css" />
     <link rel="stylesheet" href="~/css/css/main.css" />
-    
+
     <link href="~/css/css/odometer.css" rel="stylesheet" />
     <link href="~/css/css/animate.css" rel="stylesheet" />
 
@@ -40,7 +40,7 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
 
-    
+
     <style>
         * {
             margin: 0;
@@ -110,12 +110,13 @@
                                     </li>
                                 }
                             }
-                            else {
-                            <li>
-                                <a href="#">empty for now</a>
-                            </li>
+                            else
+                            {
+                                <li>
+                                    <a href="#">empty for now</a>
+                                </li>
                             }
-                            
+
                         </ul>
                     </li>
                     <li class="menu-item-has-children">
@@ -131,7 +132,7 @@
                                 <a href="/ve-chung-toi">Về chúng tôi</a>
                             </li>
                             <li>
-                                <a href="#">Khuyến mãi</a>
+                                <a href="/khuyen-mai">Khuyến mãi</a>
                             </li>
                         </ul>
                     </li>
@@ -141,21 +142,23 @@
                             <a id="register" asp-area="Identity" asp-page="/Account/Register">Đăng ký</a>
                         </li>
                         <li class="header-button pr-0">
-                            <a id="login" asp-area="Identity" asp-page="/Account/Login">Đăng nhập</a>
+                            <a id="login" asp-area="Identity" asp-page="/Account/Login"
+                               asp-route-returnUrl="@Context.Request.Path@Context.Request.QueryString">Đăng nhập</a>
                         </li>
                     }
+
                     else
                     {
                         <li>
                             <a href="/" class=" on_item" id="5"> Tài khoản </a>
                             <ul class="submenu">
-                                <li>empty for now</li>
-                                <li>empty for now</li>
+                                <li><a href="/tai-khoan/chi-tiet-tai-khoan">Tài khoản</a></li>
+                                <li><a href="/tai-khoan/lich-su-dat-ve">Lịch sử đặt vé</a></li>
                             </ul>
                         </li>
                         <li class="header-button pr-0">
                             <form id="logoutForm" class="form-inline"
-                                  asp-area="Identity" asp-page="/Account/Logout" style="display:none" method="post" 
+                                  asp-area="Identity" asp-page="/Account/Logout" style="display:none" method="post"
                                   asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
                             </form>
                             <a href="javascript:void(0);" id="logoutLink" class="btn__logout">Đăng xuất</a>
@@ -337,11 +340,13 @@
         }(window, document, "script", "subiz", "acsadgnruqpvzqeqzezv")
     </script>
     <script>
-        document.getElementById('logoutLink').addEventListener('click', function (event) {
-            event.preventDefault();
-            document.getElementById('logoutForm').submit();
-        });
+            document.getElementById('logoutLink').addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById('logoutForm').submit();
+            });
+
     </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

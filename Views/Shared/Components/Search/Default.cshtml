@@ -2,14 +2,8 @@
 
 
 <!-- ==========Preloader========== -->
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
+@{ await Html.RenderPartialAsync("_Preloader"); }
+
 
 <section class="banner-section">
     <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/banner/banner02.jpg"

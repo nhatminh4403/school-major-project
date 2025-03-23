@@ -6,6 +6,8 @@ using school_major_project.Interfaces;
 using school_major_project.ModelServices;
 using Microsoft.AspNetCore.Identity;
 using school_major_project.Models;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 
@@ -43,22 +45,6 @@ builder.Services.AddScoped<IPromotionRepository, PromotionService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<ExpiredItemCleanupService>();
 
-builder.Services.ConfigureApplicationCookie(option =>
-{
-    option.LoginPath = $"/Identity/Account/Login";
-    option.LogoutPath = $"/Identity/Account/Logout";
-    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-});
-
-var emailConfig = builder.Configuration.GetSection("EmailSettings");
-builder.Services.AddSingleton<IEmailService>(new EmailService(
-    emailConfig["SmtpServer"],
-    int.Parse(emailConfig["SmtpPort"]),
-    emailConfig["FromEmail"],
-    emailConfig["Username"],
-    emailConfig["Password"]
-));
-
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddAreaPageRoute(
@@ -72,6 +58,28 @@ builder.Services.AddRazorPages(options =>
        route: "dang-ky"
    );
 });
+
+builder.Services.ConfigureApplicationCookie(option =>
+{
+    option.LoginPath = $"/dang-nhap";
+    option.LogoutPath = $"/dang-ky";
+    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
+});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Đường dẫn trang đăng nhập
+        options.ReturnUrlParameter = "returnUrl"; // Tên tham số
+    });
+var emailConfig = builder.Configuration.GetSection("EmailSettings");
+builder.Services.AddSingleton<IEmailService>(new EmailService(
+    emailConfig["SmtpServer"],
+    int.Parse(emailConfig["SmtpPort"]),
+    emailConfig["FromEmail"],
+    emailConfig["Username"],
+    emailConfig["Password"]
+));
 
 var app = builder.Build();
 
