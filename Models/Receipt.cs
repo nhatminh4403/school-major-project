@@ -14,9 +14,9 @@ namespace school_major_project.Models
         [Required]
         public int TotalPrice { get; set; }
         [Required]
-        public string paymentType { get; set; }
+        public string PaymentType { get; set; }
         [Required]
-        public string seatName { get; set; }
+        public string SeatName { get; set; }
 
         public ICollection<ReceiptDetail>? ReceiptDetails { get; set; }
         

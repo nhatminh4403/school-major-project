@@ -3,7 +3,7 @@
 @model FilmDetailVM
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
-
+@using school_major_project.HelperClass
 @{
     ViewData["Title"] = "Chi tiết phim";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -52,15 +52,9 @@
 }
 
 <!-- Preloader -->
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
-
+@{
+    await Html.RenderPartialAsync("_Preloader");
+}
 <!-- Banner Section -->
 <section class="details-banner bg_img" data-background="@Model.Film.PosterUrl" style="background-image: url('/imgs/img/banner/banner03.jpg')">
     <div class="container">
@@ -100,7 +94,8 @@
                     <div>
                         @foreach (var item in Model.AllCategories)
                         {
-                            <a class="button mr-3" href="#0">@item.CategoryDescription</a>
+                            <a class="button mr-3" asp-action="GetFilmsByCategory" asp-controller="Films" asp-route-page="1"
+                                asp-route-name="@item.CategoryDescription.RemoveDiacritics()">@item.CategoryDescription</a>
                         }
                     </div>
                 }
@@ -232,7 +227,7 @@
                     <p>Users Rating</p>
                 </div>
             </div>
-            <a href="@Url.Action("Index", "Schedules", new { id = film.Id })" class="custom-button">Đặt vé</a>
+            <a asp-action="Index" asp-controller="Schedule" asp-route-name="@film.Name.RemoveDiacritics()" class="custom-button">Đặt vé</a>
         </div>
     </div>
 </section>

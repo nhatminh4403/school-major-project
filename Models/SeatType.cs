@@ -18,10 +18,12 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Giá loại ghế")]
-        public long? price { get; set; }
+        public long? Price { get; set; }
         [Required]
         [DisplayName("Điểm thưởng")]
-        public int? pointGiving { get; set; }
+        public int? PointGiving { get; set; }
+        [DisplayName("Hình ảnh mô tả")]
+        public string? ImageDescription { get; set; } 
 
         public ICollection<Seat>? Seats { get; set; }
     }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using school_major_project.HelperClass;
+using System.Text.RegularExpressions;
 using Tesseract;
 
 namespace school_major_project.Controllers
@@ -21,13 +23,15 @@ namespace school_major_project.Controllers
 
                 // Thực hiện OCR để trích xuất văn bản
                 string extractedText;
-                using (var engine = new TesseractEngine(_tesseractDataPath, "vie+eng", EngineMode.Default)) // Thay "eng" bằng "vie" nếu cần tiếng Việt
+                using (var engine = new TesseractEngine(_tesseractDataPath,
+                    "vie+eng+fra+por+spa+pol+deu+hun+tur+ita", EngineMode.Default)) // Thay "eng" bằng "vie" nếu cần tiếng Việt
                 {
                     using (var img = Pix.LoadFromFile(filePath))
                     {
                         using (var page = engine.Process(img))
                         {
                             extractedText = page.GetText();
+                            Console.WriteLine("extracted Text: " + extractedText);
                         }
                     }
                 }
@@ -43,53 +47,85 @@ namespace school_major_project.Controllers
 
         private object ParseStudentInfo(string text)
         {
-            // Giả sử văn bản có định dạng như sau:
-            // Student ID: 123456
-            // Name: Nguyễn Văn A
-            // Date of Birth: 01/01/2000
+            // Sử dụng các phương thức trích xuất thông tin
+            string studentId = ExtractStudentId(text);
+            string name = ExtractFullName(text);
+            string birthday = ExtractBirthday(text);
 
-            var lines = text.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-            string studentId = null;
-            string name = null;
+            // Chuyển đổi ngày sinh thành DateTime (nếu có)
             DateTime? dob = null;
-
-            foreach (var line in lines)
+            if (!string.IsNullOrEmpty(birthday) && DateTime.TryParse(birthday, out var parsedDob))
             {
-                if (line.StartsWith("Student ID:"))
-                {
-                    studentId = line.Replace("Student ID:", "").Trim();
-                }
-                else if (line.StartsWith("Name:"))
-                {
-                    name = line.Replace("Name:", "").Trim();
-                }
-                else if (line.StartsWith("Date of Birth:"))
-                {
-                    var dobStr = line.Replace("Date of Birth:", "").Trim();
-                    if (DateTime.TryParse(dobStr, out var parsedDob))
-                    {
-                        dob = parsedDob;
-                    }
-                }
+                dob = parsedDob;
             }
 
             // Tính tuổi dựa trên ngày sinh
             int? age = null;
-            if (dob.HasValue)
+            if (!string.IsNullOrEmpty(birthday))
             {
-                age = DateTime.Now.Year - dob.Value.Year;
-                if (DateTime.Now < dob.Value.AddYears(age.Value)) age--; // Điều chỉnh nếu chưa đến sinh nhật
+                age = CalculateAge(birthday);
             }
 
             // Trả về thông tin dưới dạng object
             return new
             {
                 StudentId = studentId,
-                Name = name,
+                Name = StringHelper.RemoveDiacritics(name),
                 DateOfBirth = dob?.ToString("dd/MM/yyyy"),
                 Age = age,
                 FullText = text
             };
+        }
+
+        private int CalculateAge(string birthday)
+        {
+            if (DateTime.TryParse(birthday, out DateTime dob))
+            {
+                int age = DateTime.Now.Year - dob.Year;
+                if (DateTime.Now.DayOfYear < dob.DayOfYear)
+                    age--;
+                return age;
+            }
+            return 0;
+        }
+
+        private string ExtractStudentId(string text)
+        {
+            Regex mssv = new Regex(@"(?:MSSV:|Mã SV:|Ma SV:|Student ID:|"" MãSV: - ')(?:\s*)(\d{8,12})(?=\s|$)");
+            Match match = mssv.Match(text);
+
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+
+            return string.Empty;
+        }
+        private string ExtractFullName(string text)
+        {
+            Regex name = new Regex(@"(?:Họ tên:|Họ ten:|Ho ten:|Ho tên:|Ho va ten:|Họ va ten:|Ho và ten:|Ho va tên:|Họ và ten:|Họ va tên:|Ho và tên:|Họ và tên:|Ho fen:|Họ tén:|Ho tén:|Ho tèn:|Họ tèn)\s*(.+)(?=\s|$)");
+            Match match = name.Match(text);
+
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+
+            return string.Empty;
+        }
+
+
+        private string ExtractBirthday(string text)
+        {
+            Regex birthday = new Regex(@"(?:Ngày sinh:|Ngay sinh:|Ngey sinh:|Ngèy sinh:|Ngoy sinh:|Ngòy sinh:)\s*(\d{2}/\d{2}/\d{4})(?=\s|$)");
+            Match match = birthday.Match(text);
+
+            if (match.Success)
+            {
+                return match.Groups[1].Value.Trim();
+            }
+
+            return string.Empty;
         }
     }
 }

@@ -10,18 +10,18 @@ namespace school_major_project.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public string filmName { get; set; }
+        public string FilmName { get; set; }
         [Required] 
-        public string cinemaName { get; set; }
+        public string CinemaName { get; set; }
         [Required]
-        public string roomName { get; set; }
+        public string RoomName { get; set; }
 
         [Required]
-        public string cinemaAddress { get; set; }
+        public string CinemaAddress { get; set; }
         [Required]
-        public DateTime? startTime { get; set; }
+        public DateTime? StartTime { get; set; }
         [Required]
-        public int pricePerSeat { get; set; }
+        public int PricePerSeat { get; set; }
 
         [Required]
         public int ReceiptId { get; set; }

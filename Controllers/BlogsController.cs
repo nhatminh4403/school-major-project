@@ -117,10 +117,10 @@ namespace school_major_project.Controllers
 
             var comment = new Comment
             {
-                content = content,
+                Content = content,
                 UserId = user.Id,
                 BlogId = blog.Id,
-                dateComment = DateTime.Now
+                DateComment = DateTime.Now
             };
 
             await _commentRepository.AddAsync(comment);
@@ -131,8 +131,8 @@ namespace school_major_project.Controllers
                 comment = new
                 {
                     UserId = user.Id,
-                    content = comment.content,
-                    dateComment = comment.dateComment.ToString("dd/MM/yyyy HH:mm")
+                    content = comment.Content,
+                    dateComment = comment.DateComment.ToString("dd/MM/yyyy HH:mm")
                 }
             });
         }

@@ -101,12 +101,12 @@ namespace school_major_project.Areas.Identity.Pages.Account
             [DisplayName("Họ và tên")]
             public string FullName { get; set; }
             [DisplayName("Tuổi")]
-            public int age { get; set; }
+            public int Age { get; set; }
             [DisplayName("Ngày sinh")]
-            public string? birthday { get; set; }
+            public string? Birthday { get; set; }
 
             [DisplayName("Điểm tích lũy")]
-            public long pointSaving { get; set; } = 0;
+            public long PointSaving { get; set; } = 0;
 
             [DataType(DataType.PhoneNumber)]
             [DisplayName("Số điện thoại")]

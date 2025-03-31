@@ -9,5 +9,6 @@ namespace school_major_project.Interfaces
         Task AddAsync(Schedule filmSchedule);
         Task UpdateAsync(Schedule filmSchedule);
         Task DeleteAsync(int id);
+        Task <IEnumerable<Schedule>> GetSchedulesByFilmId(int id);
     }
 }

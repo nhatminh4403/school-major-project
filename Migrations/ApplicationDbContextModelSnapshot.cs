@@ -242,6 +242,10 @@ namespace school_major_project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Map")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -262,16 +266,16 @@ namespace school_major_project.Migrations
                     b.Property<int>("BlogId")
                         .HasColumnType("int");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("content")
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("dateComment")
+                    b.Property<DateTime>("DateComment")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -451,20 +455,20 @@ namespace school_major_project.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SeatName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("TotalPrice")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("paymentType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("seatName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -483,8 +487,27 @@ namespace school_major_project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("CinemaAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CinemaName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilmName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PricePerSeat")
+                        .HasColumnType("int");
+
                     b.Property<int>("ReceiptId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RoomName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ScheduleId")
                         .HasColumnType("int");
@@ -492,26 +515,7 @@ namespace school_major_project.Migrations
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
 
-                    b.Property<string>("cinemaAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("cinemaName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("filmName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("pricePerSeat")
-                        .HasColumnType("int");
-
-                    b.Property<string>("roomName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("startTime")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -622,15 +626,18 @@ namespace school_major_project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ImageDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PointGiving")
+                        .HasColumnType("int");
+
+                    b.Property<long>("Price")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("TypeDescription")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("pointGiving")
-                        .HasColumnType("int");
-
-                    b.Property<long>("price")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
@@ -644,6 +651,9 @@ namespace school_major_project.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("Birthday")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -660,6 +670,9 @@ namespace school_major_project.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsStudent")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -684,6 +697,12 @@ namespace school_major_project.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<long>("PointSaving")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ScanningCount")
+                        .HasColumnType("int");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -696,15 +715,6 @@ namespace school_major_project.Migrations
 
                     b.Property<int>("age")
                         .HasColumnType("int");
-
-                    b.Property<string>("birthday")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("isStudent")
-                        .HasColumnType("bit");
-
-                    b.Property<long>("pointSaving")
-                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

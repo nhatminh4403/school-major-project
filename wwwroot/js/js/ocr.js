@@ -1,152 +1,87 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const imageInput = document.getElementById('imageInput');
-    const imagePreview = document.getElementById('imagePreview');
-    const scanButton = document.getElementById('scanButton');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const isStudentCheckbox = document.getElementById('isStudent');
-    const isStudentHidden = document.createElement('input');
-    // Preview ảnh
-    imageInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file) {
+document.addEventListener("DOMContentLoaded", function () {
+    const imageInput = document.getElementById("imageInput");
+    const previewContainer = document.querySelector(".preview-container");
+    const imagePreview = document.getElementById("imagePreview");
+    const previewMessage = document.querySelector(".preview-message");
+    const scanButton = document.getElementById("scanButton");
+
+    // Xử lý sự kiện khi chọn hình ảnh
+    imageInput.addEventListener("change", function (event) {
+        console.log("Image input changed:", event.target.files);
+        const fileInput = event.target;
+
+        if (fileInput.files && fileInput.files[0] && fileInput.files[0].type.startsWith("image/")) {
+            // Hiển thị preview-container và kích hoạt nút Quét Thẻ
+            previewContainer.style.display = "block";
+            scanButton.disabled = false;
+
+            // Hiển thị hình ảnh preview
             const reader = new FileReader();
-            reader.onload = function(e) {
-                imagePreview.style.display = 'block';
+            reader.onload = function (e) {
                 imagePreview.src = e.target.result;
-                scanButton.disabled = false;
-            }
-            reader.readAsDataURL(file);
+                imagePreview.style.display = "block";
+                previewMessage.textContent = "Ảnh đã được tải lên.";
+            };
+            reader.onerror = function () {
+                previewMessage.textContent = "Không thể đọc file hình ảnh.";
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            // Ẩn preview-container và vô hiệu hóa nút Quét Thẻ
+            previewContainer.style.display = "none";
+            scanButton.disabled = true;
+            imagePreview.src = "";
+            previewMessage.textContent = "Vui lòng chọn một file hình ảnh hợp lệ.";
         }
     });
 
-    // Xử lý quét thẻ
-    scanButton.addEventListener('click', async function() {
-        const file = imageInput.files[0];
-        if (!file) return;
+    // Xử lý sự kiện khi nhấn nút Quét Thẻ
+    scanButton.addEventListener("click", function () {
+        const fileInput = document.getElementById("imageInput");
+        const loadingIndicator = document.getElementById("loadingIndicator");
+        const previewMessage = document.querySelector(".preview-message");
+        const isStudentCheckbox = document.getElementById("isStudent");
+        if (fileInput.files && fileInput.files[0]) {
+            // Hiển thị thông báo đang xử lý
+            loadingIndicator.style.display = "block";
 
-        loadingIndicator.style.display = 'block';
-        scanButton.disabled = true;
+            // Tạo FormData để gửi hình ảnh
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
 
-        const formData = new FormData();
-        formData.append('imageFile', file);
-
-        try {
-            const response = await fetch('/tai-khoan/xu-ly-the-sinh-vien', {
+            // Gửi yêu cầu AJAX đến phương thức OCR
+            fetch('/Ocr/ExtractStudentInfo', {
                 method: 'POST',
                 body: formData
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                // Điền thông tin vào các trường
-                document.getElementById('fullname').value = data.fullName || '';
-                document.getElementById('birthday').value = data.birthday || '';
-                document.getElementById('age').value = data.age || '';
-                //kiem thu du lieu
-                const fullInfoElement = document.getElementById('fullInfo');
-                if (fullInfoElement) {
-                    // Tạo chuỗi thông tin đầy đủ
-                    let fullInfoText = '';
-
-                    // Thêm từng trường thông tin vào chuỗi
-                    if (data.StudentId) fullInfoText += `Mã sinh viên: ${data.StudentId}\n`;
-                    if (data.FullName) fullInfoText += `Họ và tên: ${data.FullName}\n`;
-                    if (data.Birthday) fullInfoText += `Ngày sinh: ${data.Birthday}\n`;
-                }
-                // document.getElementById('studentId').value = data.studentId ;
-                if(data.studentId){
-                    isStudentCheckbox.checked = true;
-                    isStudentCheckbox.dispatchEvent(new Event('change'));                    // Trigger change event
-                    // const event = new Event('change', {
-                    //     bubbles: true,
-                    //     cancelable: true,
-                    // });
-                    // isStudentCheckbox.dispatchEvent(event);
-                }
-                else {
-                    isStudentCheckbox.checked = false;
-                    isStudentCheckbox.dispatchEvent(new Event('change'));
-                }
-
-            } else {
-                alert('Có lỗi xảy ra: ' + data.error);
-            }
-        } catch (error) {
-            alert('Có lỗi xảy ra khi xử lý yêu cầu');
-        } finally {
-            loadingIndicator.style.display = 'none';
-            scanButton.disabled = false;
+            })
+                .then(response => response.json())
+                .then(data => {
+                    loadingIndicator.style.display = "none";
+                    if (data) {
+                        console.log("OCR result:", data);
+                        // Cập nhật các trường thông tin từ kết quả OCR
+                        document.getElementById("fullname").value = data.name || "";
+                        document.getElementById("birthday").value = data.dateOfBirth || "";
+                        document.getElementById("age").value = data.age || "";
+                        //document.getElementById("fullInfo").value = data.fullText || "";
+                        if (data.studentId) {
+                            isStudentCheckbox.checked = true;
+                            isStudentCheckbox.dispatchEvent(new Event('change'));
+                        }
+                        else {
+                            isStudentCheckbox.checked = false;
+                            isStudentCheckbox.dispatchEvent(new Event('change'));
+                        }
+                        previewMessage.textContent = "Quét thẻ thành công";
+                    } else {
+                        previewMessage.textContent = "Không thể trích xuất thông tin.";
+                    }
+                })
+                .catch(error => {
+                    loadingIndicator.style.display = "none";
+                    previewMessage.textContent = "Có lỗi xảy ra khi xử lý hình ảnh.";
+                    console.error('Error:', error);
+                });
         }
     });
 });
-//document.addEventListener('DOMContentLoaded', function () {
-//    const imageInput = document.getElementById('imageInput');
-//    const imagePreview = document.getElementById('imagePreview');
-//    const scanButton = document.getElementById('scanButton');
-//    const loadingIndicator = document.getElementById('loadingIndicator');
-//    const isStudentCheckbox = document.getElementById('isStudent');
-
-//    // Preview ảnh
-//    imageInput.addEventListener('change', function (e) {
-//        const file = e.target.files[0];
-//        if (file) {
-//            const reader = new FileReader();
-//            reader.onload = function (e) {
-//                imagePreview.style.display = 'block';
-//                imagePreview.src = e.target.result;
-//                scanButton.disabled = false;
-//            }
-//            reader.readAsDataURL(file);
-//        }
-//    });
-
-//    // Xử lý quét thẻ
-//    scanButton.addEventListener('click', async function () {
-//        const file = imageInput.files[0];
-//        if (!file) return;
-
-//        loadingIndicator.style.display = 'block';
-//        scanButton.disabled = true;
-
-//        const formData = new FormData();
-//        formData.append('imageFile', file); // Sửa tên tham số phù hợp với API
-
-//        try {
-//            const response = await fetch('/tai-khoan/xu-ly-the-sinh-vien', { // Giữ nguyên route đã định nghĩa
-//                method: 'POST',
-//                body: formData
-//            });
-
-//            const result = await response.json();
-
-//            if (result.success) {
-//                const data = result.data; // API trả về dữ liệu trong thuộc tính data
-
-//                // Điền thông tin vào các trường
-//                document.getElementById('fullname').value = data.FullName || '';
-//                document.getElementById('birthday').value = data.Birthday || '';
-//                document.getElementById('age').value = data.Age || '';
-//                document.getElementById('')
-//                // Kiểm tra xem có phải sinh viên không
-//                if (data.IsStudent) {
-//                    isStudentCheckbox.checked = true;
-//                } else {
-//                    isStudentCheckbox.checked = false;
-//                }
-
-//                // Trigger sự kiện change
-//                isStudentCheckbox.dispatchEvent(new Event('change'));
-
-               
-//            } else {
-//                alert('Có lỗi xảy ra: ' + result.message);
-//            }
-//        } catch (error) {
-//            console.error('Lỗi:', error);
-//            alert('Có lỗi xảy ra khi xử lý yêu cầu');
-//        } finally {
-//            loadingIndicator.style.display = 'none';
-//            scanButton.disabled = false;
-//        }
-//    });
-//});

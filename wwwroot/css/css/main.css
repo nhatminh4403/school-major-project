@@ -4569,7 +4569,7 @@ span::after {
 
         .seat-plan-wrapper li .movie-name .name {
             margin-right: auto;
-            margin-left: 20px;
+            margin-left: 22px;
             color: #dbe2fb;
             text-transform: uppercase;
         }
@@ -4622,8 +4622,8 @@ span::after {
             mask-position: center center;
             -webkit-mask-position: center center;
             text-align: center;
-            mask-image: url("../img/movie/movie-seat.png");
-            -webkit-mask-image: url("../img/movie/movie-seat.png");
+            mask-image: url("../../imgs/img/movie/movie-seat.png");
+            -webkit-mask-image: url("../../imgs/img/movie/movie-seat.png");
             -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
             -webkit-mask-size: 100% 100%;

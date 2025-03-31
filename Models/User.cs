@@ -17,12 +17,14 @@ namespace school_major_project.Models
         [DisplayName("Tuổi")]
         public int age { get; set; }
         [DisplayName("Ngày sinh")]
-        public string? birthday { get; set; }
+        public string? Birthday { get; set; }
 
         [DisplayName("Điểm tích lũy")]
-        public long pointSaving { get; set; } = 0;
+        public long PointSaving { get; set; } = 0;
 
-        public bool isStudent { get; set; } = false;
+        public bool IsStudent { get; set; } = false;
+
+        public int ScanningCount { get; set; } = 0;
         public ICollection<Rating>? Ratings { get; set; }
         public ICollection<Receipt>? Receipts { get; set; }
         public ICollection<Comment>? Comments { get; set; }

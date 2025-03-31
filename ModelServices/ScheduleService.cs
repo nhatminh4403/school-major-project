@@ -39,6 +39,12 @@ namespace school_major_project.ModelServices
                 await _dbContext.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<Schedule>> GetSchedulesByFilmId(int id)
+        {
+            return await _dbContext.Schedules.
+                Include(p => p.Room).ThenInclude(p => p.Cinema).
+                Where(p => p.FilmId == id).ToListAsync();
 
+        }
     }
 }

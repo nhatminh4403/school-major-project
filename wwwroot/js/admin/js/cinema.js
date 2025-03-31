@@ -19,10 +19,11 @@ document.addEventListener("DOMContentLoaded", function () {
     cinemaTabs.addEventListener("click", function (event) {
         if (event.target.classList.contains('nav-link')) {
             const cinemaId = event.target.id.split("-")[2];
-            fetch(`/api/admin/cinemas/${cinemaId}`).then(response => {
+            fetch(`/admin/rap-phim/lay-thong-tin/${cinemaId}`).then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
+                console.log(response)
                 return response.json();
             }).then(data => {
                 try {
@@ -32,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         infoDetails[0].innerText = `Tên rạp: ${data.name || ''}`;
                     }
                     if (infoDetails[1]) {
-                        infoDetails[1].innerText = `Địa chỉ: ${data.address || ''}`;
+                        infoDetails[1].innerText = `Địa chỉ: ${data.location || ''}`;
                     }
                     if (infoDetails[2]) {
                         infoDetails[2].innerText = `Vị trí: ${data.map || ''}`;

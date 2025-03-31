@@ -1,0 +1,45 @@
+﻿@model school_major_project.Models.Room
+
+@{
+    ViewData["Title"] = "ChooseSeat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>ChooseSeat</h1>
+
+<div>
+    <h4>Room</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Cinema)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Cinema.Location)
+        </dd>
+    </dl>
+</div>
+@if(Model.Seats == null)
+{
+    <h2> Trống</h2>
+}
+else
+{
+    @foreach(var seat in Model.Seats)
+{
+    
+}
+}
+

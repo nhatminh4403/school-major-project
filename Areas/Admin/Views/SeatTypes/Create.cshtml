@@ -1,41 +1,60 @@
 ﻿@model school_major_project.Models.SeatType
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm loại ghế mới";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section Styles {
 
-<h1>Create</h1>
+}
 
-<h4>SeatType</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="TypeDescription" class="control-label"></label>
-                <input asp-for="TypeDescription" class="form-control" />
-                <span asp-validation-for="TypeDescription" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="price" class="control-label"></label>
-                <input asp-for="price" class="form-control" />
-                <span asp-validation-for="price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="pointGiving" class="control-label"></label>
-                <input asp-for="pointGiving" class="form-control" />
-                <span asp-validation-for="pointGiving" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-action="Index" class="main__title-link">Trở về</a>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data" class="form">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input asp-for="TypeDescription" class="form__input" placeholder="@Html.DisplayNameFor(model => model.TypeDescription)" />
+                                        <span asp-validation-for="TypeDescription" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <input asp-for="Price" class="form__input" placeholder="@Html.DisplayNameFor(model => model.Price)" />
+                                        <span asp-validation-for="Price" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <input asp-for="PointGiving" class="form__input" placeholder="@Html.DisplayNameFor(model => model.PointGiving)" />
+                                        <span asp-validation-for="PointGiving" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-6">
+                                        <input asp-for="ImageDescription" class="form__input" type="file" accept="image/*" placeholder="@Html.DisplayNameFor(model => model.ImageDescription)" />
+                                        <span asp-validation-for="ImageDescription" class="text-danger"></span>
+                                    </div>
+                                </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+                            </div>
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="form__btn">thực hiện</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>

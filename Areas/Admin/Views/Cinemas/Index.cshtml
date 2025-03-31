@@ -1,42 +1,289 @@
-﻿@model IEnumerable<school_major_project.Models.Cinema>
+﻿@using school_major_project.Areas.Admin.Data
+@model CinemasViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý chi nhánh";
+    int numberOfCinemas = Model.Cinemas.Count();
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section Styles {
+    <style>
+        body {
+            background-color: #2b2b31 !important;
+        }
 
-<h1>Index</h1>
+        .cinema-info {
+            background-color: #28282d;
+            margin-top: 20px;
+            color: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Location)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Location)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        .cinema-info__container {
+            padding: 5px 10px;
+        }
+
+        ::selection {
+            background-color: lightgray;
+            color: black;
+        }
+
+        .disable-selection {
+            user-select: none;
+        }
+
+        .room-actions a {
+            margin-right: 10px;
+        }
+    </style>
 }
-    </tbody>
-</table>
+
+
+@* <section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Main Title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+
+                        <a href="/admin/rap-phim/tao-moi" class="main__title-link">Thêm mới</a>
+                    </div>
+                </div>
+                <!-- End Main Title -->
+            </div>
+            <!-- Tabs Navigation -->
+            <div class="col-12">
+                <ul class="nav nav-tabs" id="cinemaTabs" role="tablist">
+                    @for (int i = 0; i < Model.Cinemas.Count(); i++)
+                    {
+                        var cinema = Model.Cinemas.ElementAt(i);
+                        <li class="nav-item">
+                            <button class="nav-link @(i == 0 ? "active" : "")"
+                                    id="tab-cinema-@cinema.Id"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tab-@cinema.Id"
+                                    type="button"
+                                    role="tab"
+                                    aria-controls="tab-@cinema.Id"
+                                    aria-selected="@(i == 0 ? "true" : "false")">
+                                @cinema.Name
+                            </button>
+                        </li>
+                    }
+
+                </ul>
+            </div>
+            @foreach (var cinema in Model.Cinemas)
+            {
+                <div class="cinema-info">
+                    <div class="cinema-info__container">
+                        <h4 class="cinema-info__title">Thông tin chi nhánh</h4>
+                        <p class="cinema-info__detail">Tên rạp: @Model.SelectedCinema.Name</p>
+                        <p class="cinema-info__detail">Địa chỉ: @Model.SelectedCinema.Location</p>
+                        <p class="cinema-info__detail">Vị trí: @Model.SelectedCinema.Map</p>
+                    </div>
+                    <div class="cinema-info__container">
+                        <a href="/admin/room/add/" class="btn btn-primary">
+                            Thêm phòng mới
+                        </a>
+                        <a href="/admin/cinemas/edit/" class="btn btn-primary">
+                            Chỉnh sửa thông tin rạp
+                        </a>
+                    </div>
+                </div>
+                <!-- Tabs Content -->
+                <div class="tab-content" id="cinemaTabsContent">
+                    <div class="tab-pane fade show" th:classappend="${cinemaStat.index == 0} ? 'active'"
+                         th:each="cinema, cinemaStat : ${cinemas}"
+                         th:id="'tab-' + ${cinema.id}"
+                         role="tabpanel"
+                         th:aria-labelledby="'cinema-tab-' + ${cinema.id}">
+                        <div class="row mt-3">
+                            @foreach (var room in cinema?.Rooms)
+                            {
+                                <div class="col-md-6 mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5 class="card-title">@room.Name</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                Địa chỉ: <span th:text="${cinema.address}">@cinema.</span>
+                                            </p>
+                                            <p class="card-text">
+                                                Vị trí: <span th:text="${cinema.map}"></span>
+                                            </p>
+                                            <a href="/admin/rooms/" class="btn btn-info">Chi tiết phòng</a>
+                                            <a href="/admin/rooms/edit/" class="btn btn-primary">
+                                                Chỉnh
+                                                sửa
+                                            </a>
+                                            <a href="#modal-delete" th:onclick="'setDeleteItem(' + ${room.id} + ')'"
+                                               class="btn btn-danger open-modal">Xóa</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <!-- End Tabs Content -->
+            }
+
+        </div>
+    </main>
+
+    <!-- Modal Delete -->
+    <div id="modal-delete" class="zoom-anim-dialog mfp-hide modal">
+        <h6 class="modal__title">Thông báo</h6>
+        <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
+        <div class="modal__btns">
+            <button class="modal__btn modal__btn--apply" type="button"
+                    th:onclick="'deleteItem(\'/admin/rooms/delete/\' + ' + item_id + ', \'/admin/rooms\')'">
+                Xoá
+            </button>
+            <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>
+        </div>
+    </div>
+</section>
+ *@
+
+
+<main class="main">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Main Title -->
+            <div class="col-12">
+                <div class="main__title">
+                    <h2>@ViewBag.Title</h2>
+                    <a asp-controller="Admin" asp-action="AddCinema" class="main__title-link">Thêm mới</a>
+                </div>
+            </div>
+            <!-- End Main Title -->
+        </div>
+        <!-- Tabs Navigation -->
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="cinemaTabs" role="tablist">
+
+                @for (int i = 0; i < Model.Cinemas.Count(); i++)
+                {
+                    var cinema = Model.Cinemas.ElementAt(i);
+
+                    <li class="nav-item">
+                        <button class="nav-link @(i == 0 ? "active" : "")"
+                                id="tab-cinema-@cinema.Id"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tab-@cinema.Id"
+                                type="button"
+                                role="tab"
+                                aria-controls="tab-@cinema.Id"
+                                aria-selected="@(i == 0 ? "true" : "false")">
+                            @cinema.Name
+                        </button>
+                    </li>
+
+
+                }
+            </ul>
+        </div>
+
+        <div class="cinema-info">
+            <div class="cinema-info__container">
+                <h4 class="cinema-info__title">Thông tin chi nhánh</h4>
+                <p class="cinema-info__detail">Tên rạp: @Model.SelectedCinema?.Name</p>
+                <p class="cinema-info__detail">Địa chỉ: @Model.SelectedCinema?.Location</p>
+                <p class="cinema-info__detail">Vị trí: @Model.SelectedCinema?.Map</p>
+            </div>
+            <div class="cinema-info__container">
+                <a asp-controller="Room" asp-action="Add" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
+                    Thêm phòng mới
+                </a>
+                <a asp-controller="Cinema" asp-action="Edit" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
+                    Chỉnh sửa thông tin rạp
+                </a>
+            </div>
+        </div>
+
+        <!-- Tabs Content -->
+        <div class="tab-content" id="cinemaTabsContent">
+            @for (int i = 0; i < Model.Cinemas.Count(); i++)
+            {
+                var cinema = Model.Cinemas.ElementAt(i);
+                <div class="tab-pane fade show @(i == 0 ? "active" : "")"
+                     id="tab-@cinema.Id"
+                     role="tabpanel"
+                     aria-labelledby="cinema-tab-@cinema.Id">
+                    <div class="row mt-3">
+                        @foreach (var room in cinema.Rooms)
+                        {
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">@room.Name</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+                                            Địa chỉ: <span>@cinema.Location</span>
+                                        </p>
+                                        <p class="card-text">
+                                            Vị trí: <span>@cinema.Map</span>
+                                        </p>
+                                        <a asp-controller="Room" asp-action="Details" asp-route-id="@room.Id" class="btn btn-info">Chi tiết phòng</a>
+                                        <a asp-controller="Room" asp-action="Edit" asp-route-id="@room.Id" class="btn btn-primary">Chỉnh sửa</a>
+                                        <a href="#modal-delete" onclick="setDeleteItem(@room.Id)" class="btn btn-danger open-modal">Xóa</a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- End Tabs Content -->
+    </div>
+</main>
+
+<!-- Modal Delete -->
+<div id="modal-delete" class="zoom-anim-dialog mfp-hide modal">
+    <h6 class="modal__title">Thông báo</h6>
+    <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
+    <div class="modal__btns">
+        <button class="modal__btn modal__btn--apply" type="button"
+                onclick="deleteItem('/admin/rooms/delete/' + item_id, '/admin/rooms')">
+            Xoá
+        </button>
+        <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var item_id = 0;
+
+        function setDeleteItem(id) {
+            item_id = id;
+        }
+
+        function deleteItem(deleteUrl, redirectUrl) {
+            // Implement your delete logic here using fetch or jQuery ajax
+            fetch(deleteUrl, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = redirectUrl;
+                } else {
+                    alert('Có lỗi xảy ra khi xóa dữ liệu.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+}

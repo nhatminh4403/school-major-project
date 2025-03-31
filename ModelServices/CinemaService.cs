@@ -39,5 +39,17 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<Cinema> GetSelectedCinema(int? id = null)
+        {
+            if(id.HasValue)
+            {
+                var cinema = await GetByIdAsync(id.Value);
+                return cinema;
+            }
+
+            return await _context.Cinemas.Include(c => c.Rooms).OrderBy(c => c.Id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

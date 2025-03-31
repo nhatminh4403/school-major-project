@@ -11,14 +11,14 @@ namespace school_major_project.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public string? Name { get; set; }
+        public string Name { get; set; }
         [DisplayName("Địa chỉ rạp")]
         [Required]
-        public string? Location { get; set; }
+        public string Location { get; set; }
 
         [Required]
         [DisplayName("Địa chỉ trên Map")]
-        private string? Map { get; set; }
+        public string Map { get; set; }
 
         public virtual ICollection<Room>? Rooms { get; set; }
     }

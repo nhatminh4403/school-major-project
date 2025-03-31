@@ -5,8 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
+using school_major_project.Services;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -15,17 +18,32 @@ namespace school_major_project.Areas.Admin.Controllers
     public class CinemasController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public CinemasController(ApplicationDbContext context)
+        private readonly ICinemaRepository _cinemaRepository;
+        private readonly ISeatRepository _seatRepository;
+        private readonly IScheduleRepository _scheduleRepository;
+        public CinemasController(ApplicationDbContext context,IScheduleRepository scheduleRepository,ICinemaRepository cinemaRepository,
+            ISeatRepository seatRepository)
         {
             _context = context;
+            _seatRepository = seatRepository;
+            _scheduleRepository = scheduleRepository;
+            _cinemaRepository = cinemaRepository;
         }
 
         // GET: Admin/Cinemas
         [Route("")] 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id = null)
         {
-            return View(await _context.Cinemas.ToListAsync());
+            var cinemas = await _cinemaRepository.GetAllAsync();
+            //var selectedCinema = await _cinemaRepository.GetSelectedCinema(id);
+            var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value): (cinemas.Any() ? cinemas.ElementAt(0) : null);
+            var viewModel = new CinemasViewModel
+            {
+                SelectedCinema = selectedCinema,
+                Cinemas = cinemas
+            };
+
+            return View(viewModel);
         }
 
         // GET: Admin/Cinemas/Details/5
@@ -46,7 +64,31 @@ namespace school_major_project.Areas.Admin.Controllers
 
             return View(cinema);
         }
+        [HttpGet]
+        [Route("lay-thong-tin/{id}")]
+        public async Task<IActionResult> GetCinemaInfo(int id)
+        {
+            try
+            {
+                Cinema cinema =await _cinemaRepository.GetByIdAsync(id);
+                if (cinema == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy rạp chiếu" });
+                }
 
+                return Json(new
+                {
+                    id = cinema.Id,
+                    name = cinema.Name,
+                    address = cinema.Location,
+                    map = cinema.Map
+                });
+            }
+            catch (System.Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi máy chủ", error = ex.Message });
+            }
+        }
         // GET: Admin/Cinemas/Create
         [Route("tao-moi")]
         public IActionResult Create()

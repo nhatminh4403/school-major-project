@@ -65,7 +65,7 @@
                                 </div>
                                 @if(signInManager.IsSignedIn(User)) {
                                     <div class="promotion-item__actions">
-                                        @if (user.Result.pointSaving >= promotion.RedemptionPoint)
+                                        @if (user.Result.PointSaving >= promotion.RedemptionPoint)
                                         {
                                             <button class="btn btn-primary"
                                                     onclick="redeemPromotion(@promotion.Id)"

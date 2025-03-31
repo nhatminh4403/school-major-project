@@ -12,8 +12,8 @@
 @section Styles {
     <link href="~/css/css/edit-profile.css" rel="stylesheet" />
     <style>
-        .header-section{
-            position: relative ;
+        .header-section {
+            position: relative;
         }
 
         .banner-section {
@@ -50,13 +50,13 @@
 
             }
 
-            <form asp-controller="User" asp-action="Edit" method="post" enctype="multipart/form-data">
+            <form asp-controller="User" asp-action="Edit" asp-area="" method="post" enctype="multipart/form-data">
                 <div class="profile-grid">
                     <!-- Cột bên trái - Thông tin -->
                     <div class="profile-info">
-                        <input type="hidden" asp-for="@user.Id" />
+                        <input type="hidden" asp-for="@Model.Id" />
                         @* <input type="hidden" asp-for="Provider" /> *@
-
+                        @Html.AntiForgeryToken()
                         <div class="form-group">
                             <label class="form-label" asp-for="FullName">Họ và tên</label>
                             <input type="text" asp-for="FullName" class="form-control" id="fullname" placeholder="Nhập họ và tên" />
@@ -70,9 +70,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" asp-for="PhoneNumber">Số điện thoại</label>
-                            <input type="text" asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                            <span class="error-message" asp-validation-for="PhoneNumber"></span>
+                            <label class="form-label" asp-for="PhoneNumber">Số điện thoại (tùy chọn)</label>
+                            <input type="text" asp-for="PhoneNumber" value="@Model.PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
                         </div>
 
                         <div class="form-group">
@@ -91,27 +90,24 @@
 
                         <div class="form-group" style="display: flex; align-items: center; gap: 15px;">
                             <div style="display: flex; align-items: center; gap:10px;">
-                                <label asp-for="isStudent" style="color: #31d7a9; margin-left: 8px; user-select: none;margin-bottom: 0;">
+                                <label asp-for="isStudent"
+                                       style="color: #31d7a9; margin-left: 8px; user-select: none;margin-bottom: 0;">
                                     Bạn là sinh viên?
                                 </label>
-                                <input type="checkbox" asp-for="isStudent" class="custom-checkbox"
+
+                                <input type="checkbox" asp-for="isStudent" class="custom-checkbox" id="isStudent"
                                        style="width: 20px; height: 20px;cursor: pointer;"
                                        onclick="return false;" onkeydown="return false;" />
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label class="form-label" asp-for="pointSaving">Điểm tích lũy</label>
-                            <input type="text" asp-for="pointSaving" class="form-control" readonly />
-                        </div>
-
                         <div class="btn-group">
                             <button type="submit" class="btn btn--primary">Lưu thay đổi</button>
-                            <a asp-controller="Account" asp-action="Index" class="btn btn-secondary">Hủy</a>
+                            <a asp-controller="User" asp-action="Details" class="btn btn-secondary">Hủy</a>
                         </div>
-                        <div>
-                            <textarea id="fullInfo"></textarea>
-                        </div>
+                        @* <div> *@
+                        @*     <textarea id="fullInfo"></textarea> *@
+                        @* </div> *@
                     </div>
 
                     <!-- Cột bên phải - Quét thẻ -->
@@ -146,91 +142,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-             const imageInput = document.getElementById("imageInput");
-             const previewContainer = document.querySelector(".preview-container");
-             const imagePreview = document.getElementById("imagePreview");
-             const previewMessage = document.querySelector(".preview-message");
-             const scanButton = document.getElementById("scanButton");
 
-             // Xử lý sự kiện khi chọn hình ảnh
-             imageInput.addEventListener("change", function (event) {
-                 console.log("Image input changed:", event.target.files);
-                 const fileInput = event.target;
-
-                 if (fileInput.files && fileInput.files[0] && fileInput.files[0].type.startsWith("image/")) {
-                     // Hiển thị preview-container và kích hoạt nút Quét Thẻ
-                     previewContainer.style.display = "block";
-                     scanButton.disabled = false;
-
-                     // Hiển thị hình ảnh preview
-                     const reader = new FileReader();
-                     reader.onload = function (e) {
-                         console.log("Image src:", e.target.result);
-                         imagePreview.src = e.target.result;
-                         imagePreview.style.display="block";
-                         previewMessage.textContent = "Ảnh đã được tải lên.";
-                     };
-                     reader.onerror = function () {
-                         previewMessage.textContent = "Không thể đọc file hình ảnh.";
-                     };
-                     reader.readAsDataURL(fileInput.files[0]);
-                 } else {
-                     // Ẩn preview-container và vô hiệu hóa nút Quét Thẻ
-                     previewContainer.style.display = "none";
-                     scanButton.disabled = true;
-                     imagePreview.src = "";
-                     previewMessage.textContent = "Vui lòng chọn một file hình ảnh hợp lệ.";
-                 }
-             });
-
-             // Xử lý sự kiện khi nhấn nút Quét Thẻ
-             scanButton.addEventListener("click", function () {
-                 const fileInput = document.getElementById("imageInput");
-                 const loadingIndicator = document.getElementById("loadingIndicator");
-                 const previewMessage = document.querySelector(".preview-message");
-
-                 if (fileInput.files && fileInput.files[0]) {
-                     // Hiển thị thông báo đang xử lý
-                     loadingIndicator.style.display = "block";
-                     previewMessage.textContent = "Đang xử lý...";
-
-                     // Tạo FormData để gửi hình ảnh
-                     const formData = new FormData();
-                     formData.append("file", fileInput.files[0]);
-
-                     // Gửi yêu cầu AJAX đến phương thức OCR
-                     fetch('/Ocr/ExtractStudentInfo', {
-                         method: 'POST',
-                         body: formData
-                     })
-                     .then(response => response.json())
-                     .then(data => {
-                         loadingIndicator.style.display = "none";
-                         if (data) {
-                             // Cập nhật các trường thông tin từ kết quả OCR
-                             document.getElementById("fullname").value = data.name || "";
-                             document.getElementById("birthday").value = data.dateOfBirth || "";
-                             document.getElementById("age").value = data.age || "";
-                             document.getElementById("fullInfo").value = data.fullText || "";
-
-                             previewMessage.textContent = "Thông tin đã được trích xuất.";
-                         } else {
-                             previewMessage.textContent = "Không thể trích xuất thông tin.";
-                         }
-                     })
-                     .catch(error => {
-                         loadingIndicator.style.display = "none";
-                         previewMessage.textContent = "Có lỗi xảy ra khi xử lý hình ảnh.";
-                         console.error('Error:', error);
-                     });
-                 }
-             });
-         });
-        
-    </script>
-   
-
+    <script src="~/js/js/ocr.js"></script>
 }
-@*  <script src="~/js/js/ocr.js"></script> *@

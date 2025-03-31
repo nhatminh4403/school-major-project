@@ -1,48 +1,80 @@
 ﻿@model IEnumerable<school_major_project.Models.SeatType>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách loại ghế";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2 >@ViewData["Title"]</h2>
+                        <a href="/admin/loai-ghe/tao-moi" class="main__title-link">Thêm mới</a>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.TypeDescription)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.pointGiving)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TypeDescription)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.pointGiving)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!-- users -->
+                <div class="col-12">
+                    <div class="main__table-wrap">
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>LOẠI GHẾ</th>
+                                    <th>GIÁ GHẾ</th>
+                                    <th>ẢNH MÔ TẢ</th>
+                                    <th>ĐIỂM THƯỞNG</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var type in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="main__table-text">@type.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@type.TypeDescription</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">
+                                                @type.Price.ToString() Vnđ
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">
+                                                <img src="@Html.DisplayFor(item => type.ImageDescription)" alt="@type.TypeDescription" />
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@type.PointGiving</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-btns">
+                                                <a asp-action="Edit" asp-controller="SeatTypes" asp-route-id="@type.Id"
+                                                   class="main__table-btn main__table-btn--edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                        <path d="M5,18H9.24a1,1,0,0,0,.71-.29l6.92-6.93h0L19.71,8a1,1,0,0,0,0-1.42L15.47,2.29a1,1,0,0,0-1.42,0L11.23,5.12h0L4.29,12.05a1,1,0,0,0-.29.71V17A1,1,0,0,0,5,18ZM14.76,4.41l2.83,2.83L16.17,8.66,13.34,5.83ZM6,13.17l5.93-5.93,2.83,2.83L8.83,16H6ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end users -->
+            </div>
+        </div>
+    </main>
+    <!-- end main content -->
+</section>

@@ -17,16 +17,9 @@
     </style>
 }
 
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
-
-
+@{
+    await Html.RenderPartialAsync("_Preloader");
+}}
 
 <section class="main-page-header speaker-banner bg_img" data-background="/imgs/img/banner/banner07.jpg"
          style="background-image: url('/imgs/img/banner/banner07.jpg');">
@@ -100,13 +93,13 @@
                                 {
                                     <li>
                                         <div class="blog-thumb-info">
-                                            <span>@comment.dateComment</span>
+                                            <span>@comment.DateComment</span>
                                             <h6 class="title">
                                                 <a href="#0">@comment.User.FullName</a>
                                             </h6>
                                         </div>
                                         <div class="blog-content">
-                                            <p>@comment.content</p>
+                                            <p>@comment.Content</p>
                                         </div>
                                         @if (User.IsInRole("Admin") || User.IsInRole("Customer"))
                                         {

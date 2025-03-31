@@ -6,30 +6,27 @@ namespace school_major_project.HelperClass
 {
     public static class StringHelper
     {
-        public static string RemoveDiacritics(this string text)
+        public static string RemoveDiacritics(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return text;
+            if (string.IsNullOrEmpty(text)) return text;
 
-            text = text.Replace("Đ", "D-special-")
-              .Replace("đ", "d-special-");
+            string normalizedString = text.Normalize(NormalizationForm.FormD);
+            System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
 
-            text = text.Normalize(NormalizationForm.FormD);
-            var chars = text.Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark).ToArray();
-            text = new string(chars).Normalize(NormalizationForm.FormC);
+            foreach (char c in normalizedString)
+            {
+                System.Globalization.UnicodeCategory category = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c);
+                if (category != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
+                    stringBuilder.Append(c);
+                }
+            }
 
-            // Then replace spaces with dashes
-            text = text.Replace(" ", "-");
-            text = text.Replace("D-special-", "d")
-                             .Replace("d-special-", "d");
-
-            // Optionally: remove other special characters and convert to lowercase
-            text = Regex.Replace(text, @"[^a-zA-Z0-9\-]", "");
-            text = text.ToLowerInvariant();
-
-            return text;
+            string result = stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+            result = result.Replace("đ", "d").Replace("Đ", "D");
+            return result;
         }
-        
+
     }
 
 }

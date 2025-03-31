@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,29 +16,37 @@ namespace school_major_project.Areas.Admin.Controllers
     public class SeatTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ISeatTypeRepository _seatTypeRepository;
 
-        public SeatTypesController(ApplicationDbContext context)
+        public SeatTypesController(ApplicationDbContext context, ISeatTypeRepository seatTypeRepository)
         {
             _context = context;
+            _seatTypeRepository = seatTypeRepository;
         }
-
+        private async Task<string> SaveImage(IFormFile image)
+        {
+            var savePath = Path.Combine("wwwroot/admin/images/seattypes", image.FileName); // Thay đổi đường dẫn theo cấu hình của bạn     
+            using (var fileStream = new FileStream(savePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+            return "/admin/images/seattypes/" + image.FileName; // Trả về đường dẫn tương đối
+        }
         // GET: Admin/SeatTypes
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.SeatTypes.ToListAsync());
+
+            var types = await _seatTypeRepository.GetAllSeatTypeAsync();
+            return View(types);
         }
 
         // GET: Admin/SeatTypes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        [Route("chi-tiet-loai-ghe/{id}")]
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var seatType = await _context.SeatTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var seatType = await _seatTypeRepository.GetByIdAsync(id);
             if (seatType == null)
             {
                 return NotFound();
@@ -53,17 +62,24 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/SeatTypes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
+        [Route("tao-moi")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,TypeDescription,price,pointGiving")] SeatType seatType)
+        public async Task<IActionResult> Create(SeatType seatType, IFormFile ImageDescription)
         {
+            if (ImageDescription != null)
+            {
+                seatType.ImageDescription = await SaveImage(ImageDescription);
+            }
+            else
+            {
+                ModelState.Remove("ImageDescription"); // Bỏ qua validation cho thuộc tính này
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(seatType);
-                await _context.SaveChangesAsync();
+                await _seatTypeRepository.AddAsync(seatType);
                 return RedirectToAction(nameof(Index));
             }
             return View(seatType);
@@ -86,12 +102,9 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(seatType);
         }
 
-        // POST: Admin/SeatTypes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,TypeDescription,price,pointGiving")] SeatType seatType)
+        public async Task<IActionResult> Edit(int id,  SeatType seatType, IFormFile ImageDescription)
         {
             if (id != seatType.Id)
             {
@@ -102,8 +115,12 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(seatType);
-                    await _context.SaveChangesAsync();
+                    if(ImageDescription != null)
+                    {
+                        seatType.ImageDescription= await SaveImage(ImageDescription);
+                    }
+                    await _seatTypeRepository.UpdateAsync(seatType);
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,15 +140,9 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/SeatTypes/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var seatType = await _context.SeatTypes
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var seatType = await _seatTypeRepository.GetByIdAsync(id);
             if (seatType == null)
             {
                 return NotFound();
@@ -145,13 +156,12 @@ namespace school_major_project.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var seatType = await _context.SeatTypes.FindAsync(id);
+            var seatType = await _seatTypeRepository.GetByIdAsync(id);
             if (seatType != null)
             {
-                _context.SeatTypes.Remove(seatType);
+               await _seatTypeRepository.DeleteAsync(seatType.Id);
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

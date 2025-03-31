@@ -14,9 +14,9 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Id mã giảm giá")]
-        public string content { get; set; }
+        public string Content { get; set; }
         [Required]
-        public DateTime dateComment { get; set; }
+        public DateTime DateComment { get; set; }
 
         [Required]
         public int BlogId { get; set; }

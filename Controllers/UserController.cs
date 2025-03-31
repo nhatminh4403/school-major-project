@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.Models;
 using school_major_project.ViewModel;
-using Tesseract;
 namespace school_major_project.Controllers
 {
     [Authorize(Roles = Role.Role_Customer)]
@@ -29,15 +28,33 @@ namespace school_major_project.Controllers
 
         [Route("chi-tiet-tai-khoan")]
         [HttpGet]
-        public ActionResult Details(int id)
+        public async Task<IActionResult> Details()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var userVM = new UserVM
+            {
+                FullName = user.FullName,
+                PhoneNumber = user.PhoneNumber,
+                age = user.age,
+                birthday = user.Birthday,
+                isStudent = user.IsStudent,
+                Email = user.Email,
+                Id = user.Id
+            };
+            ViewBag.PointSaving = user.PointSaving;
+            ViewBag.UserName = user.UserName;
+            ViewBag.Promotions = user.Promotions;
+            return View(userVM);
         }
 
         [HttpGet]
         [Route("chinh-sua-tai-khoan")]
         [Authorize]
-        public async Task<ActionResult> Edit()
+        public async Task<IActionResult> Edit()
         {
             var user = await _userManager.GetUserAsync(User);
             if(user == null)
@@ -50,38 +67,35 @@ namespace school_major_project.Controllers
                 FullName = user.FullName,
                 PhoneNumber = user.PhoneNumber,
                 age = user.age,
-                birthday = user.birthday,
-                pointSaving = user.pointSaving,
-                isStudent = user.isStudent,
-                Email = user.Email
+                birthday = user.Birthday,
+                isStudent = user.IsStudent,
+                Email = user.Email,
+                Id = user.Id
             };
-
             return View(userVM);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(UserVM model)
+        [Route("chinh-sua-tai-khoan")]
+        public async Task<IActionResult> Edit(UserVM model)
         {
             if (!ModelState.IsValid)
             {
+                // Trả về view với model để giữ lại dữ liệu người dùng đã nhập
                 return View(model);
             }
 
             try
             {
-
                 var user = await _userManager.GetUserAsync(User);
                 if (user == null)
                 {
                     return NotFound();
                 }
-                
 
-                // Kiểm tra nếu email đã thay đổi
+                // Kiểm tra và cập nhật email
                 if (model.Email != user.Email)
                 {
-                    // Kiểm tra xem email mới đã tồn tại chưa
                     var userWithSameEmail = await _userManager.FindByEmailAsync(model.Email);
                     if (userWithSameEmail != null && userWithSameEmail.Id != user.Id)
                     {
@@ -89,44 +103,38 @@ namespace school_major_project.Controllers
                         return View(model);
                     }
                     user.Email = model.Email;
-                    user.EmailConfirmed = false; // Yêu cầu xác thực lại email
-
-                    // Có thể gửi email xác thực tại đây
-                    // var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    // await _emailService.SendEmailConfirmationAsync(user.Email, code);
+                    user.EmailConfirmed = false;
                 }
-
-                // Cập nhật số điện thoại
+                user.Id = model.Id;
+                // Cập nhật các trường thông tin
+                user.FullName = model.FullName;
                 user.PhoneNumber = model.PhoneNumber;
+                user.age = model.age;
+                user.Birthday = model.birthday;
+                user.IsStudent = model.isStudent;
 
-                // Cập nhật các trường tùy chỉnh khác nếu có
-
-                // Lưu thay đổi vào database
+                // Lưu thay đổi
                 var result = await _userManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    // Cập nhật cookie đăng nhập nếu thông tin đăng nhập thay đổi
                     await _signInManager.RefreshSignInAsync(user);
-
                     TempData["SuccessMessage"] = "Cập nhật thông tin tài khoản thành công";
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Details", "User");
                 }
 
-                // Nếu cập nhật không thành công, thêm lỗi vào ModelState
+                // Xử lý lỗi từ UpdateAsync
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError("", error.Description);
                 }
-                return RedirectToAction(nameof(Index));
+                return View(model);
             }
             catch (Exception ex)
             {
-                // Log lỗi
                 _logger.LogError(ex, "Lỗi khi cập nhật thông tin người dùng");
                 ModelState.AddModelError("", "Đã xảy ra lỗi khi cập nhật thông tin tài khoản");
+                return View(model);
             }
-
-            return View(model);
         }
         [Route("xoa-tai-khoan")]
         public ActionResult Delete(int id)
@@ -134,7 +142,7 @@ namespace school_major_project.Controllers
             return View();
         }
 
-        [HttpPost]
+/*        [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {
@@ -148,7 +156,7 @@ namespace school_major_project.Controllers
             }
         }
 
-
+*/
         [Route("lich-su-dat-ve")]
         public IActionResult History()
         {

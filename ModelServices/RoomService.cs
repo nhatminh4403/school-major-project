@@ -39,5 +39,11 @@ namespace school_major_project.ModelServices
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<Room> GetByScheduleIdAsync(int id)
+        {
+            var schedule =  _context.Schedules.FirstOrDefaultAsync(p => p.Id == id).Result;
+            var room = await _context.Rooms.Include(p => p.Schedules).Include(p=> p.Cinema).FirstOrDefaultAsync(p => p.Id == schedule.RoomId);
+            return room;
+        }
     }
 }

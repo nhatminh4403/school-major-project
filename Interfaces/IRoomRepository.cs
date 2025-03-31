@@ -9,5 +9,6 @@ namespace school_major_project.Interfaces
         Task AddAsync(Room theatreRoom);
         Task UpdateAsync(Room theatreRoom);
         Task DeleteAsync(int id);
+        Task<Room> GetByScheduleIdAsync(int id);
     }
 }

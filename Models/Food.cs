@@ -15,16 +15,16 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Tên combo")]
-        private string? comboName { get; set; }
+        private string? ComboName { get; set; }
         [Required]
         [DisplayName("Giá combo")]
-        private long price { get; set; }
+        private long Price { get; set; }
         [Required]
         [DisplayName("Mô tả")]
-        private string description { get; set; }
+        private string Description { get; set; }
         [Required]
         [DisplayName("Hình ảnh")]
-        private string poster
+        private string Poster
         {
             get; set;
         }

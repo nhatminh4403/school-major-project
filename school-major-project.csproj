@@ -24,8 +24,9 @@
     <PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Areas\Admin\Models\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\admin\images\seattypes\" />
     <Folder Include="wwwroot\cards\" />
     <Folder Include="wwwroot\OCR\Tesseract-OCR\tessdata\script\" />
   </ItemGroup>

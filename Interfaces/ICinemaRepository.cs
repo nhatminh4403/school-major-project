@@ -10,5 +10,6 @@ namespace school_major_project.Interfaces
         Task AddAsync(Cinema theatre);
         Task UpdateAsync(Cinema theatre);
         Task DeleteAsync(int id);
+        Task<Cinema> GetSelectedCinema(int? id);
     }
 }
