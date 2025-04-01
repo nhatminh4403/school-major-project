@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,17 +16,23 @@ namespace school_major_project.Areas.Admin.Controllers
     public class FilmsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public FilmsController(ApplicationDbContext context)
+        private readonly IFilmRepository _filmRepository;
+        private readonly ICountryRepository _countryRepository;
+        public FilmsController(ApplicationDbContext context,IFilmRepository filmRepository,ICountryRepository countryRepository)
         {
             _context = context;
+            _filmRepository = filmRepository;
+            _countryRepository = countryRepository;
         }
 
         // GET: Admin/Films
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Films.ToListAsync());
+            var films = await _filmRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
+            ViewBag.Countries = countries;
+            return View(films);
         }
 
         // GET: Admin/Films/Details/5

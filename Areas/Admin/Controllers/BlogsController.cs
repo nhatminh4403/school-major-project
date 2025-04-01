@@ -11,7 +11,7 @@ using school_major_project.Models;
 namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Route("admin/blogs")]
+    [Route("admin/bai-viet")]
     public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;

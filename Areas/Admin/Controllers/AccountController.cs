@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Models;
+using System.Threading.Tasks;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -21,9 +23,10 @@ namespace school_major_project.Areas.Admin.Controllers
             _userManager = userManager;
         }
         [Route("")]
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var users = await _userManager.Users.ToListAsync();
+            return View(users);
         }
 
         // GET: UserController/Details/5
