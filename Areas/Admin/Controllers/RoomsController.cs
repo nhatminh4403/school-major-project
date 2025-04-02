@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,18 +16,27 @@ namespace school_major_project.Areas.Admin.Controllers
     public class RoomsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public RoomsController(ApplicationDbContext context)
+        private readonly IRoomRepository _roomRepository;
+        public RoomsController(ApplicationDbContext context,IRoomRepository roomRepository)
         {
             _context = context;
+            _roomRepository = roomRepository;
         }
 
         // GET: Admin/Rooms
         [Route("")]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
-            var applicationDbContext = _context.Rooms.Include(r => r.Cinema);
-            return View(await applicationDbContext.ToListAsync());
+            var rooms =await _roomRepository.GetAllRoomAsync();
+
+            rooms = sortOrder switch
+            {
+                "id_asc" => rooms.OrderBy(r => r.Cinema.Id).ToList(),
+                "id_desc" => rooms.OrderByDescending(r => r.Cinema.Id).ToList(),
+                _ => rooms
+            };
+            ViewBag.SortOrder = sortOrder;
+            return View(rooms);
         }
 
 

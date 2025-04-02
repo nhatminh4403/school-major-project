@@ -1,48 +1,218 @@
-﻿@model IEnumerable<school_major_project.Models.Schedule>
+﻿@using school_major_project.Areas.Admin.Data
+@model ScheduleVM
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý lịch chiếu";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section Styles {
+    <style>
+        .schedule-container {
+            margin-bottom: 30px;
+            background: #2b2b31;
+            border-radius: 6px;
+            padding: 20px;
+        }
 
-<h1>Index</h1>
+            .schedule-container h3 {
+                --white: #ffffff;
+                color: var(--white);
+                margin-bottom: 20px;
+                font-size: 24px;
+            }
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ScheduleTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Film)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Room)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ScheduleTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Film.Actors)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Room.Description)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .empty-message {
+            --muted-text: rgba(255, 255, 255, 0.5);
+            color: var(--muted-text);
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
 }
-    </tbody>
-</table>
+
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a href="/admin/schedules/add" class="main__title-link">Thêm lịch chiếu</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Films with Schedules -->
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h3>Phim đang chiếu có lịch</h3>
+                </div>
+                <div class="main__table-wrap">
+                    @if (Model.Schedules != null && Model.Schedules.Any())
+                    {
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>TÊN PHIM</th>
+                                    <th>TÊN RẠP</th>
+                                    <th>TÊN PHÒNG</th>
+                                    <th>THỜI GIAN CHIẾU</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Schedules)
+                                {
+                                    <tr>
+                                        <td><div class="main__table-text">@item.Id</div></td>
+                                        <td><div class="main__table-text">@item.Film.Name</div></td>
+                                        <td><div class="main__table-text">@item.Room.Cinema.Name</div></td>
+                                        <td><div class="main__table-text">@item.Room.Name</div></td>
+                                        <td><div class="main__table-text">@item.ScheduleTime</div></td>
+                                        <td>
+                                            <div class="main__table-btns">
+                                                <a href="/admin/schedules/edit/@item.Id" class="main__table-btn main__table-btn--edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="#modal-delete" onclick="setDeleteItem(@item.Id)" class="main__table-btn main__table-btn--delete open-modal">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-message">Không có phim nào đang có lịch chiếu</div>
+                    }
+                </div>
+            </div>
+
+
+            <!-- Films without Schedules -->
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h3>Phim đang chiếu chưa có lịch</h3>
+                    <a href="/admin/schedules/add" class="main__title-link">Tạo lịch chiếu</a>
+                </div>
+                <div class="main__table-wrap">
+                    @if (Model.ReleasedFilmsWithoutSchedules != null && Model.ReleasedFilmsWithoutSchedules.Any())
+                    {
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>TÊN PHIM</th>
+                                    <th>THỜI GIAN CHIẾU</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var film in Model.ReleasedFilmsWithoutSchedules)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="main__table-text">@film.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@film.Name</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@film.FilmDuration phút</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-btns">
+                                                <a href="/admin/schedules/add/@film.Id" class="main__table-btn main__table-btn--edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                        <path d="M19,11H13V5a1,1,0,0,0-2,0v6H5a1,1,0,0,0,0,2h6v6a1,1,0,0,0,2,0V13h6a1,1,0,0,0,0-2Z" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-message">
+                            Không có phim nào chưa có lịch chiếu
+                        </div>
+                    }
+                </div>
+            </div>
+
+
+            <!-- Upcoming Films -->
+            <div class="schedule-container">
+                <div class="schedule-header">
+                    <h3>Phim sắp chiếu</h3>
+                </div>
+                <div class="main__table-wrap">
+                    @if (Model.UpcomingFilms != null && Model.UpcomingFilms.Any())
+                    {
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>TÊN PHIM</th>
+                                    <th>NGÀY KHỞI CHIẾU</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var film in Model.UpcomingFilms)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="main__table-text">@film.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@film.Name</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@film.FilmDuration phút</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@film.StartTime.ToString("dd/MM/yyyy")</div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="empty-message">
+                            Không có phim sắp chiếu
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Modal delete -->
+    <div id="modal-delete" class="zoom-anim-dialog mfp-hide modal">
+        <h6 class="modal__title">Thông báo</h6>
+        <p class="modal__text">Bạn có muốn xoá lịch chiếu này không?</p>
+        <div class="modal__btns">
+            <button class="modal__btn modal__btn--apply" type="button" onclick="deleteItem('/admin/schedules/delete/' + item_id, '/admin/schedules')">
+                Xoá
+            </button>
+            <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>
+        </div>
+    </div>
+</section>

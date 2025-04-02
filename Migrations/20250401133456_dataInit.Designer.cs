@@ -12,7 +12,7 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250330132331_dataInit")]
+    [Migration("20250401133456_dataInit")]
     partial class dataInit
     {
         /// <inheritdoc />

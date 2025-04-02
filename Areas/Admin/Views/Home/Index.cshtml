@@ -4,5 +4,47 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
-
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                    </div>
+                </div>
+                <!-- end main title -->
+            </div>
+            <div class="row row--grid">
+                <!-- stats -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stats">
+                        <span>Tổng người dùng</span>
+                        <p >@ViewBag.TotalUserCount</p>
+                        <img src="~/imgs/admin/img/graph-bar.svg" alt="">
+                    </div>
+                </div>
+                <!-- end stats -->
+                <!-- stats -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stats">
+                        <span>Tổng lần đặt (booking)</span>
+                        <p >@ViewBag.TotalReceiptCount</p>
+                        <img src="~/imgs/admin/img/film.svg" alt="">
+                    </div>
+                </div>
+                <!-- end stats -->
+                <!-- stats -->
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stats">
+                        <span>Tổng lợi nhuận tạm tính</span>
+                        <p>@ViewBag.TotalPrice</p>
+                        <img src="~/imgs/admin/img/star-half-alt.svg" alt="">
+                    </div>
+                </div>
+                <!-- end stats -->
+            </div>
+        </div>
+    </main>
+</section>

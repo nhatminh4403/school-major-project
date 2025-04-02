@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,17 +16,19 @@ namespace school_major_project.Areas.Admin.Controllers
     public class FoodsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public FoodsController(ApplicationDbContext context)
+        private readonly IFoodRepository _foodRepository;
+        public FoodsController(ApplicationDbContext context,IFoodRepository foodRepository)
         {
             _context = context;
+            _foodRepository = foodRepository;
         }
 
         // GET: Admin/Foods
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Foods.ToListAsync());
+            var foods = await _foodRepository.GetAllAsync();
+            return View(foods);
         }
 
         // GET: Admin/Foods/Details/5

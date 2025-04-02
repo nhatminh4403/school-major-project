@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,17 +16,18 @@ namespace school_major_project.Areas.Admin.Controllers
     public class PromotionsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public PromotionsController(ApplicationDbContext context)
+        private readonly IPromotionRepository _promotionRepository;
+        public PromotionsController(ApplicationDbContext context,IPromotionRepository promotionRepository)
         {
             _context = context;
+            _promotionRepository = promotionRepository;
         }
 
         // GET: Admin/Promotions
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Promotions.ToListAsync());
+            return View(await _promotionRepository.GetAllAsync());
         }
 
         // GET: Admin/Promotions/Details/5

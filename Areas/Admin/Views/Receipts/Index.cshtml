@@ -1,11 +1,126 @@
 ﻿@model IEnumerable<school_major_project.Models.Receipt>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý đơn hàng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section Styles {
+<style>
+    #reader {
+    margin: 0 auto;
+    }
 
-<h1>Index</h1>
+    #scanner-container {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    }
+
+    .btnQRScanner {
+    padding: 16px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    width: 150px;
+    }
+
+    .btn--primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    }
+
+    .btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    }
+
+    .ml-2 {
+    margin-left: 8px;
+    }
+
+    .main__table tbody td {
+    max-width: 50px;
+    }
+
+    .scanner-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .scanner-modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    }
+
+    .scanner-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    }
+
+    .scanner-header h3 {
+    margin: 0;
+    color: #333;
+    }
+
+    .close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
+
+    .close-button:hover {
+    color: #333;
+    }
+
+    #reader {
+    background: white !important;
+    border-radius: 8px;
+    overflow: hidden;
+    }
+
+    #reader video {
+    width: 100% !important;
+    height: auto !important;
+    border-radius: 8px;
+    }
+
+    .scanner-modal {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+
+}
+@* <h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -63,4 +178,148 @@
         </tr>
 }
     </tbody>
-</table>
+</table> *@
+
+
+
+
+<section layout:fragment="content">
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <button class="btnQRScanner btn--primary main__title-link" onclick="toggleScanner()">Scan QR Code</button>
+                    </div>
+                </div>
+                <!-- QR Scanner container -->
+                <div id="scanner-overlay" class="scanner-overlay">
+                    <div class="scanner-modal">
+                        <div class="scanner-header">
+                            <h3>Scan QR Code</h3>
+                            <button class="close-button" onclick="toggleScanner()">&times;</button>
+                        </div>
+                        <div id="reader" style="width: 100%"></div>
+                        <div id="scan-status" style="text-align: center; margin-top: 10px;"></div>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!-- users -->
+                <div class="col-12">
+                    <div class="main__table-wrap">
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>HỌ TÊN</th>
+                                    <th>PHIM</th>
+                                    <th>LỊCH CHIẾU</th>
+                                    <th>NGÀY ĐẶT</th>
+                                    <th>RẠP</th>
+                                    <th>PHÒNG</th>
+                                    <th>GIÁ</th>
+                                </tr>
+                            </thead>
+
+
+                            @* th:each="item : ${bookings}" *@
+                            <tbody id="bookingTableBody">
+                                @if(Model == null || Model.Count()==0 || !Model.Any())
+                                {
+                                    <tr>
+                                        <td colspan="8">
+                                            <h2 style="text-align: center;color:white">Chưa có đơn hàng nào</h2>
+                                        </td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var receipt in Model)
+                                {
+                                    <tr data-booking-id="@receipt.Id">
+                                        <td>
+                                            <div class="main__table-text">@receipt.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text" th:text="${item.user.fullname}">@receipt.GetUser.FullName</div>
+                                        </td>
+                                        @foreach (var details in receipt.ReceiptDetails)
+                                        {
+                                            <td>
+                                                <div class="main__table-text">@details.FilmName</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@details.StartTime</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@receipt.Date</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@details.CinemaName</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@details.RoomName</div>
+                                            </td>
+                                        }
+
+                                        <td>
+                                            <div class="main__table-text">
+                                                @receipt.TotalPrice.ToString("N0")
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-btns">
+                                                <a class="main__table-btn main__table-btn--edit print-ticket" data-booking-id="@receipt.Id"
+                                                   href="#">
+                                                    <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1"
+                                                         xmlns="http://www.w3.org/2000/svg"
+                                                         xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                         viewBox="0 0 502 502" xml:space="preserve">
+                                                    <g>
+                                                    <g>
+                                                    <g>
+                                                    <path d="M492,158.5h-41v-135c0-5.522-4.478-10-10-10H61c-5.522,0-10,4.478-10,10v135H10c-5.522,0-10,4.478-10,10v220
+                                                                c0,5.522,4.478,10,10,10h41v80c0,5.522,4.478,10,10,10h380c5.522,0,10-4.478,10-10v-80h41c5.522,0,10-4.478,10-10v-220
+                                                                C502,162.978,497.522,158.5,492,158.5z M71,33.5h360v125H71V33.5z M431,468.5H71v-148h360V468.5z M482,378.5h-31v-68
+                                                                c0-5.522-4.478-10-10-10H61c-5.522,0-10,4.478-10,10v68H20v-200h462V378.5z" />
+                                                    <path d="M423,268.5c15.99,0,29-13.01,29-29s-13.01-29-29-29s-29,13.01-29,29S407.01,268.5,423,268.5z M423,230.5
+                                                                c4.963,0,9,4.037,9,9s-4.037,9-9,9s-9-4.037-9-9S418.037,230.5,423,230.5z" />
+                                                    <path d="M316,248.5h47c5.522,0,10-4.478,10-10c0-5.522-4.478-10-10-10h-47c-5.522,0-10,4.478-10,10
+                                                                C306,244.022,310.478,248.5,316,248.5z" />
+                                                    <path d="M367,362.5h24c5.522,0,10-4.478,10-10c0-5.522-4.478-10-10-10h-24c-5.522,0-10,4.478-10,10
+                                                                C357,358.022,361.478,362.5,367,362.5z" />
+                                                    <path d="M111,362.5h215c5.522,0,10-4.478,10-10c0-5.522-4.478-10-10-10H111c-5.522,0-10,4.478-10,10
+                                                                C101,358.022,105.478,362.5,111,362.5z" />
+                                                    <path d="M111,403.5h280c5.522,0,10-4.478,10-10c0-5.522-4.478-10-10-10H111c-5.522,0-10,4.478-10,10
+                                                                C101,399.022,105.478,403.5,111,403.5z" />
+                                                    <path d="M111,443.5h280c5.522,0,10-4.478,10-10c0-5.522-4.478-10-10-10H111c-5.522,0-10,4.478-10,10
+                                                                C101,439.022,105.478,443.5,111,443.5z" />
+                                                                    </g>
+                                                                </g>
+                                                            </g>
+                                                        </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                }
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end users -->
+            </div>
+        </div>
+    </main>
+    <!-- end main content -->
+</section>
+@section Scripts {
+    <script src="~/js/admin/js/print.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="~/js/admin/qrCode.js"></script>
+}

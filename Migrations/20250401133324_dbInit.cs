@@ -65,7 +65,7 @@ namespace school_major_project.Migrations
                     BlogTitle = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BlogContent = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BlogCreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BlogPoster = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    BlogPoster = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -253,6 +253,7 @@ namespace school_major_project.Migrations
                 });
         }
 
+
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {

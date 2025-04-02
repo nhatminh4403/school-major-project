@@ -1,66 +1,98 @@
 ﻿@model IEnumerable<school_major_project.Models.Promotion>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý khuyến mãi";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Code)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DiscountRate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RedemptionPoint)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Code)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DiscountRate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RedemptionPoint)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@section Styles {
+    <link href="~/css/admin/css/promotion-page.css" rel="stylesheet" />
 }
-    </tbody>
-</table>
+
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a href="/admin/khuyen-mai/add" class="main__title-link">Thêm mới</a>
+                    </div>
+                </div>
+                <div class="promotion-section">
+                    @if (Model == null || Model.Count() == 0)
+                    {
+                        <h2>Hiện tại chưa có khuyến mãi</h2>
+                    }
+                    else
+                    {
+                        <div class="promotion-section__container">
+                            <div class="promotion-section__items">
+                                @foreach (var promotion in Model)
+                                {
+                                    <div class="promotion-item">
+                                        <div class="promotion-item__info">
+                                            <img src="~/imgs/img/Percentage.png" alt=" % Image" class="promotion-item__image" />
+                                            <p>
+                                                <strong>ID:</strong>
+                                                <span>@promotion.Id</span>
+                                            </p>
+                                            <p>
+                                                <strong>Mã khuyến mãi:</strong>
+                                                <span >@promotion.Code</span>
+                                            </p>
+                                            <p>
+                                                <strong>Mô tả:</strong>
+                                                <span>@promotion.Description</span>
+                                            </p>
+                                            <p>
+                                                <strong>Giá trị khuyến mãi:</strong>
+                                                <span >
+                                                    @((promotion.DiscountRate * 100).ToString("0") + "%")
+                                                </span>
+                                            </p>
+                                            <p>
+                                                <strong>Điểm để đổi:</strong>
+                                                <span >@promotion.RedemptionPoint</span>
+                                            </p>
+                                            <p>
+                                                <strong>Thời gian khuyến mãi:</strong> <br>
+                                                <span>
+                                                    @promotion.StartDate.ToString("dd/MM/yyyy HH:mm:ss") - <br />
+                                                    @promotion.EndDate.ToString("dd/MM/yyyy HH:mm:ss")
+                                                </span>
+                                            </p>
+                                        </div>
+                                        <div class="promotion-item__actions">
+                                            <a asp-action="Edit" asp-route-id="@promotion.Id" class="btn--edit-promotion">Chỉnh sửa</a>
+                                            
+                                            <a href="#modal-delete" onclick="setDeleteItem(@promotion.Id)"
+                                               class="main__table-btn main__table-btn--delete open-modal">
+                                                Xóa
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                }
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+
+            </div>
+        </div>
+    </main>
+    <div id="modal-delete" class="zoom-anim-dialog mfp-hide modal">
+        <h6 class="modal__title">Thông báo</h6>
+        <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
+        <div class="modal__btns">
+            <button class="modal__btn modal__btn--apply" type="button"
+                    onclick="deleteItem('/admin/khuyen-mai/xoa/' + item_id, '/admin/khuyen-mai')">
+                Xoá
+            </button>
+            <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>
+        </div>
+    </div>
+</section>

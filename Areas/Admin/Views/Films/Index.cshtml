@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<school_major_project.Models.Film>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Trang quản lý phim";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var countries = ViewBag.Countries as IEnumerable<Country>;
 }
@@ -103,8 +103,8 @@
                 <!-- main title -->
                 <div class="col-12">
                     <div class="main__title">
-                        <h2 th:text="${title}"></h2>
-                        <a th:href="/admin/films/add" class="main__title-link">Thêm mới</a>
+                        <h2>@ViewData["Title"]</h2>
+                        <a th:href="/admin/films/tao-moi" class="main__title-link">Thêm mới</a>
                     </div>
                 </div>
                 <!-- end main title -->
@@ -155,12 +155,12 @@
                                             }
                                         </td>
                                         <td>
-                                            <div class="main__table-text" th:text="${item.limit_age}">@film.FilmRated</div>
+                                            <div class="main__table-text">@film.FilmRated</div>
                                         </td>
                                         <td>
                                             <div class="main__table-btns">
-                                                <a th:href="/admin/schedules/add/{filmId}(filmId=${item.id})}"
-                                                   class="main__table-btn main__table-btn&#45;&#45;banned"
+                                                <a th:href="/admin/lich-chieu/tao-moi/{filmId}(filmId=${item.id})}"
+                                                   class="main__table-btn main__table-btn--banned"
                                                    title="Thêm lịch chiếu phim này">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                         <g transform="matrix(0.43 0 0 0.43 12 12)">
@@ -170,14 +170,14 @@
                                                         </g>
                                                     </svg>
                                                 </a>
-                                                <a th:href="/admin/films/edit/{id}(id=${item.id})}"
-                                                   class="main__table-btn main__table-btn&#45;&#45;edit">
+                                                <a href="/admin/films/edit/{id}(id=${item.id})}"
+                                                   class="main__table-btn main__table-btn--edit">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                         <path d="M5,18H9.24a1,1,0,0,0,.71-.29l6.92-6.93h0L19.71,8a1,1,0,0,0,0-1.42L15.47,2.29a1,1,0,0,0-1.42,0L11.23,5.12h0L4.29,12.05a1,1,0,0,0-.29.71V17A1,1,0,0,0,5,18ZM14.76,4.41l2.83,2.83L16.17,8.66,13.34,5.83ZM6,13.17l5.93-5.93,2.83,2.83L8.83,16H6ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z" />
                                                     </svg>
                                                 </a>
-                                                <a href="#modal-delete" th:onclick="'setDeleteItem( ' + ${item.id} + ')'"
-                                                   class="main__table-btn main__table-btn&#45;&#45;delete open-modal">
+                                                <a href="#modal-delete" onclick="setDeleteItem(@film.Id)"
+                                                   class="main__table-btn main__table-btn--delete open-modal">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                         <path d="M20,6H16V5a3,3,0,0,0-3-3H11A3,3,0,0,0,8,5V6H4A1,1,0,0,0,4,8H5V19a3,3,0,0,0,3,3h8a3,3,0,0,0,3-3V8h1a1,1,0,0,0,0-2ZM10,5a1,1,0,0,1,1-1h2a1,1,0,0,1,1,1V6H10Zm7,14a1,1,0,0,1-1,1H8a1,1,0,0,1-1-1V8H17Z" />
                                                     </svg>
@@ -188,11 +188,8 @@
                                 }
 
                             </tbody>
-
                             <!--                            API
-                                                        <tbody id="film_body">
-
-                                                                                    </tbody>-->
+                                                        <tbody id="film_body"></tbody>-->
                         </table>
                     </div>
                 </div>
@@ -207,7 +204,7 @@
         <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
         <div class="modal__btns">
             <button class="modal__btn modal__btn--apply" type="button"
-                    onclick="deleteItem('/admin/films/delete/' + item_id, '/admin/films')">
+                    onclick="deleteItem('/admin/phim/xoa/' + item_id, '/admin/phim')">
                 Xoá
             </button>
             <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>

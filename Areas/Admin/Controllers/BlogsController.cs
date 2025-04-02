@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,17 +16,18 @@ namespace school_major_project.Areas.Admin.Controllers
     public class BlogsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public BlogsController(ApplicationDbContext context)
+        private readonly IBlogRepository _blogRepository;
+        public BlogsController(ApplicationDbContext context,IBlogRepository blogRepository)
         {
             _context = context;
+            _blogRepository = blogRepository;
         }
 
         // GET: Admin/Blogs
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Blogs.ToListAsync());
+            return View(await _blogRepository.GetAllAsync());
         }
 
         // GET: Admin/Blogs/Details/5
@@ -59,12 +61,20 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BlogTitle,BlogContent,BlogCreatedDate,BlogPoster")] Blog blog)
+        [Route("tao-moi")]
+        public async Task<IActionResult> Create(Blog blog, IFormFile BlogPoster)
         {
+            if(BlogPoster != null)
+            {
+                blog.BlogPoster = await SaveImage(BlogPoster);
+            }
+            else
+            {
+                ModelState.Remove("BlogPoster"); // Bỏ qua validation cho thuộc tính này
+            }
             if (ModelState.IsValid)
             {
-                _context.Add(blog);
-                await _context.SaveChangesAsync();
+                await _blogRepository.AddAsync(blog);
                 return RedirectToAction(nameof(Index));
             }
             return View(blog);
@@ -123,42 +133,38 @@ namespace school_major_project.Areas.Admin.Controllers
         }
 
         // GET: Admin/Blogs/Delete/5
-        [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var blog = await _context.Blogs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (blog == null)
-            {
-                return NotFound();
-            }
-
-            return View(blog);
-        }
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    var blog = await _blogRepository.GetByIdAsync(id);
+        //    if (blog == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return View(blog);
+        //}
 
         // POST: Admin/Blogs/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [Route("xoa/{id}")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var blog = await _context.Blogs.FindAsync(id);
-            if (blog != null)
-            {
-                _context.Blogs.Remove(blog);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            await _blogRepository.DeleteAsync(id);
+            return Json(new { success = true });
         }
 
         private bool BlogExists(int id)
         {
             return _context.Blogs.Any(e => e.Id == id);
+        }
+        private async Task<string> SaveImage(IFormFile image)
+        {
+            var savePath = Path.Combine("wwwroot/admin/images/blogs", image.FileName); // Thay đổi đường dẫn theo cấu hình của bạn     
+            using (var fileStream = new FileStream(savePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+            return "/admin/images/blogs/" + image.FileName; // Trả về đường dẫn tương đối
         }
     }
 }

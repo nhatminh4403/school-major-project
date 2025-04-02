@@ -1,16 +1,30 @@
-﻿let item_id = 0;
+﻿let deleteItemId = 0;
 
 function setDeleteItem(id) {
-    item_id = id;
+    console.log('Setting delete item ID: ' + id);
+    deleteItemId = id;
 }
 
-function deleteItem(api, href) {
-    $.get(api, function (data) {
-        window.location.href = href;
+function deleteItem(apiUrl, redirectUrl) {
+    console.log('Deleting item ID: ' + deleteItemId + ' using API: ' + apiUrl);
+
+    // Thay thế placeholder với ID thực tế
+    const url = apiUrl.replace('{id}', deleteItemId);
+
+    $.ajax({
+        url: url,
+        type: 'POST',
+        headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+        },
+        success: function (data) {
+            window.location.href = redirectUrl;
+        },
+        error: function (xhr, status, error) {
+            alert('Có lỗi xảy ra khi xoá dữ liệu: ' + error);
+        }
     });
 }
-
-
 document.querySelectorAll('.toggle-btn').forEach((button) => {
     button.addEventListener('click', function (e) {
         e.preventDefault(); // Ngăn chặn hành động mặc định của thẻ <a>

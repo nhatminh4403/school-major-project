@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
-
+using school_major_project.Areas.Admin.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -15,18 +13,34 @@ namespace school_major_project.Areas.Admin.Controllers
     public class SchedulesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public SchedulesController(ApplicationDbContext context)
+        private readonly IScheduleRepository _scheduleRepository;
+        private readonly IFilmRepository _filmRepository;
+        public SchedulesController(ApplicationDbContext context, IFilmRepository filmRepository,IScheduleRepository scheduleRepository)
         {
             _context = context;
+            _filmRepository = filmRepository;
+            _scheduleRepository = scheduleRepository;
         }
 
         // GET: Admin/Schedules
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Schedules.Include(s => s.Film).Include(s => s.Room);
-            return View(await applicationDbContext.ToListAsync());
+            DateTime today = DateTime.Today;
+
+            var filmSchedules = await _scheduleRepository.GetAllAsync();
+            var films = await _filmRepository.GetAllAsync();
+            var GetReleasedFilmsWithoutSchedules =films.Where(film => film.StartTime <= today).Where(film => film.Schedules == null || !film.Schedules.Any()).ToList();
+            var upcoming = films.Where(film => film.StartTime > today).ToList();
+
+
+            var viewModel = new ScheduleVM
+            {
+                Schedules =filmSchedules,
+                UpcomingFilms = upcoming,
+                ReleasedFilmsWithoutSchedules = GetReleasedFilmsWithoutSchedules,
+            };
+            return View(viewModel);
         }
 
         // GET: Admin/Schedules/Details/5

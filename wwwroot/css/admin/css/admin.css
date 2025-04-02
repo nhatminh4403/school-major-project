@@ -743,7 +743,7 @@ ul {
         border-bottom: 2px solid white;
     }
 
-        .main__table thead th {
+        .main__table thead th, .thead-sort {
             font-size: 12px;
             color: rgba(255,255,255,0.5);
             font-weight: 300;
@@ -761,7 +761,9 @@ ul {
     .main__table tbody td {
         padding: 15px;
     }
-
+.thead-sort {
+    text-decoration:none;
+}
 .main__table--dash {
     width: 100%;
     min-width: 500px;
