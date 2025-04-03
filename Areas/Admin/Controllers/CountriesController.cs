@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,17 +16,18 @@ namespace school_major_project.Areas.Admin.Controllers
     public class CountriesController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public CountriesController(ApplicationDbContext context)
+        private readonly ICountryRepository _countryRepository;
+        public CountriesController(ApplicationDbContext context, ICountryRepository countryRepository)
         {
             _context = context;
+            _countryRepository = countryRepository;
         }
 
         // GET: Admin/Countries
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Countries.ToListAsync());
+            return View(await _countryRepository.GetAllAsync());
         }
 
         // GET: Admin/Countries/Details/5
@@ -37,8 +39,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var country = await _context.Countries
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var country = await _countryRepository.GetByIdAsync(id.Value);
             if (country == null)
             {
                 return NotFound();
@@ -59,13 +60,11 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-
         public async Task<IActionResult> Create([Bind("Id,Name")] Country country)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(country);
-                await _context.SaveChangesAsync();
+                await _countryRepository.AddAsync(country);
                 return RedirectToAction(nameof(Index));
             }
             return View(country);
@@ -80,7 +79,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var country = await _context.Countries.FindAsync(id);
+            var country = await _countryRepository.GetByIdAsync(id.Value);
             if (country == null)
             {
                 return NotFound();
@@ -105,8 +104,9 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(country);
-                    await _context.SaveChangesAsync();
+                    var currentCountry = await _countryRepository.GetByIdAsync(id);
+                    currentCountry.Name = country.Name;
+                    await _countryRepository.UpdateAsync(country);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -126,35 +126,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Countries/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var country = await _context.Countries
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (country == null)
-            {
-                return NotFound();
-            }
-
-            return View(country);
-        }
-
-        // POST: Admin/Countries/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var country = await _context.Countries.FindAsync(id);
-            if (country != null)
-            {
-                _context.Countries.Remove(country);
-            }
-
-            await _context.SaveChangesAsync();
+            await _countryRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

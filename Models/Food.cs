@@ -15,19 +15,15 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Tên combo")]
-        public string? ComboName { get; set; }
+        public string ComboName { get; set; }
         [Required]
         [DisplayName("Giá combo")]
-        public long Price { get; set; }
+        public int Price { get; set; }
         [Required]
         [DisplayName("Mô tả")]
         public string Description { get; set; }
-        [Required]
         [DisplayName("Hình ảnh")]
-        public string? Poster
-        {
-            get; set;
-        }
+        public string? Poster { get; set; }
 
         public ICollection<Receipt>? Receipt { get; set; }
     }

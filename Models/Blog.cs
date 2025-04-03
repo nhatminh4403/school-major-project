@@ -26,7 +26,7 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Ảnh mô tả")]
-        public string? BlogPoster { get; set; }
+        public string BlogPoster { get; set; }
 
         public ICollection<Comment>? comments { get; set; }
     }

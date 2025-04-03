@@ -135,27 +135,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Seats/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var seat = await _context.Seats
-                .Include(s => s.Room)
-                .Include(s => s.SeatType)
-                .FirstOrDefaultAsync(m => m.SeatId == id);
-            if (seat == null)
-            {
-                return NotFound();
-            }
-
-            return View(seat);
-        }
-
-        // POST: Admin/Seats/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

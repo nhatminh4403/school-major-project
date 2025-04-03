@@ -150,27 +150,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Schedules/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var schedule = await _context.Schedules
-                .Include(s => s.Film)
-                .Include(s => s.Room)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-
-            return View(schedule);
-        }
-
-        // POST: Admin/Schedules/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

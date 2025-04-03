@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -56,47 +57,51 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Categories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CategoryDescription")] Category category)
+        [Route("tao-moi")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Category category)
         {
+            ModelState.Remove(nameof(Category.Films));
             if (ModelState.IsValid)
             {
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(category);
+
         }
 
         // GET: Admin/Categories/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _categoryRepository.GetByIdAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
-            return View(category);
+            var vm = new CategoryVM
+            {
+                Id = category.Id,
+                CategoryDescription = category.CategoryDescription,
+            };
+                return View(vm);
         }
 
         // POST: Admin/Categories/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Route("chinh-sua/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CategoryDescription")] Category category)
+        public async Task<IActionResult> Edit(int id, CategoryVM viewModel)
         {
-            if (id != category.Id)
+            if (id != viewModel.Id)
             {
                 return NotFound();
             }
@@ -105,12 +110,21 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    var currentCategory = await _categoryRepository.GetByIdAsync(id);
+                    if (currentCategory == null)
+                    {
+                        // Category đã bị xóa sau khi mở form Edit?
+                        ModelState.AddModelError("", "Không tìm thấy thể loại để cập nhật.");
+                        return View(viewModel); // Quay lại view với lỗi
+                                                // Hoặc return NotFound();
+                    }
+                 
+                    currentCategory.CategoryDescription =  viewModel.CategoryDescription;
+                    await _categoryRepository.UpdateAsync(currentCategory);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!CategoryExists(viewModel.Id))
                     {
                         return NotFound();
                     }
@@ -121,30 +135,12 @@ namespace school_major_project.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(category);
+            return View(viewModel);
         }
 
         // GET: Admin/Categories/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return View(category);
-        }
-
-        // POST: Admin/Categories/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

@@ -64,16 +64,17 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("tao-moi")]
         public async Task<IActionResult> Create(Blog blog, IFormFile BlogPoster)
         {
-            if(BlogPoster != null)
-            {
-                blog.BlogPoster = await SaveImage(BlogPoster);
-            }
-            else
-            {
-                ModelState.Remove("BlogPoster"); // Bỏ qua validation cho thuộc tính này
-            }
+
             if (ModelState.IsValid)
             {
+                if (BlogPoster != null)
+                {
+                    blog.BlogPoster = await SaveImage(BlogPoster);
+                }
+                else
+                {
+                    ModelState.Remove("BlogPoster"); // Bỏ qua validation cho thuộc tính này
+                }
                 await _blogRepository.AddAsync(blog);
                 return RedirectToAction(nameof(Index));
             }
@@ -82,14 +83,9 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Blogs/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var blog = await _context.Blogs.FindAsync(id);
+            var blog = await _blogRepository.GetByIdAsync(id);
             if (blog == null)
             {
                 return NotFound();
@@ -97,9 +93,6 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(blog);
         }
 
-        // POST: Admin/Blogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,BlogTitle,BlogContent,BlogCreatedDate,BlogPoster")] Blog blog)
@@ -132,18 +125,6 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(blog);
         }
 
-        // GET: Admin/Blogs/Delete/5
-        //public async Task<IActionResult> Delete(int id)
-        //{
-        //    var blog = await _blogRepository.GetByIdAsync(id);
-        //    if (blog == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return View(blog);
-        //}
-
-        // POST: Admin/Blogs/Delete/5
         [Route("xoa/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]

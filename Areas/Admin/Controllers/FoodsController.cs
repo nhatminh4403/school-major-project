@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.HelperClasses;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
+using Tesseract;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -17,7 +21,7 @@ namespace school_major_project.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IFoodRepository _foodRepository;
-        public FoodsController(ApplicationDbContext context,IFoodRepository foodRepository)
+        public FoodsController(ApplicationDbContext context, IFoodRepository foodRepository)
         {
             _context = context;
             _foodRepository = foodRepository;
@@ -40,8 +44,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var food = await _context.Foods
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var food = await _foodRepository.GetByIdAsync(id.Value);
             if (food == null)
             {
                 return NotFound();
@@ -49,7 +52,15 @@ namespace school_major_project.Areas.Admin.Controllers
 
             return View(food);
         }
-
+        private async Task<string> SaveImage(IFormFile image)
+        {
+            var savePath = Path.Combine("wwwroot/admin/images/foods", image.FileName); // Thay đổi đường dẫn theo cấu hình của bạn     
+            using (var fileStream = new FileStream(savePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+            return "/admin/images/foods/" + image.FileName; // Trả về đường dẫn tương đối
+        }
         // GET: Admin/Foods/Create
         [Route("tao-moi")]
         public IActionResult Create()
@@ -57,17 +68,23 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Foods/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Update the Create method to use the instance of SaveImage
         [HttpPost]
+        [Route("tao-moi")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] Food food)
+        public async Task<IActionResult> Create(Food food, IFormFile Poster)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(food);
-                await _context.SaveChangesAsync();
+                if (Poster != null)
+                {
+                    food.Poster = await SaveImage(Poster);
+                }
+                else
+                {
+                    ModelState.Remove("Poster"); // Bỏ qua validation cho thuộc tính này
+                }
+                await _foodRepository.AddAsync(food);
                 return RedirectToAction(nameof(Index));
             }
             return View(food);
@@ -75,14 +92,10 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Foods/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var food = await _context.Foods.FindAsync(id);
+            var food = await _foodRepository.GetByIdAsync(id);
             if (food == null)
             {
                 return NotFound();
@@ -95,7 +108,7 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id")] Food food)
+        public async Task<IActionResult> Edit(int id, Food food, IFormFile Poster)
         {
             if (id != food.Id)
             {
@@ -106,8 +119,20 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(food);
-                    await _context.SaveChangesAsync();
+                    var currentFood = await _foodRepository.GetByIdAsync(id);
+
+                    if (Poster == null)
+                    {
+                        food.Poster = currentFood.Poster;
+                    }
+                    else
+                    {
+                        food.Poster = await SaveImage(Poster);
+                    }
+                    currentFood.Price = food.Price;
+                    currentFood.ComboName = food.ComboName;
+                    currentFood.Description = food.Description;
+                    await _foodRepository.UpdateAsync(food);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -127,35 +152,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Foods/Delete/
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var food = await _context.Foods
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (food == null)
-            {
-                return NotFound();
-            }
-
-            return View(food);
-        }
-
-        // POST: Admin/Foods/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var food = await _context.Foods.FindAsync(id);
-            if (food != null)
-            {
-                _context.Foods.Remove(food);
-            }
-
-            await _context.SaveChangesAsync();
+            await _foodRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

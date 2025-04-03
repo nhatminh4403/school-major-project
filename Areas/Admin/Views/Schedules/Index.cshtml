@@ -44,7 +44,7 @@
                 <div class="col-12">
                     <div class="main__title">
                         <h2>@ViewData["Title"]</h2>
-                        <a href="/admin/schedules/add" class="main__title-link">Thêm lịch chiếu</a>
+                        <a href="/admin/lich-chieu/tao-moi" class="main__title-link">Thêm lịch chiếu</a>
                     </div>
                 </div>
             </div>
@@ -79,7 +79,7 @@
                                         <td><div class="main__table-text">@item.ScheduleTime</div></td>
                                         <td>
                                             <div class="main__table-btns">
-                                                <a href="/admin/schedules/edit/@item.Id" class="main__table-btn main__table-btn--edit">
+                                                <a asp-action="Edit" asp-controller="Schedules" asp-route-id="@item.Id" class="main__table-btn main__table-btn--edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="#modal-delete" onclick="setDeleteItem(@item.Id)" class="main__table-btn main__table-btn--delete open-modal">
@@ -209,7 +209,7 @@
         <h6 class="modal__title">Thông báo</h6>
         <p class="modal__text">Bạn có muốn xoá lịch chiếu này không?</p>
         <div class="modal__btns">
-            <button class="modal__btn modal__btn--apply" type="button" onclick="deleteItem('/admin/schedules/delete/' + item_id, '/admin/schedules')">
+            <button class="modal__btn modal__btn--apply" type="button" onclick="deleteItem('/admin/lich-chieu/xoa/' + item_id, '/admin/lich-chieu' )">
                 Xoá
             </button>
             <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>

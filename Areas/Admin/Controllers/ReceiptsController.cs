@@ -135,27 +135,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Receipts/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var receipt = await _context.Receipts
-                .Include(r => r.GetFood)
-                .Include(r => r.GetUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (receipt == null)
-            {
-                return NotFound();
-            }
-
-            return View(receipt);
-        }
-
-        // POST: Admin/Receipts/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

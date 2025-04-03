@@ -27,6 +27,7 @@
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\admin\images\blogs\" />
+    <Folder Include="wwwroot\admin\images\foods\" />
     <Folder Include="wwwroot\admin\images\seattypes\" />
     <Folder Include="wwwroot\cards\" />
     <Folder Include="wwwroot\OCR\Tesseract-OCR\tessdata\script\" />

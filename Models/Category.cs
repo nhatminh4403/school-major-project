@@ -13,7 +13,7 @@ namespace school_major_project.Models
         public int Id { get; set; }
         [Required]
         [DisplayName("Tên")]
-        public string? CategoryDescription { get; set; }
+        public string CategoryDescription { get; set; }
 
         public ICollection<Film> Films { get; set; }
     }

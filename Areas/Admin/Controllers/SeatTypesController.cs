@@ -135,19 +135,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/SeatTypes/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var seatType = await _seatTypeRepository.GetByIdAsync(id);
-            if (seatType == null)
-            {
-                return NotFound();
-            }
-
-            return View(seatType);
-        }
-
-        // POST: Admin/SeatTypes/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

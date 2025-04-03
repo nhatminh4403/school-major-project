@@ -126,25 +126,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Promotions/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var promotion = await _context.Promotions
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (promotion == null)
-            {
-                return NotFound();
-            }
-
-            return View(promotion);
-        }
-
-        // POST: Admin/Promotions/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

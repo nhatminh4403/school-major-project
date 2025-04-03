@@ -5,36 +5,7 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-@* <h1>Index</h1> *@
-
-@* <p> *@
-@*     <a asp-action="Create">Create New</a> *@
-@* </p> *@
-@* <table class="table"> *@
-@*     <thead> *@
-@*         <tr> *@
-@*             <th> *@
-@*                 @Html.DisplayNameFor(model => model.CategoryDescription) *@
-@*             </th> *@
-@*             <th></th> *@
-@*         </tr> *@
-@*     </thead> *@
-@*     <tbody> *@
-@* @foreach (var item in Model) { *@
-@*         <tr> *@
-@*             <td> *@
-@*                 @Html.DisplayFor(modelItem => item.CategoryDescription) *@
-@*             </td> *@
-@*             <td> *@
-@*                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> | *@
-@*                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> | *@
-@*                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> *@
-@*             </td> *@
-@*         </tr> *@
-@* } *@
-@*     </tbody> *@
-@* </table> *@
-<section layout:fragment="content" class="mt-5">
+<section  class="mt-5">
     <main class="main">
         <div class="container-fluid">
             <div class="row">
@@ -42,7 +13,7 @@
                 <div class="col-12">
                     <div class="main__title">
                         <h2>Danh sách thể loại</h2>
-                        <a href="/admin/the-loai/tao-moi" class="main__title-link">Thêm mới</a>
+                        <a asp-action="Create" class="main__title-link">Thêm mới</a>
                     </div>
                 </div>
                 <!-- end main title -->
@@ -102,7 +73,7 @@
         <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
         <div class="modal__btns">
             <button class="modal__btn modal__btn--apply" type="button"
-                    onclick="deleteItem('/admin/the-loai/xoa/'+ item_id, '/admin/the-loai')">
+                    onclick="deleteItem('/admin/the-loai/xoa/'+ deleteItemId, '/admin/the-loai')">
                 Xoá
             </button>
             <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>

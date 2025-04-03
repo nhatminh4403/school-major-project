@@ -131,35 +131,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Films/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var film = await _context.Films
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (film == null)
-            {
-                return NotFound();
-            }
-
-            return View(film);
-        }
-
-        // POST: Admin/Films/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var film = await _context.Films.FindAsync(id);
-            if (film != null)
-            {
-                _context.Films.Remove(film);
-            }
-
-            await _context.SaveChangesAsync();
+            await _filmRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

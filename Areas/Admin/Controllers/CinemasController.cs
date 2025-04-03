@@ -21,7 +21,7 @@ namespace school_major_project.Areas.Admin.Controllers
         private readonly ICinemaRepository _cinemaRepository;
         private readonly ISeatRepository _seatRepository;
         private readonly IScheduleRepository _scheduleRepository;
-        public CinemasController(ApplicationDbContext context,IScheduleRepository scheduleRepository,ICinemaRepository cinemaRepository,
+        public CinemasController(ApplicationDbContext context, IScheduleRepository scheduleRepository, ICinemaRepository cinemaRepository,
             ISeatRepository seatRepository)
         {
             _context = context;
@@ -31,12 +31,12 @@ namespace school_major_project.Areas.Admin.Controllers
         }
 
         // GET: Admin/Cinemas
-        [Route("")] 
+        [Route("")]
         public async Task<IActionResult> Index(int? id = null)
         {
             var cinemas = await _cinemaRepository.GetAllAsync();
             //var selectedCinema = await _cinemaRepository.GetSelectedCinema(id);
-            var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value): (cinemas.Any() ? cinemas.ElementAt(0) : null);
+            var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value) : (cinemas.Any() ? cinemas.ElementAt(0) : null);
             var viewModel = new CinemasViewModel
             {
                 SelectedCinema = selectedCinema,
@@ -55,8 +55,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var cinema = await _context.Cinemas
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var cinema = await _cinemaRepository.GetByIdAsync(id.Value);
             if (cinema == null)
             {
                 return NotFound();
@@ -70,7 +69,7 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             try
             {
-                Cinema cinema =await _cinemaRepository.GetByIdAsync(id);
+                Cinema cinema = await _cinemaRepository.GetByIdAsync(id);
                 if (cinema == null)
                 {
                     return NotFound(new { message = "Không tìm thấy rạp chiếu" });
@@ -96,17 +95,13 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Cinemas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Location")] Cinema cinema)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(cinema);
-                await _context.SaveChangesAsync();
+                await _cinemaRepository.AddAsync(cinema);
                 return RedirectToAction(nameof(Index));
             }
             return View(cinema);
@@ -121,7 +116,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var cinema = await _context.Cinemas.FindAsync(id);
+            var cinema = await _cinemaRepository.GetByIdAsync(id.Value);
             if (cinema == null)
             {
                 return NotFound();
@@ -129,9 +124,6 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(cinema);
         }
 
-        // POST: Admin/Cinemas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Location")] Cinema cinema)
@@ -145,8 +137,13 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(cinema);
-                    await _context.SaveChangesAsync();
+                    var currentCinema = await _cinemaRepository.GetByIdAsync(id);
+                    currentCinema.Id = cinema.Id;
+                    currentCinema.Location = cinema.Location;
+                    currentCinema.Map = cinema.Map;
+                    currentCinema.Name = cinema.Name;
+                    await _cinemaRepository.UpdateAsync(currentCinema);
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -166,35 +163,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Cinemas/Delete/5
         [Route("xoa/{id}")]
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var cinema = await _context.Cinemas
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (cinema == null)
-            {
-                return NotFound();
-            }
-
-            return View(cinema);
-        }
-
-        // POST: Admin/Cinemas/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cinema = await _context.Cinemas.FindAsync(id);
-            if (cinema != null)
-            {
-                _context.Cinemas.Remove(cinema);
-            }
-
-            await _context.SaveChangesAsync();
+            await _cinemaRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
