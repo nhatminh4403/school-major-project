@@ -59,8 +59,9 @@ namespace school_major_project.Areas.Admin.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
+        [Route("tao-moi")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name")] Country country)
+        public async Task<IActionResult> Create(Country country)
         {
             if (ModelState.IsValid)
             {
@@ -72,14 +73,10 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Countries/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var country = await _countryRepository.GetByIdAsync(id.Value);
+            var country = await _countryRepository.GetByIdAsync(id);
             if (country == null)
             {
                 return NotFound();
@@ -92,8 +89,8 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Country country)
+        [Route("chinh-sua/{id}")]
+        public async Task<IActionResult> Edit(int id, Country country)
         {
             if (id != country.Id)
             {
@@ -106,7 +103,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 {
                     var currentCountry = await _countryRepository.GetByIdAsync(id);
                     currentCountry.Name = country.Name;
-                    await _countryRepository.UpdateAsync(country);
+                    await _countryRepository.UpdateAsync(currentCountry);
                 }
                 catch (DbUpdateConcurrencyException)
                 {

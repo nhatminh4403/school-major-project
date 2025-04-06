@@ -97,7 +97,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Location")] Cinema cinema)
+        public async Task<IActionResult> Create( Cinema cinema)
         {
             if (ModelState.IsValid)
             {

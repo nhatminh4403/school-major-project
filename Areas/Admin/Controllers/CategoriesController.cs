@@ -66,8 +66,7 @@ namespace school_major_project.Areas.Admin.Controllers
             ModelState.Remove(nameof(Category.Films));
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                await _categoryRepository.AddAsync(category);
                 return RedirectToAction(nameof(Index));
             }
 
@@ -85,12 +84,8 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            var vm = new CategoryVM
-            {
-                Id = category.Id,
-                CategoryDescription = category.CategoryDescription,
-            };
-                return View(vm);
+            
+                return View(category);
         }
 
         // POST: Admin/Categories/Edit/5
@@ -99,9 +94,9 @@ namespace school_major_project.Areas.Admin.Controllers
         [HttpPost]
         [Route("chinh-sua/{id}")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, CategoryVM viewModel)
+        public async Task<IActionResult> Edit(int id, Category category)
         {
-            if (id != viewModel.Id)
+            if (id != category.Id)
             {
                 return NotFound();
             }
@@ -115,16 +110,16 @@ namespace school_major_project.Areas.Admin.Controllers
                     {
                         // Category đã bị xóa sau khi mở form Edit?
                         ModelState.AddModelError("", "Không tìm thấy thể loại để cập nhật.");
-                        return View(viewModel); // Quay lại view với lỗi
+                        return View(category); // Quay lại view với lỗi
                                                 // Hoặc return NotFound();
                     }
                  
-                    currentCategory.CategoryDescription =  viewModel.CategoryDescription;
+                    currentCategory.CategoryDescription =  category.CategoryDescription;
                     await _categoryRepository.UpdateAsync(currentCategory);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(viewModel.Id))
+                    if (!CategoryExists(category.Id))
                     {
                         return NotFound();
                     }
@@ -135,7 +130,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(viewModel);
+            return View(category);
         }
 
         // GET: Admin/Categories/Delete/5

@@ -13,9 +13,7 @@ namespace school_major_project.Models
         [Required]
         [DisplayName("Số ghế")]
         public string? SeatNumber { get; set; }
-        [Required]
-        [DisplayName("Giá")]
-        public int SeatPrice { get; set; }
+
         [DisplayName("Tình trạng ghế")]
         [Required]
         public bool Status { get; set; }

@@ -18,7 +18,7 @@ namespace school_major_project.Models
 
         [Required]
         [DisplayName("Giá loại ghế")]
-        public long? Price { get; set; }
+        public int Price { get; set; }
         [Required]
         [DisplayName("Điểm thưởng")]
         public int? PointGiving { get; set; }

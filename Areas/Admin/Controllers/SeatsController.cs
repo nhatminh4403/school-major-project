@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 
 namespace school_major_project.Areas.Admin.Controllers
@@ -15,10 +12,11 @@ namespace school_major_project.Areas.Admin.Controllers
     public class SeatsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public SeatsController(ApplicationDbContext context)
+        private readonly ISeatRepository _seatRepository;
+        public SeatsController(ApplicationDbContext context, ISeatRepository seatRepository)
         {
             _context = context;
+            _seatRepository = seatRepository;
         }
 
         // GET: Admin/Seats
@@ -139,13 +137,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var seat = await _context.Seats.FindAsync(id);
-            if (seat != null)
-            {
-                _context.Seats.Remove(seat);
-            }
-
-            await _context.SaveChangesAsync();
+            await _seatRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

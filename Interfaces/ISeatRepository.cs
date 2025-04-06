@@ -9,5 +9,7 @@ namespace school_major_project.Interfaces
         Task AddAsync(Seat seat);
         Task UpdateAsync(Seat seat);
         Task DeleteAsync(int id);
+        Task<IEnumerable<Seat>> GetSeatsByRoomId(int id);
+        Task<IEnumerable<Seat>> GetSeatsByScheduleIdAndRoomId(int roomId, int scheduleId);
     }
 }

@@ -20,5 +20,10 @@ namespace school_major_project.ModelServices
         {
             return await _context.ReceiptDetails.Include(p => p.Receipt).FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public async Task<IEnumerable<ReceiptDetail>> FindByScheduleId(int scheduleId)
+        {
+            return await _context.ReceiptDetails.Include(p => p.Receipt).Where(p => p.ScheduleId == scheduleId).ToListAsync();
+        }
     }
 }

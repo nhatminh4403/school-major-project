@@ -1,32 +1,51 @@
 ﻿@model school_major_project.Models.Country
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Chỉnh sửa quốc gia";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Edit</h1>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-action="Index" class="main__title-link">Trở về</a>
 
-<h4>Country</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!-- form -->
+                <div class="col-12">
+                    <form method="post" asp-action="Edit" class="form">
+                        <input type="hidden" asp-for="Id" />
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-12">
+
+                                <label class="form-check-label" style="color: white" asp-for="Name">Quốc gia</label>
+                                <input type="text" class="form__input" placeholder="Nhập tên quốc gia"
+                                       asp-for="Name" required aria-required="true" />
+                                <span asp-validation-for="Name" class="text-danger"></span>
+
+                            </div>
+
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="form__btn">Thực hiện</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- end form -->
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+        </div>
+    </main>
+</section>

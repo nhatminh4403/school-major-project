@@ -6,38 +6,6 @@
     int numberOfCinemas = Model.Cinemas.Count();
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-@section Styles {
-    <style>
-        body {
-            background-color: #2b2b31 !important;
-        }
-
-        .cinema-info {
-            background-color: #28282d;
-            margin-top: 20px;
-            color: white;
-            border-radius: 10px;
-            padding: 10px;
-        }
-
-        .cinema-info__container {
-            padding: 5px 10px;
-        }
-
-        ::selection {
-            background-color: lightgray;
-            color: black;
-        }
-
-        .disable-selection {
-            user-select: none;
-        }
-
-        .room-actions a {
-            margin-right: 10px;
-        }
-    </style>
-}
 
 
 <main class="main">
@@ -55,25 +23,20 @@
         <!-- Tabs Navigation -->
         <div class="col-12">
             <ul class="nav nav-tabs" id="cinemaTabs" role="tablist">
-
-                @for (int i = 0; i < Model.Cinemas.Count(); i++)
+                @foreach (var cinema in Model.Cinemas)
                 {
-                    var cinema = Model.Cinemas.ElementAt(i);
-
-                    <li class="nav-item">
-                        <button class="nav-link @(i == 0 ? "active" : "")"
-                                id="tab-cinema-@cinema.Id"
-                                data-bs-toggle="tab"
-                                data-bs-target="#tab-@cinema.Id"
-                                type="button"
-                                role="tab"
-                                aria-controls="tab-@cinema.Id"
-                                aria-selected="@(i == 0 ? "true" : "false")">
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-@cinema.Id"
+                           id="cinema-tab-@cinema.Id"
+                           class="nav-link @(Model.SelectedCinema?.Id == cinema.Id ? "active" : "")"
+                           data-cinema-id="@cinema.Id"
+                           data-bs-toggle="tab"
+                           role="tab"
+                           aria-controls="tab-@cinema.Id"
+                           aria-selected="@(Model.SelectedCinema?.Id == cinema.Id ? "true" : "false")">
                             @cinema.Name
-                        </button>
+                        </a>
                     </li>
-
-
                 }
             </ul>
         </div>
@@ -81,15 +44,15 @@
         <div class="cinema-info">
             <div class="cinema-info__container">
                 <h4 class="cinema-info__title">Thông tin chi nhánh</h4>
-                <p class="cinema-info__detail">Tên rạp: @Model.SelectedCinema?.Name</p>
-                <p class="cinema-info__detail">Địa chỉ: @Model.SelectedCinema?.Location</p>
-                <p class="cinema-info__detail">Vị trí: @Model.SelectedCinema?.Map</p>
+                <p class="cinema-info__detail">Tên rạp: <span id="cinema-name">@Model.SelectedCinema?.Name</span></p>
+                <p class="cinema-info__detail">Địa chỉ: <span id="cinema-location">@Model.SelectedCinema?.Location</span></p>
+                <p class="cinema-info__detail">Vị trí: <span id="cinema-map">@Model.SelectedCinema?.Map</span></p>
             </div>
             <div class="cinema-info__container">
-                <a asp-controller="Rooms" asp-action="Add" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
+                <button id="quick-create-room" class="btn btn-primary" data-cinema-id="@Model.SelectedCinema?.Id">
                     Thêm phòng mới
-                </a>
-                <a asp-controller="Cinemas" asp-action="Edit" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
+                </button>
+                <a id="edit-cinema-link" asp-controller="Cinemas" asp-action="Edit" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
                     Chỉnh sửa thông tin rạp
                 </a>
             </div>
@@ -97,10 +60,9 @@
 
         <!-- Tabs Content -->
         <div class="tab-content" id="cinemaTabsContent">
-            @for (int i = 0; i < Model.Cinemas.Count(); i++)
+            @foreach (var cinema in Model.Cinemas)
             {
-                var cinema = Model.Cinemas.ElementAt(i);
-                <div class="tab-pane fade show @(i == 0 ? "active" : "")"
+                <div class="tab-pane fade @(Model.SelectedCinema?.Id == cinema.Id ? "show active" : "")"
                      id="tab-@cinema.Id"
                      role="tabpanel"
                      aria-labelledby="cinema-tab-@cinema.Id">
@@ -119,8 +81,16 @@
                                         <p class="card-text">
                                             Vị trí: <span>@cinema.Map</span>
                                         </p>
-                                        <a asp-controller="Rooms" asp-action="Details" asp-area="Admin" asp-route-id="@room.Id" class="btn btn-info">Chi tiết phòng</a>
-                                        <a asp-controller="Rooms" asp-action="Edit" asp-area="Admin" asp-route-id="@room.Id" class="btn btn-primary">Chỉnh sửa</a>
+                                        <a asp-controller="Rooms"
+                                           asp-action="Details"
+                                           asp-area="Admin"
+                                           asp-route-id="@room.Id"
+                                           class="btn btn-info">Chi tiết phòng</a>
+                                        <a asp-controller="Rooms"
+                                           asp-action="Edit"
+                                           asp-area="Admin"
+                                           asp-route-id="@room.Id"
+                                           class="btn btn-primary">Chỉnh sửa</a>
                                         <a href="#modal-delete" onclick="setDeleteItem(@room.Id)" class="btn btn-danger open-modal">Xóa</a>
                                     </div>
                                 </div>
@@ -130,7 +100,6 @@
                 </div>
             }
         </div>
-
         <!-- End Tabs Content -->
     </div>
 </main>
@@ -141,7 +110,7 @@
     <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
     <div class="modal__btns">
         <button class="modal__btn modal__btn--apply" type="button"
-                onclick="deleteItem('/admin/phong-chieu/xoa/' + item_id, '/admin/rap-chieu')">
+                onclick="deleteItem('/admin/phong-chieu/xoa/' + deleteItemId, '/admin/rap-phim')">
             Xoá
         </button>
         <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>
@@ -150,4 +119,45 @@
 
 @section Scripts {
     <script src="~/js/admin/js/cinema.js"></script>
+}
+@section Styles {
+    <style>
+        body {
+            background-color: #2b2b31 !important;
+        }
+
+        .cinema-info {
+            background-color: #28282d;
+            margin-top: 20px;
+            color: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .cinema-info__container {
+            padding: 5px 10px;
+        }
+
+        .nav-item a {
+            color: white;
+        }
+
+            .nav-item a:hover {
+                background-color: #9d9d9d;
+                color: black;
+            }
+
+        ::selection {
+            background-color: lightgray;
+            color: black;
+        }
+
+        .disable-selection {
+            user-select: none;
+        }
+
+        .room-actions a {
+            margin-right: 10px;
+        }
+    </style>
 }

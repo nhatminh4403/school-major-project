@@ -15,6 +15,6 @@ namespace school_major_project.Models
         [DisplayName("Tên")]
         public string CategoryDescription { get; set; }
 
-        public ICollection<Film> Films { get; set; }
+        public ICollection<Film>? Films { get; set; }
     }
 }

@@ -46,5 +46,12 @@ namespace school_major_project.ModelServices
                 Where(p => p.FilmId == id).ToListAsync();
 
         }
+
+        public async Task<IEnumerable<Schedule>> GetSchedulesByRoomId(int id)
+        {
+            return await _dbContext.Schedules.
+                Include(p => p.Film).
+                Where(p => p.RoomId == id).ToListAsync();
+        }
     }
 }
