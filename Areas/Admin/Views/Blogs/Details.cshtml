@@ -1,43 +1,180 @@
 ﻿@model school_major_project.Models.Blog
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết bài đăng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section Styles {
+    <link href="~/css/admin/css/blog-detail.css" rel="stylesheet" />
+}
 
-<h1>Details</h1>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-action="Index" class="main__title-link">Trở về</a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<div>
-    <h4>Blog</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BlogTitle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BlogTitle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BlogContent)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BlogContent)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BlogCreatedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BlogCreatedDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BlogPoster)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BlogPoster)
-        </dd>
-    </dl>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <div class="blog-details-container">
+                        <div class="blog-details-header">
+                            <h3>
+                                <i class="fas fa-info-circle"></i> Thông tin bài đăng
+                            </h3>
+                            <div class="blog-details-actions">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="blog-details-edit">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa
+                                </a>
+                                <a href="#" class="blog-details-delete" data-toggle="modal" data-target="#modal-delete" data-id="@Model.Id">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                            </div>
+                        </div>
+                        <div class="blog-details-content">
+                            <div class="blog-details-row">
+                                <div class="blog-details-image-col">
+                                    <div class="blog-details-image">
+                                        <img src="@Model.BlogPoster" alt="@Model.BlogTitle">
+                                    </div>
+                                </div>
+                                <div class="blog-details-text-col">
+                                    <h4 class="blog-details-title">@Model.BlogTitle</h4>
+                                    <div class="blog-details-meta">
+                                        <div class="blog-details-date">
+                                            <i class="far fa-calendar-alt"></i> @Model.BlogCreatedDate.ToString("dd/MM/yyyy HH:mm")
+                                        </div>
+                                        <div class="blog-details-comments">
+                                            <i class="far fa-comment"></i> @Model.comments?.Count() bình luận
+                                        </div>
+                                    </div>
+                                    <div class="blog-details-text">
+                                        @Html.Raw(Model.BlogContent)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="blog-details-container comments-section">
+                        <div class="blog-details-header">
+                            <h3>
+                                <i class="far fa-comments"></i> Bình luận @Model.comments?.Count()
+                            </h3>
+                        </div>
+                        <div class="blog-details-content">
+                            @if (Model.comments != null && Model.comments.Any())
+                            {
+                                <table class="comments-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Người dùng</th>
+                                            <th>Nội dung</th>
+                                            <th>Ngày bình luận</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var comment in Model.comments.OrderByDescending(c => c.DateComment))
+                                        {
+                                            <tr>
+                                                <td>@comment.User?.UserName</td>
+                                                <td>@comment.Content</td>
+                                                <td>@comment.DateComment.ToString("dd/MM/yyyy HH:mm")</td>
+                                                <td>
+                                                    <a href="#" class="blog-details-delete" data-toggle="modal" data-target="#modal-delete-comment" data-id="@comment.Id">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="comments-empty">
+                                    <p>Chưa có bình luận nào cho bài đăng này.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+
+<!-- Delete Blog Modal -->
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <h5 class="modal-title custom-modal-title" id="modal-delete-label">Xác nhận xóa</h5>
+                <button type="button" class="close custom-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer custom-modal-footer">
+                <button type="button" class="btn custom-btn-secondary" data-dismiss="modal">Hủy</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn custom-btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<!-- Delete Comment Modal -->
+<div class="modal fade" id="modal-delete-comment" tabindex="-1" role="dialog" aria-labelledby="modal-delete-comment-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <h5 class="modal-title custom-modal-title" id="modal-delete-comment-label">Xác nhận xóa bình luận</h5>
+                <button type="button" class="close custom-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                Bạn có chắc chắn muốn xóa bình luận này không? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer custom-modal-footer">
+                <button type="button" class="btn custom-btn-secondary" data-dismiss="modal">Hủy</button>
+                <form id="delete-comment-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn custom-btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle delete comment modal
+            $('#modal-delete-comment').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var commentId = button.data('id');
+                var form = $('#delete-comment-form');
+                form.attr('action', '/admin/blogs/delete-comment/' + commentId);
+            });
+        });
+    </script>
+}

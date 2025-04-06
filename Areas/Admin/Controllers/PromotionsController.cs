@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
@@ -17,7 +12,7 @@ namespace school_major_project.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IPromotionRepository _promotionRepository;
-        public PromotionsController(ApplicationDbContext context,IPromotionRepository promotionRepository)
+        public PromotionsController(ApplicationDbContext context, IPromotionRepository promotionRepository)
         {
             _context = context;
             _promotionRepository = promotionRepository;
@@ -32,15 +27,10 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Promotions/Details/5
         [Route("chi-tiet/{id}")]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var promotion = await _context.Promotions
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var promotion = await _promotionRepository.GetByIdAsync(id);
             if (promotion == null)
             {
                 return NotFound();
@@ -56,17 +46,15 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: Admin/Promotions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Route("tao-moi")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Code,Description,StartDate,EndDate,DiscountRate,RedemptionPoint")] Promotion promotion)
+        public async Task<IActionResult> Create(Promotion promotion)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(promotion);
-                await _context.SaveChangesAsync();
+                promotion.Code = promotion.Code.ToUpper();
+                await _promotionRepository.AddAsync(promotion);
                 return RedirectToAction(nameof(Index));
             }
             return View(promotion);
@@ -74,14 +62,9 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Promotions/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var promotion = await _context.Promotions.FindAsync(id);
+            var promotion = await _promotionRepository.GetByIdAsync(id);
             if (promotion == null)
             {
                 return NotFound();
@@ -89,12 +72,10 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(promotion);
         }
 
-        // POST: Admin/Promotions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Route("chinh-sua/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Code,Description,StartDate,EndDate,DiscountRate,RedemptionPoint")] Promotion promotion)
+        public async Task<IActionResult> Edit(int id, Promotion promotion)
         {
             if (id != promotion.Id)
             {
@@ -105,8 +86,15 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(promotion);
-                    await _context.SaveChangesAsync();
+                    var currentPromotion = await _promotionRepository.GetByIdAsync(id);
+                    currentPromotion.Code = promotion.Code.ToUpper();
+                    currentPromotion.Description = promotion.Description;
+                    currentPromotion.StartDate = promotion.StartDate;
+                    currentPromotion.EndDate = promotion.EndDate;
+                    currentPromotion.DiscountRate = promotion.DiscountRate;
+                    currentPromotion.RedemptionPoint = promotion.RedemptionPoint;
+
+                    await _promotionRepository.UpdateAsync(currentPromotion);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,19 +112,12 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(promotion);
         }
 
-        // GET: Admin/Promotions/Delete/5
         [Route("xoa/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var promotion = await _context.Promotions.FindAsync(id);
-            if (promotion != null)
-            {
-                _context.Promotions.Remove(promotion);
-            }
-
-            await _context.SaveChangesAsync();
+            await _promotionRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 

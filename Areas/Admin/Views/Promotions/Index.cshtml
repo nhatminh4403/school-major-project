@@ -16,7 +16,7 @@
                 <div class="col-12">
                     <div class="main__title">
                         <h2>@ViewData["Title"]</h2>
-                        <a href="/admin/khuyen-mai/add" class="main__title-link">Thêm mới</a>
+                        <a href="/admin/khuyen-mai/tao-moi" class="main__title-link">Thêm mới</a>
                     </div>
                 </div>
                 <div class="promotion-section">
@@ -89,7 +89,7 @@
         <p class="modal__text">Bạn có muốn xoá dữ liệu này không? Không thể xoá dữ liệu đã có liên kết.</p>
         <div class="modal__btns">
             <button class="modal__btn modal__btn--apply" type="button"
-                    onclick="deleteItem('/admin/khuyen-mai/xoa/' + item_id, '/admin/khuyen-mai')">
+                    onclick="deleteItem('/admin/khuyen-mai/xoa/' + deleteItemId, '/admin/khuyen-mai')">
                 Xoá
             </button>
             <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>

@@ -2,7 +2,7 @@
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace school_major_project.Areas.Admin.Controllers
+namespace school_major_project.Areas.Admin.Controllers.ApiControllers
 {
     [Route("api/[controller]")]
     [ApiController]

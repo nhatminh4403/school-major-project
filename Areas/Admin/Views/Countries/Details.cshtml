@@ -5,21 +5,113 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>Country Details</h2>
+                    </div>
+                </div>
+            </div>
 
-<div>
-    <h4>Country</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4>@Model.Name</h4>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <dl class="row">
+                                        <dt class="col-sm-4">Country ID</dt>
+                                        <dd class="col-sm-8">@Model.Id</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.films != null && Model.films.Any())
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="main__title">
+                            <h2>Related Films</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-12">
+                        <div class="table-responsive">
+                            <table class="table main__table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Poster</th>
+                                        <th>Duration</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var film in Model.films)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="main__table-text">@film.Id</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@film.Name</div>
+                                            </td>
+                                            <td>
+                                                <img src="@film.PosterUrl" alt="Film Poster" style="max-width: 100px;" />
+                                            </td>
+                                            <td>
+                                                <div class="main__table-text">@film.FilmDuration minutes</div>
+                                            </td>
+                                            <td>
+                                                <div class="main__table-btns">
+                                                    <a href="#!" class="main__table-btn main__table-btn--view">
+                                                        <i class="icon ion-ios-eye"></i>
+                                                    </a>
+                                                    <a href="#!" class="main__table-btn main__table-btn--edit">
+                                                        <i class="icon ion-ios-create"></i>
+                                                    </a>
+                                                    <a href="#!" class="main__table-btn main__table-btn--delete">
+                                                        <i class="icon ion-ios-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            No films found for this country.
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="row mt-4">
+                <div class="col-12">
+                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
+                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>

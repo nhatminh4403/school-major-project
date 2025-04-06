@@ -1,9 +1,85 @@
 ﻿@model school_major_project.Models.Promotion
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Tạo khuyến mãi";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!--normal form -->
+                <div class="col-12">
+                    <form asp-action="Create" enctype="multipart/form-data" method="post" class="form">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="row">
+                            <div class="col-12 form__content">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="Code" class="text-white">Mã giảm giá</label>
+                                        <input type="text" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.Code)"
+                                               asp-for="Code" required />
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="Description" class="text-white">Mô tả</label>
+                                        <input type="text" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.Description)"
+                                               asp-for="Description" required />
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="StartDate" class="text-white">Ngày bắt đầu</label>
+                                        <input type="datetime-local" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.StartDate)"
+                                               asp-for="StartDate"
+                                               title="Ngày phát hành" required />
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="EndDate" class="text-white">Ngày kết thúc</label>
+                                        <input type="datetime-local" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.EndDate)" 
+                                               asp-for="EndDate"
+                                               title="Ngày phát hành" required />
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="DiscountRate" class="text-white">Mức giảm</label>
+                                        <input type="text" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.DiscountRate)"
+                                               asp-for="DiscountRate" required />
+                                    </div>
+                                    <div class="col-12 col-sm-6">
+                                        <label asp-for="RedemptionPoint" class="text-white">Điểm để đổi</label>
+                                        <input type="text" class="form__input"
+                                               placeholder="@Html.DisplayNameFor(model => model.RedemptionPoint)"
+                                               asp-for="RedemptionPoint"
+                                               required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="form__btn">Thực hiện</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+
+
+
+
+@* 
 
 <h1>Create</h1>
 
@@ -54,3 +130,4 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+ *@
