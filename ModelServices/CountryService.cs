@@ -14,11 +14,11 @@ namespace school_major_project.ModelServices
         }
         public async Task<IEnumerable<Country>> GetAllAsync()
         {
-            return await _context.Countries.ToListAsync();
+            return await _context.Countries.Include(p=>p.films).ToListAsync();
         }
         public async Task<Country> GetByIdAsync(int id)
         {
-            return await _context.Countries.FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Countries.Include(p => p.films).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Country country)
         {

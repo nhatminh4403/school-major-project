@@ -40,6 +40,8 @@ namespace school_major_project.Models
 
         [Required]
         public int CountryId { get; set; }
+        [ForeignKey(nameof(CountryId))]
+        public virtual Country? Country { get; set; }
 
         public ICollection<Rating>? Rating { get; set; }
         public ICollection<Schedule>? Schedules { get; set; }

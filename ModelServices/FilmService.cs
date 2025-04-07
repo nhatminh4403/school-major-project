@@ -15,11 +15,11 @@ namespace school_major_project.Services
         }
         public async Task<IEnumerable<Film>> GetAllAsync()
         {
-            return await _context.Films.Include(p => p.Categories).Include(p=> p.Rating).Include(p=>p.Schedules).ToListAsync();
+            return await _context.Films.Include(p => p.Categories).Include(p=> p.Rating).Include(p=>p.Schedules).Include(p=>p.Country).ToListAsync();
         }
         public async Task<Film> GetByIdAsync(int id)
         {
-            return await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).Include(p => p.Country).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Film film)
         {

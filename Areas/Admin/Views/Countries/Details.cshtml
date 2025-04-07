@@ -1,8 +1,11 @@
 ﻿@model school_major_project.Models.Country
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết quốc gia";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section Styles {
+    <link href="~/css/admin/css/country-detail.css" rel="stylesheet" />
 }
 
 <section>
@@ -11,23 +14,39 @@
             <div class="row">
                 <div class="col-12">
                     <div class="main__title">
-                        <h2>Country Details</h2>
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-action="Index" class="main__title-link">Trở về</a>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>@Model.Name</h4>
-                            <hr />
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-4">Country ID</dt>
-                                        <dd class="col-sm-8">@Model.Id</dd>
-                                    </dl>
+                    <div class="country-details-container">
+                        <div class="country-details-header">
+                            <h3>
+                                <i class="fas fa-info-circle"></i> Thông tin quốc gia
+                            </h3>
+                            <div class="country-details-actions">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="country-details-edit">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa
+                                </a>
+                                <a href="#" class="country-details-delete" data-toggle="modal" data-target="#modal-delete" data-id="@Model.Id">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                            </div>
+                        </div>
+                        <div class="country-details-content">
+                            <div class="country-details-row">
+                                <div class="country-details-text-col">
+                                    <h4 class="country-details-title">@Model.Name</h4>
+                                    <div class="country-details-meta">
+                                        <div class="country-details-id">
+                                            <i class="fas fa-hashtag"></i> ID: @Model.Id
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -35,83 +54,88 @@
                 </div>
             </div>
 
-            @if (Model.films != null && Model.films.Any())
-            {
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="main__title">
-                            <h2>Related Films</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table main__table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Poster</th>
-                                        <th>Duration</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var film in Model.films)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="main__table-text">@film.Id</div>
-                                            </td>
-                                            <td>
-                                                <div class="main__table-text">@film.Name</div>
-                                            </td>
-                                            <td>
-                                                <img src="@film.PosterUrl" alt="Film Poster" style="max-width: 100px;" />
-                                            </td>
-                                            <td>
-                                                <div class="main__table-text">@film.FilmDuration minutes</div>
-                                            </td>
-                                            <td>
-                                                <div class="main__table-btns">
-                                                    <a href="#!" class="main__table-btn main__table-btn--view">
-                                                        <i class="icon ion-ios-eye"></i>
-                                                    </a>
-                                                    <a href="#!" class="main__table-btn main__table-btn--edit">
-                                                        <i class="icon ion-ios-create"></i>
-                                                    </a>
-                                                    <a href="#!" class="main__table-btn main__table-btn--delete">
-                                                        <i class="icon ion-ios-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            No films found for this country.
-                        </div>
-                    </div>
-                </div>
-            }
-
-            <div class="row mt-4">
+            <!-- Films Section -->
+            <div class="row">
                 <div class="col-12">
-                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    <div class="country-details-container films-section">
+                        <div class="country-details-header">
+                            <h3>
+                                <i class="fas fa-film"></i>Số lượng phim: @Model.films?.Count()
+                            </h3>
+                        </div>
+                        <div class="country-details-content">
+                            @if (Model.films != null && Model.films.Any() && @Model.films?.Count() >0)
+                            {
+                                <table class="films-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên phim</th>
+                                            <th>Poster</th>
+                                            <th>Thời lượng</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var film in Model.films)
+                                        {
+                                            <tr>
+                                                <td>@film.Id</td>
+                                                <td>@film.Name</td>
+                                                <td>
+                                                    <img src="@film.PosterUrl" alt="Film Poster" style="max-width: 100px;" />
+                                                </td>
+                                                <td>@film.FilmDuration phút</td>
+                                                <td>
+                                                    <div class="country-details-actions">
+                                                        
+                                                        <a href="#!" class="country-details-edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="#!" class="country-details-delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="films-empty">
+                                    <p>Chưa có phim nào thuộc quốc gia này.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 </section>
+
+<!-- Delete Country Modal -->
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <h5 class="modal-title custom-modal-title" id="modal-delete-label">Xác nhận xóa</h5>
+                <button type="button" class="close custom-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                Bạn có chắc chắn muốn xóa quốc gia này không? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer custom-modal-footer">
+                <button type="button" class="btn custom-btn-secondary" data-dismiss="modal">Hủy</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn custom-btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

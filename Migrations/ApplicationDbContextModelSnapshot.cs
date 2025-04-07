@@ -842,11 +842,13 @@ namespace school_major_project.Migrations
 
             modelBuilder.Entity("school_major_project.Models.Film", b =>
                 {
-                    b.HasOne("school_major_project.Models.Country", null)
+                    b.HasOne("school_major_project.Models.Country", "Country")
                         .WithMany("films")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("school_major_project.Models.Rating", b =>

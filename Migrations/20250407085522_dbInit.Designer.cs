@@ -12,8 +12,8 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250401133456_dataInit")]
-    partial class dataInit
+    [Migration("20250407085522_dbInit")]
+    partial class dbInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -372,6 +372,20 @@ namespace school_major_project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ComboName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Poster")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.ToTable("Foods");
@@ -603,9 +617,6 @@ namespace school_major_project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SeatPrice")
-                        .HasColumnType("int");
-
                     b.Property<int>("SeatTypeId")
                         .HasColumnType("int");
 
@@ -635,8 +646,8 @@ namespace school_major_project.Migrations
                     b.Property<int>("PointGiving")
                         .HasColumnType("int");
 
-                    b.Property<long>("Price")
-                        .HasColumnType("bigint");
+                    b.Property<int>("Price")
+                        .HasColumnType("int");
 
                     b.Property<string>("TypeDescription")
                         .IsRequired()
@@ -834,11 +845,13 @@ namespace school_major_project.Migrations
 
             modelBuilder.Entity("school_major_project.Models.Film", b =>
                 {
-                    b.HasOne("school_major_project.Models.Country", null)
+                    b.HasOne("school_major_project.Models.Country", "Country")
                         .WithMany("films")
                         .HasForeignKey("CountryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("school_major_project.Models.Rating", b =>

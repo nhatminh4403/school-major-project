@@ -1,8 +1,11 @@
 ﻿@model school_major_project.Models.Category
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết thể loại";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section Styles {
+    <link href="~/css/admin/css/category-detail.css" rel="stylesheet" />
 }
 
 <section>
@@ -11,23 +14,39 @@
             <div class="row">
                 <div class="col-12">
                     <div class="main__title">
-                        <h2>Category Details</h2>
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-action="Index" class="main__title-link">Trở về</a>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <div class="container">
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4>@Model.CategoryDescription</h4>
-                            <hr />
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <dl class="row">
-                                        <dt class="col-sm-4">Category ID</dt>
-                                        <dd class="col-sm-8">@Model.Id</dd>
-                                    </dl>
+                    <div class="category-details-container">
+                        <div class="category-details-header">
+                            <h3>
+                                <i class="fas fa-info-circle"></i> Thông tin thể loại
+                            </h3>
+                            <div class="category-details-actions">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="category-details-edit">
+                                    <i class="fas fa-edit"></i> Chỉnh sửa
+                                </a>
+                                <a href="#" class="category-details-delete" data-toggle="modal" data-target="#modal-delete" data-id="@Model.Id">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                            </div>
+                        </div>
+                        <div class="category-details-content">
+                            <div class="category-details-row">
+                                <div class="category-details-text-col">
+                                    <h4 class="category-details-title">@Model.CategoryDescription</h4>
+                                    <div class="category-details-meta">
+                                        <div class="category-details-id">
+                                            <i class="fas fa-hashtag"></i> ID: @Model.Id
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -35,83 +54,88 @@
                 </div>
             </div>
 
-            @if (Model.Films != null && Model.Films.Any())
-            {
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="main__title">
-                            <h2>Related Films</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-12">
-                        <div class="table-responsive">
-                            <table class="table main__table">
-                                <thead>
-                                    <tr>
-                                        <th style="color:black">ID</th>
-                                        <th style="color:black">Name</th>
-                                        <th style="color:black">Poster</th>
-                                        <th style ="color:black">Duration</th>
-                                        <th style="color:black">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var film in Model.Films)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="main__table-text" style="color:black">@film.Id</div>
-                                            </td>
-                                            <td>
-                                                <div class="main__table-text" style="color:black">@film.Name</div>
-                                            </td>
-                                            <td>
-                                                <img src="@film.PosterUrl" alt="Film Poster" style="max-width: 100px;" />
-                                            </td>
-                                            <td>
-                                                <div class="main__table-text" style="color:black">@film.FilmDuration minutes</div>
-                                            </td>
-                                            <td>
-                                                <div class="main__table-btns">
-                                                    <a href="#!" class="main__table-btn main__table-btn--view">
-                                                        <i class="icon ion-ios-eye"></i>
-                                                    </a>
-                                                    <a href="#!" class="main__table-btn main__table-btn--edit">
-                                                        <i class="icon ion-ios-create"></i>
-                                                    </a>
-                                                    <a href="#!" class="main__table-btn main__table-btn--delete">
-                                                        <i class="icon ion-ios-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            }
-            else
-            {
-                <div class="row mt-4">
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            No films found in this category.
-                        </div>
-                    </div>
-                </div>
-            }
-
-            <div class="row mt-4">
+            <!-- Films Section -->
+            <div class="row">
                 <div class="col-12">
-                    <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-primary">Edit</a>
-                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                    <div class="category-details-container films-section">
+                        <div class="category-details-header">
+                            <h3>
+                                <i class="fas fa-film"></i> Số lượng phim: @Model.Films?.Count()
+                            </h3>
+                        </div>
+                        <div class="category-details-content">
+                            @if (Model.Films != null && Model.Films.Any())
+                            {
+                                <table class="films-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Tên phim</th>
+                                            <th>Poster</th>
+                                            <th>Thời lượng</th>
+                                            <th>Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var film in Model.Films)
+                                        {
+                                            <tr>
+                                                <td>@film.Id</td>
+                                                <td>@film.Name</td>
+                                                <td>
+                                                    <img src="@film.PosterUrl" alt="Film Poster" style="max-width: 100px;" />
+                                                </td>
+                                                <td>@film.FilmDuration phút</td>
+                                                <td>
+                                                    <div class="category-details-actions">
+                                                        
+                                                        <a href="#!" class="category-details-edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </a>
+                                                        <a href="#!" class="category-details-delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="films-empty">
+                                    <p>Chưa có phim nào thuộc thể loại này.</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 </section>
+
+<!-- Delete Category Modal -->
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <h5 class="modal-title custom-modal-title" id="modal-delete-label">Xác nhận xóa</h5>
+                <button type="button" class="close custom-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                Bạn có chắc chắn muốn xóa thể loại này không? Hành động này không thể hoàn tác.
+            </div>
+            <div class="modal-footer custom-modal-footer">
+                <button type="button" class="btn custom-btn-secondary" data-dismiss="modal">Hủy</button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn custom-btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
