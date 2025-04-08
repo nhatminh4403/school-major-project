@@ -18,11 +18,13 @@ namespace school_major_project.Areas.Admin.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IFilmRepository _filmRepository;
         private readonly ICountryRepository _countryRepository;
-        public FilmsController(ApplicationDbContext context,IFilmRepository filmRepository,ICountryRepository countryRepository)
+        private readonly ICategoryRepository _categoryRepository;
+        public FilmsController(ApplicationDbContext context,IFilmRepository filmRepository,ICountryRepository countryRepository,ICategoryRepository categoryRepository)
         {
             _context = context;
             _filmRepository = filmRepository;
             _countryRepository = countryRepository;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: Admin/Films
@@ -56,8 +58,12 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Films/Create
         [Route("tao-moi")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var categories = await _categoryRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
+            ViewBag.Categories =categories;
+            ViewBag.Countries = countries;
             return View();
         }
 
@@ -66,15 +72,22 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,PosterUrl,TrailerUrl,DirectorName,Language,FilmRated,FilmDuration,Actors,Quality,StartTime,CountryId")] Film film)
+        public async Task<IActionResult> Create( Film film,IFormFile PosterUrl)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(film);
-                await _context.SaveChangesAsync();
+                await _filmRepository.AddAsync(film);
                 return RedirectToAction(nameof(Index));
             }
-            return View(film);
+            else
+            {
+                var countries = await _countryRepository.GetAllAsync();
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "CategoryDescription");
+                ViewBag.Countries = new SelectList(countries, "Id", "Name");
+                return View(film);
+
+            }
         }
 
         // GET: Admin/Films/Edit/5

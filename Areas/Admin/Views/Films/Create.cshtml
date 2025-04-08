@@ -1,85 +1,232 @@
 ﻿@model school_major_project.Models.Film
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm phim mới";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var categories = ViewBag.Categories as IEnumerable<Category>;
+    var countries = ViewBag.Countries as IEnumerable<Country>;
 }
 
-<h1>Create</h1>
+@section Styles {
+    <style>
+        /* Select2 container styles */
+        .select2-container {
+            width: 100% !important;
+        }
+        
+        /* Multiple select styles */
+        .select2-container--default .select2-selection--multiple {
+            background-color: #2f3640;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            min-height: 38px;
+            max-height: none;
+            overflow-y: auto;
+        }
+        
+        /* Selected choice styles */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #ffd700;
+            color: #2f3640;
+            border: none;
+            margin: 4px;
+            padding: 2px 8px;
+        }
+        
+        /* Remove button styles */
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #2f3640;
+            margin-right: 5px;
+        }
+        
+        /* Highlighted option styles */
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #ffd700;
+            color: #2f3640;
+        }
+        
+        /* Dropdown styles */
+        .select2-dropdown {
+            background-color: #2f3640;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        /* Option styles */
+        .select2-container--default .select2-results__option {
+            color: #fff;
+            padding: 8px 12px;
+        }
+        
+        /* Search field styles */
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            background-color: #2f3640;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px;
+        }
+        
+        /* Make the selection area expandable */
+        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 4px;
+            min-height: 38px;
+            max-height: none;
+            overflow-y: auto;
+        }
+        
+        /* Ensure the dropdown is visible */
+        .select2-container--open .select2-dropdown {
+            z-index: 9999;
+        }
+    </style>
+}
 
-<h4>Film</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!--normal form -->
+                <div class="col-12">
+                    <form asp-action="Create" enctype="multipart/form-data" method="post" class="form">
+                        <div class="row">
+                            <div class="col-12 col-md-5 form__cover">
+                                <div class="row">
+                                    <div class="col-12 col-sm-6 col-md-12">
+                                        <div class="form__img">
+                                            <label for="form__img-upload">Upload cover (270 x 400)</label>
+                                            <input id="form__img-upload" class="form__img-upload" asp-for="PosterUrl"
+                                                   type="file" accept="image/*">
+                                            <img id="form__img" src="#" alt="Preview image">
+                                            <span asp-validation-for="PosterUrl" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-7 form__content">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <input type="text" class="form__input" placeholder="Tên phim" asp-for="Name" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <textarea id="text" asp-for="Description"
+                                                  class="form__textarea" placeholder="Mô tả" required></textarea>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <input type="datetime-local" class="form__input" placeholder="Ngày phát hành"
+                                               title="Ngày phát hành" asp-for="StartTime"
+                                               required />
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <input type="number" class="form__input" placeholder="Thời lượng (phút)"
+                                               title="Thời lượng (phút)" asp-for="FilmDuration" 
+                                               required />
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <select class="js-example-basic-single form-control" asp-for="CountryId" required>
+                                            <option value="">Chọn quốc gia</option>
+                                            @foreach (var country in countries)
+                                            {
+                                                <option value="@country.Id">@country.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="CountryId" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-lg-3">
+                                        <input class="form__input" placeholder="Giới hạn độ tuổi" type="text"
+                                               asp-for="FilmRated" required />
+                                    </div>
+                                    <div class="col-12 col-lg-6">
+                                        <select class="js-example-basic-multiple form-control" name="CategoryIds" multiple="multiple" required>
+                                            @foreach (var category in categories)
+                                            {
+                                                <option value="@category.Id">@category.CategoryDescription</option>
+                                            }
+                                        </select>
+                                        <span class="text-danger field-validation-valid" data-valmsg-for="CategoryIds" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="col-12  col-lg-6">
+                                        <input type="text" class="form__input" placeholder="Trailer" title="Trailer"
+                                              asp-for="TrailerUrl" required />
+                                    </div>
+                                    <div class="col-12  col-lg-6">
+                                        <input type="text" class="form__input" placeholder="Đạo diễn" title="Đạo diễn"
+                                               asp-for="DirectorName" required />
+                                    </div>
+                                    <div class="col-12  col-lg-6">
+                                        <input type="text" class="form__input" placeholder="Diễn viên" title="Diễn viên"
+                                               asp-for="Actors" required />
+                                    </div>
+                                    <div class="col-12  col-lg-6">
+                                        <input type="text" class="form__input" placeholder="Phụ đề" title="Phụ đề"
+                                               asp-for="Language" required />
+                                    </div>
+                                    <div class="col-12  col-lg-6">
+                                        <input type="text" class="form__input" placeholder="Chất luợng phim"
+                                               title="Chất luợng phim"
+                                               asp-for="Quality" required />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="form__btn">Thực hiện</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- end form -->
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PosterUrl" class="control-label"></label>
-                <input asp-for="PosterUrl" class="form-control" />
-                <span asp-validation-for="PosterUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TrailerUrl" class="control-label"></label>
-                <input asp-for="TrailerUrl" class="form-control" />
-                <span asp-validation-for="TrailerUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DirectorName" class="control-label"></label>
-                <input asp-for="DirectorName" class="form-control" />
-                <span asp-validation-for="DirectorName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Language" class="control-label"></label>
-                <input asp-for="Language" class="form-control" />
-                <span asp-validation-for="Language" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FilmRated" class="control-label"></label>
-                <input asp-for="FilmRated" class="form-control" />
-                <span asp-validation-for="FilmRated" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FilmDuration" class="control-label"></label>
-                <input asp-for="FilmDuration" class="form-control" />
-                <span asp-validation-for="FilmDuration" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Actors" class="control-label"></label>
-                <input asp-for="Actors" class="form-control" />
-                <span asp-validation-for="Actors" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Quality" class="control-label"></label>
-                <input asp-for="Quality" class="form-control" />
-                <span asp-validation-for="Quality" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CountryId" class="control-label"></label>
-                <select asp-for="CountryId" class ="form-control" asp-items="ViewBag.CountryId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        </div>
+    </main>
+</section>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+@section Scripts {
+    <script>
+        $(function() {
+            // Wait for Select2 to be available
+            if (typeof $.fn.select2 === 'undefined') {
+                console.error('Select2 is not loaded!');
+                return;
+            }
+
+            // Initialize Select2 for single select
+            $('.js-example-basic-single').select2({
+                theme: 'default',
+                placeholder: 'Chọn quốc gia',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Initialize Select2 for multiple select
+            $('.js-example-basic-multiple').select2({
+                theme: 'default',
+                placeholder: 'Chọn thể loại',
+                allowClear: true,
+                closeOnSelect: false,
+                width: '100%'
+            });
+
+            // Preview image before upload
+            $("#form__img-upload").change(function () {
+                const file = this.files[0];
+                if (file) {
+                    let reader = new FileReader();
+                    reader.onload = function(event) {
+                        $("#form__img").attr("src", event.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    </script>
+}
 

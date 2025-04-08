@@ -5,13 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <!-- CSS -->
-    <link rel="stylesheet" href="~/css/admin/css/bootstrap-reboot.min.css" />
-    <link rel="stylesheet" href="~/css/admin/css/bootstrap-grid.min.css" />
-    <link rel="stylesheet" href="~/css/admin/css/magnific-popup.css" />
-    <link rel="stylesheet" href="~/css/admin/css/jquery.mCustomScrollbar.min.css" />
-    <link rel="stylesheet" href="~/css/admin/css/select2.min.css" />
-    <link rel="stylesheet" href="~/css/admin/css/admin.css" />
-    <link rel="stylesheet" href="~/css/admin/css/sidebarNav.css" />
+    <link rel="stylesheet" href="~/css/admin/css/bootstrap-reboot.min.css">
+    <link rel="stylesheet" href="~/css/admin/css/bootstrap-grid.min.css">
+    <link rel="stylesheet" href="~/css/admin/css/magnific-popup.css">
+    <link rel="stylesheet" href="~/css/admin/css/jquery.mCustomScrollbar.min.css">
+    <link rel="stylesheet" href="~/css/admin/css/select2.min.css">
+    <link rel="stylesheet" href="~/css/admin/css/admin.css">
+    <link rel="stylesheet" href="~/css/admin/css/sidebarNav.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
@@ -40,6 +40,40 @@
             display: block;
             align-content: center;
             position: relative;
+        }
+
+        /* Select2 Custom Styles */
+        .select2-container {
+            width: 100% !important;
+        }
+        .select2-container--default .select2-selection--multiple {
+            background-color: #2f3640;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #ffd700;
+            color: #2f3640;
+            border: none;
+        }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: #2f3640;
+        }
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #ffd700;
+            color: #2f3640;
+        }
+        .select2-dropdown {
+            background-color: #2f3640;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .select2-container--default .select2-results__option {
+            color: #fff;
+        }
+        .select2-container--default .select2-search--dropdown .select2-search__field {
+            background-color: #2f3640;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
     @RenderSection("Styles", required: false)
@@ -445,31 +479,21 @@
         @RenderBody()
     </main>
 
+    <!-- JS -->
     <script src="~/js/admin/js/jquery-3.6.0.min.js"></script>
-    <!--<script src="~/js/admin/jsbootstrap.bundle.min.js"></script>-->
+    <script src="~/js/admin/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/admin/js/jquery.magnific-popup.min.js"></script>
-    <script src="~/js/admin/js/jquery.mousewheel.min.js"></script>
     <script src="~/js/admin/js/jquery.mCustomScrollbar.min.js"></script>
     <script src="~/js/admin/js/select2.min.js"></script>
     <script src="~/js/admin/js/admin.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    @* <script src="        /assets/admin/js/adminFilmApi.js"> </script> *@
-    @* <script src="        /assets/admin/js/adminCategoryAPI.js"></script> *@
-    @* <script src="        /assets/admin/js/adminAddFilmApi.js"></script> *@
-    @* <script src="        /assets/admin/js/adminCategoryApiEdit.js"></script> *@
-
-    <script src="~/js/admin/index.js"></script>
     <script>
-        document.getElementById('logoutLink').addEventListener('click', function (event) {
-            event.preventDefault();
-            document.getElementById('logoutForm').submit();
+        // Ensure Select2 is loaded before any page scripts
+        $(document).ready(function() {
+            if (typeof $.fn.select2 === 'undefined') {
+                console.error('Select2 is not loaded properly');
+            }
         });
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.min.js"
-            integrity="sha512-79j1YQOJuI8mLseq9icSQKT6bLlLtWknKwj1OpJZMdPt2pFBry3vQTt+NZuJw7NSd1pHhZlu0s12Ngqfa371EA=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
