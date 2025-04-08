@@ -1,36 +1,58 @@
 ﻿@model school_major_project.Models.Cinema
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm chi nhánh mới";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
 
-<h4>Cinema</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Location" class="control-label"></label>
-                <input asp-for="Location" class="form-control" />
-                <span asp-validation-for="Location" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<section >
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"] </h2>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!-- form -->
+                <div class="col-12">
+                    <form asp-action="Create" method="post" class="form">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        @Html.AntiForgeryToken()
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.Name)"
+                                               asp-for="Name" required />
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.Location)"
+                                               asp-for="Location" required />
+                                    </div>
+                                    <div class="col-12">
+                                        <input type="text" class="form__input" placeholder="Bản đồ hiển thị" asp-for="Map"
+                                               placeholder="@Html.DisplayNameFor(Model=> Model.Map)" name="map" required />
+                                    </div>
+                                </div>
+                            </div>
 
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <button type="submit" class="form__btn">thực hiện</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- end form -->
+            </div>
+        </div>
+    </main>
+</section>

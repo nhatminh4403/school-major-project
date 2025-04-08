@@ -27,9 +27,9 @@ namespace school_major_project.Models
         public int SeatTypeId { get; set; }
 
         [ForeignKey(nameof(RoomId))]
-        public virtual Room Room { get; set; }
+        public virtual Room? Room { get; set; }
 
         [ForeignKey(nameof(SeatTypeId))]
-        public virtual SeatType SeatType { get; set; }
+        public virtual SeatType? SeatType { get; set; }
     }
 }

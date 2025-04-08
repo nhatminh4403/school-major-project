@@ -22,7 +22,7 @@ namespace school_major_project.Models
         [Required]
         public int CinemaId { get; set; }
         [ForeignKey("CinemaId")]
-        public virtual Cinema Cinema { get; set; }
+        public virtual Cinema? Cinema { get; set; }
         public virtual ICollection<Seat>? Seats { get; set; }
         public virtual ICollection<Schedule>? Schedules { get; set; }
 

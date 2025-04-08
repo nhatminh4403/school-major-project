@@ -23,8 +23,8 @@ namespace school_major_project.Models
         [Required]
         public string UserId { get; set; }
         [ForeignKey("UserId")]
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
         [ForeignKey("BlogId")]
-        public virtual Blog Blog { get; set; }  
+        public virtual Blog? Blog { get; set; }  
     }
 }

@@ -14,11 +14,17 @@ namespace school_major_project.Services
         }
         public async Task<IEnumerable<Cinema>> GetAllAsync()
         {
-            return await _context.Cinemas.Include(p =>p.Rooms).ToListAsync();
+            return await _context.Cinemas
+                .Include(p => p.Rooms)
+                .ThenInclude(r => r.Seats)
+                .ToListAsync();
         }
         public async Task<Cinema> GetByIdAsync(int id)
         {
-            return await _context.Cinemas.Include(p => p.Rooms).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Cinemas
+                .Include(p => p.Rooms)
+                .ThenInclude(r => r.Seats)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Cinema cinema)
         {

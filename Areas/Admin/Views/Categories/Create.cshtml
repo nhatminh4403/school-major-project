@@ -20,7 +20,7 @@
                 <!-- form -->
                 <div class="col-12">
                     <form method="post" asp-action="Create" class="form">
-                        <div asp-validation-summary="All" class="text-danger"></div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         @Html.AntiForgeryToken() @* Thêm dòng này *@
 
                         <div class="row">

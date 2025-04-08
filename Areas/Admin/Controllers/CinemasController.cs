@@ -30,13 +30,17 @@ namespace school_major_project.Areas.Admin.Controllers
             _cinemaRepository = cinemaRepository;
         }
 
-        // GET: Admin/Cinemas
         [Route("")]
-        public async Task<IActionResult> Index(int? id = null)
+        public async Task<IActionResult> Index(int? id =null)
         {
             var cinemas = await _cinemaRepository.GetAllAsync();
-            //var selectedCinema = await _cinemaRepository.GetSelectedCinema(id);
-            var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value) : (cinemas.Any() ? cinemas.ElementAt(0) : null);
+            var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value)
+                : (cinemas.Any() ? cinemas.ElementAt(0) : null);
+            if(selectedCinema == null)
+            {
+                return NotFound();
+            }
+
             var viewModel = new CinemasViewModel
             {
                 SelectedCinema = selectedCinema,
@@ -45,6 +49,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
             return View(viewModel);
         }
+
 
         // GET: Admin/Cinemas/Details/5
         [Route("chi-tiet/{id}")]
@@ -95,6 +100,7 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
+        [Route("tao-moi")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create( Cinema cinema)
@@ -124,9 +130,10 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(cinema);
         }
 
+        [Route("chinh-sua/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Location")] Cinema cinema)
+        public async Task<IActionResult> Edit(int id, Cinema cinema)
         {
             if (id != cinema.Id)
             {
@@ -138,7 +145,6 @@ namespace school_major_project.Areas.Admin.Controllers
                 try
                 {
                     var currentCinema = await _cinemaRepository.GetByIdAsync(id);
-                    currentCinema.Id = cinema.Id;
                     currentCinema.Location = cinema.Location;
                     currentCinema.Map = cinema.Map;
                     currentCinema.Name = cinema.Name;

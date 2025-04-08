@@ -31,14 +31,14 @@ namespace school_major_project.Models
         public int ScheduleId { get; set; }
         [ForeignKey(nameof(ReceiptId))]
         [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
-        public virtual Receipt Receipt { get; set; }
+        public virtual Receipt? Receipt { get; set; }
 
         [ForeignKey(nameof(ScheduleId))]
         [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
-        public virtual Schedule Schedule { get; set; }
+        public virtual Schedule? Schedule { get; set; }
 
         [ForeignKey(nameof(SeatId))]  // Changed to use nameof for consistency
         [DeleteBehavior(DeleteBehavior.NoAction)]  // Add this
-        public virtual Seat Seat { get; set; }
+        public virtual Seat? Seat { get; set; }
     }
 }

@@ -1,9 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     const cinemaTabs = document.getElementById("cinemaTabs");
 
-    // Hàm hiển thị toast (giữ nguyên từ lần trước)
+    // Hàm hiển thị toast
     function showToast(message, type = 'info') {
-        // ... (code hàm showToast)
         let backgroundColor;
         switch (type.toLowerCase()) {
             case 'success': backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; break;
@@ -14,29 +13,43 @@ document.addEventListener("DOMContentLoaded", function () {
         Toastify({ text: message, duration: 3000, close: true, gravity: "top", position: "right", stopOnFocus: true, style: { background: backgroundColor } }).showToast();
     }
 
+    // Hàm tạo HTML cho card phòng chiếu mới
     function createRoomCardHtml(roomData) {
-        // Sử dụng template literals để dễ đọc và chèn biến
         return `
-            <div class="col-md-6 mb-4" id="room-card-${roomData.id}">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">${roomData.name || 'Phòng mới'}</h5>
+            <div class="room-card" id="room-card-${roomData.id}">
+                <div class="room-card-header">
+                    <h4 class="room-card-title">${roomData.name || 'Phòng mới'}</h4>
+                    <span class="room-card-id">#${roomData.id}</span>
+                </div>
+                <div class="room-card-content">
+                    <div class="room-card-info">
+                        <i class="fas fa-chair"></i>
+                        <span>Số ghế: ${roomData.seats ? roomData.seats.length : 0}</span>
                     </div>
-                    <div class="card-body">
-                        <p class="card-text">
-                            Địa chỉ: <span>${roomData.cinemaLocation || ''}</span>
-                        </p>
-                        <p class="card-text">
-                            Vị trí: <span>${roomData.cinemaMap || ''}</span>
-                        </p>
-                        <a href="${roomData.detailsUrl || '#'}" class="btn btn-info">Chi tiết phòng</a>
-                        <a href="${roomData.editUrl || '#'}" class="btn btn-primary">Chỉnh sửa</a>
-                        <a href="#modal-delete" onclick="setDeleteItem(${roomData.id})" class="btn btn-danger open-modal">Xóa</a>
+                    <div class="room-card-status ${roomData.isActive ? 'active' : 'inactive'}">
+                        <i class="fas ${roomData.isActive ? 'fa-check-circle' : 'fa-times-circle'}"></i>
+                        <span>${roomData.isActive ? 'Đang hoạt động' : 'Không hoạt động'}</span>
                     </div>
+                </div>
+                <div class="room-card-actions">
+                    <a href="/admin/phong-chieu/chi-tiet/${roomData.id}" class="view">
+                        <i class="fas fa-eye"></i>
+                        <span>Xem</span>
+                    </a>
+                    <a href="/admin/phong-chieu/chinh-sua/${roomData.id}" class="edit">
+                        <i class="fas fa-edit"></i>
+                        <span>Sửa</span>
+                    </a>
+                    <a href="#" class="delete" data-toggle="modal" data-target="#modal-delete-room-${roomData.id}">
+                        <i class="fas fa-trash"></i>
+                        <span>Xóa</span>
+                    </a>
                 </div>
             </div>
         `;
     }
+
+    // Xử lý chuyển tab
     if (!cinemaTabs) {
         console.error("Không tìm thấy các phần tử DOM cần thiết cho cinemaTabs");
     } else {
@@ -45,38 +58,46 @@ document.addEventListener("DOMContentLoaded", function () {
             const target = event.target;
 
             if (target.classList.contains("nav-link")) {
-                // ... (code xử lý active tab, cập nhật link, fetch info giữ nguyên) ...
-                document.querySelectorAll("#cinemaTabs .nav-link").forEach(link => { /*...*/ });
-                target.classList.add("active"); target.setAttribute("aria-selected", "true");
-                const cinemaId = target.getAttribute("data-cinema-id");
-                document.querySelectorAll("#cinemaTabsContent .tab-pane").forEach(pane => { /*...*/ });
-                const selectedPane = document.getElementById(`tab-${cinemaId}`);
-                if (selectedPane) selectedPane.classList.add("show", "active");
-                const addRoomLink = document.getElementById("add-room-link"); // Đảm bảo có ID này hoặc bỏ qua
-                const editCinemaLink = document.getElementById("edit-cinema-link");
-                // if (addRoomLink) addRoomLink.setAttribute("href", `/admin/phong-chieu/tao-moi/${cinemaId}`); // Có thể không cần link này nữa
-                if (editCinemaLink) editCinemaLink.setAttribute("href", `/admin/rap-phim/chinh-sua/${cinemaId}`);
+                // Cập nhật active tab
+                document.querySelectorAll("#cinemaTabs .nav-link").forEach(link => {
+                    link.classList.remove("active");
+                    link.setAttribute("aria-selected", "false");
+                });
+                target.classList.add("active");
+                target.setAttribute("aria-selected", "true");
 
-                // Cập nhật data-cinema-id cho nút Quick Create khi chuyển tab
-                const quickCreateBtn = document.getElementById("quick-create-room");
-                if (quickCreateBtn) {
-                    quickCreateBtn.setAttribute("data-cinema-id", cinemaId);
+                // Cập nhật active tab content
+                const cinemaId = target.getAttribute("data-cinema-id");
+                document.querySelectorAll("#cinemaTabsContent .tab-pane").forEach(pane => {
+                    pane.classList.remove("show", "active");
+                });
+                const selectedPane = document.getElementById(`tab-${cinemaId}`);
+                if (selectedPane) {
+                    selectedPane.classList.add("show", "active");
                 }
 
-
-                // Fetch cinema info (giữ nguyên)
+                // Fetch cinema info
                 fetch(`/admin/rap-phim/lay-thong-tin/${cinemaId}`)
-                    .then(/* ... */)
-                    .then(/* ... */)
-                    .catch(/* ... */);
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Cập nhật thông tin rạp phim nếu cần
+                        console.log("Cinema info updated:", data);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching cinema info:', error);
+                    });
             }
         });
     }
 
-    const quickCreateButton = document.getElementById("quick-create-room");
-    if (quickCreateButton) {
-        quickCreateButton.addEventListener("click", function () {
-            // Lấy cinemaId từ data attribute của nút (đã được cập nhật khi chuyển tab)
+    // Xử lý nút thêm phòng mới
+    document.querySelectorAll('.quick-create-room').forEach(button => {
+        button.addEventListener("click", function () {
             const cinemaId = this.getAttribute("data-cinema-id");
 
             if (!cinemaId) {
@@ -85,87 +106,110 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             this.disabled = true;
-            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang xử lý...';
-            const originalButtonText = "Thêm phòng mới"; // Lưu lại text gốc
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+            const originalButtonText = '<i class="fas fa-plus"></i> Thêm phòng mới';
 
             const formData = new FormData();
             const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
             if (!tokenInput) {
                 showToast("Lỗi bảo mật: Không tìm thấy Anti-Forgery Token.", 'error');
-                this.disabled = false; this.innerHTML = originalButtonText;
+                this.disabled = false;
+                this.innerHTML = originalButtonText;
                 return;
             }
             const token = tokenInput.value;
 
             fetch(`/admin/phong-chieu/tao-moi/${cinemaId}`, {
-                method: 'POST', headers: { 'RequestVerificationToken': token }, body: formData
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                body: formData
             })
-                .then(response => {
-                    const contentType = response.headers.get("content-type");
-                    if (contentType && contentType.indexOf("application/json") !== -1) {
-                        return response.json().then(data => ({ ok: response.ok, status: response.status, data }));
-                    } else {
-                        return response.text().then(text => { throw new Error("Server không trả về JSON: " + text) });
-                    }
-                })
-                .then(({ ok, status, data }) => {
-                    if (ok && data.success && data.room) { // <<< Kiểm tra có data.room
-                        showToast(data.message || `Đã tạo phòng thành công!`, 'success');
-
-                        // <<< START: Cập nhật DOM >>>
-                        const targetPaneId = `tab-${cinemaId}`;
-                        const targetContainer = document.querySelector(`#${targetPaneId} .row.mt-3`);
-
-                        if (targetContainer) {
-                            // Tạo HTML cho card mới
-                            const newRoomHtml = createRoomCardHtml(data.room);
-                            // Thêm vào container
-                            targetContainer.insertAdjacentHTML('beforeend', newRoomHtml);
-
-                            // Xóa thông báo "chưa có phòng" nếu có
-                            const noRoomsMessage = targetContainer.querySelector('.no-rooms-message');
-                            if (noRoomsMessage) {
-                                noRoomsMessage.remove();
-                            }
-
-                        } else {
-                            console.error(`Không tìm thấy container phòng cho tab ID: ${targetPaneId}`);
-                            showToast("Tạo phòng thành công nhưng lỗi cập nhật giao diện.", 'warning');
-                            // Có thể cân nhắc reload lại trang trong trường hợp này
-                            // setTimeout(() => location.reload(), 1500);
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showToast("Thêm phòng mới thành công!", 'success');
+                    
+                    // Tạo card phòng mới và thêm vào grid
+                    const roomsGrid = document.querySelector(`#tab-${cinemaId} .rooms-grid`);
+                    if (roomsGrid) {
+                        // Nếu chưa có phòng nào, xóa thông báo "Chưa có phòng chiếu nào"
+                        const emptyMessage = document.querySelector(`#tab-${cinemaId} .rooms-empty`);
+                        if (emptyMessage) {
+                            emptyMessage.remove();
                         }
-
-                        this.disabled = false;
-                        this.innerHTML = originalButtonText;
-
-                    } else {
-                        const errorMessage = data?.message || `Lỗi không xác định (HTTP ${status})`;
-                        showToast(`Lỗi: ${errorMessage}`, 'error');
-                        this.disabled = false; this.innerHTML = originalButtonText;
+                        
+                        // Thêm card phòng mới vào đầu grid
+                        roomsGrid.insertAdjacentHTML('afterbegin', createRoomCardHtml(data.room));
                     }
-                })
-                .catch(error => {
-                    console.error("Lỗi khi tạo phòng:", error);
-                    showToast(`Có lỗi xảy ra khi tạo phòng mới: ${error.message}`, 'error');
-                    this.disabled = false; this.innerHTML = originalButtonText;
-                });
+                } else {
+                    showToast(data.message || "Có lỗi xảy ra khi thêm phòng mới.", 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast("Có lỗi xảy ra khi thêm phòng mới.", 'error');
+            })
+            .finally(() => {
+                this.disabled = false;
+                this.innerHTML = originalButtonText;
+            });
         });
-    }
+    });
 
-    const initialActiveTab = document.querySelector("#cinemaTabs .nav-link.active");
-    const initialCinemaId = initialActiveTab ? initialActiveTab.getAttribute("data-cinema-id") : null;
-    if (initialCinemaId && quickCreateButton) {
-        quickCreateButton.setAttribute("data-cinema-id", initialCinemaId);
-    }
-    // ===
-
-    document.querySelectorAll("#cinemaTabsContent .tab-pane").forEach(pane => {
-        const roomContainer = pane.querySelector('.row.mt-3');
-        if (roomContainer && !roomContainer.querySelector('.col-md-6')) { // Nếu không có card phòng nào
-            roomContainer.innerHTML = '<p class="no-rooms-message col-12 text-center text-muted fst-italic">Rạp này chưa có phòng nào.</p>';
+    // Xử lý xóa phòng chiếu
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.room-card-actions .delete')) {
+            event.preventDefault();
+            const deleteLink = event.target.closest('.room-card-actions .delete');
+            const roomId = deleteLink.getAttribute('data-room-id');
+            
+            if (roomId) {
+                // Hiển thị modal xác nhận xóa
+                const modalId = `#modal-delete-room-${roomId}`;
+                const modal = document.querySelector(modalId);
+                if (modal) {
+                    $(modal).modal('show');
+                }
+            }
         }
     });
-    // ===
 
+    // Xử lý xóa rạp phim
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.cinema-details-delete')) {
+            event.preventDefault();
+            const deleteLink = event.target.closest('.cinema-details-delete');
+            const modalId = deleteLink.getAttribute('data-target');
+            
+            if (modalId) {
+                $(modalId).modal('show');
+            }
+        }
+    });
+});
 
+$(document).ready(function () {
+    // Xử lý modal xóa rạp phim
+    $('.cinema-details-delete').on('click', function (e) {
+        e.preventDefault();
+        const cinemaId = $(this).data('cinema-id');
+        const cinemaName = $(this).data('cinema-name');
+
+        // Cập nhật nội dung modal
+        $('#modal-delete-cinema-label').text(`Xác nhận xóa rạp phim: ${cinemaName}`);
+        $('.custom-modal-body').html(`Bạn có chắc chắn muốn xóa rạp phim <strong>${cinemaName}</strong> không? Hành động này sẽ xóa tất cả các phòng chiếu thuộc rạp và không thể hoàn tác.`);
+
+        // Cập nhật action của form
+        $('#delete-cinema-form').attr('action', `/admin/rap-phim/xoa/${cinemaId}`);
+
+        // Hiển thị modal
+        $('#modal-delete-cinema').modal('show');
+    });
 });

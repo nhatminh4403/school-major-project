@@ -15,7 +15,7 @@
             <div class="col-12">
                 <div class="main__title">
                     <h2>@ViewBag.Title</h2>
-                    <a asp-controller="Admin" asp-action="AddCinema" class="main__title-link">Thêm mới</a>
+                    <a asp-action="Create" class="main__title-link">Thêm mới</a>
                 </div>
             </div>
             <!-- End Main Title -->
@@ -27,13 +27,13 @@
                 {
                     <li class="nav-item" role="presentation">
                         <a href="#tab-@cinema.Id"
-                           id="cinema-tab-@cinema.Id"
-                           class="nav-link @(Model.SelectedCinema?.Id == cinema.Id ? "active" : "")"
-                           data-cinema-id="@cinema.Id"
-                           data-bs-toggle="tab"
-                           role="tab"
-                           aria-controls="tab-@cinema.Id"
-                           aria-selected="@(Model.SelectedCinema?.Id == cinema.Id ? "true" : "false")">
+                        id="cinema-tab-@cinema.Id"
+                        class="nav-link @(Model.SelectedCinema?.Id == cinema.Id ? "active" : "")"
+                        data-cinema-id="@cinema.Id"
+                        data-bs-toggle="tab"
+                        role="tab"
+                        aria-controls="tab-@cinema.Id"
+                        aria-selected="@(Model.SelectedCinema?.Id == cinema.Id ? "true" : "false")">
                             @cinema.Name
                         </a>
                     </li>
@@ -41,61 +41,99 @@
             </ul>
         </div>
 
-        <div class="cinema-info">
-            <div class="cinema-info__container">
-                <h4 class="cinema-info__title">Thông tin chi nhánh</h4>
-                <p class="cinema-info__detail">Tên rạp: <span id="cinema-name">@Model.SelectedCinema?.Name</span></p>
-                <p class="cinema-info__detail">Địa chỉ: <span id="cinema-location">@Model.SelectedCinema?.Location</span></p>
-                <p class="cinema-info__detail">Vị trí: <span id="cinema-map">@Model.SelectedCinema?.Map</span></p>
-            </div>
-            <div class="cinema-info__container">
-                <button id="quick-create-room" class="btn btn-primary" data-cinema-id="@Model.SelectedCinema?.Id">
-                    Thêm phòng mới
-                </button>
-                <a id="edit-cinema-link" asp-controller="Cinemas" asp-action="Edit" asp-route-id="@Model.SelectedCinema?.Id" class="btn btn-primary">
-                    Chỉnh sửa thông tin rạp
-                </a>
-            </div>
-        </div>
-
         <!-- Tabs Content -->
         <div class="tab-content" id="cinemaTabsContent">
             @foreach (var cinema in Model.Cinemas)
             {
                 <div class="tab-pane fade @(Model.SelectedCinema?.Id == cinema.Id ? "show active" : "")"
-                     id="tab-@cinema.Id"
-                     role="tabpanel"
-                     aria-labelledby="cinema-tab-@cinema.Id">
-                    <div class="row mt-3">
-                        @foreach (var room in cinema.Rooms)
-                        {
-                            <div class="col-md-6 mb-4">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="card-title">@room.Name</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="card-text">
-                                            Địa chỉ: <span>@cinema.Location</span>
-                                        </p>
-                                        <p class="card-text">
-                                            Vị trí: <span>@cinema.Map</span>
-                                        </p>
-                                        <a asp-controller="Rooms"
-                                           asp-action="Details"
-                                           asp-area="Admin"
-                                           asp-route-id="@room.Id"
-                                           class="btn btn-info">Chi tiết phòng</a>
-                                        <a asp-controller="Rooms"
-                                           asp-action="Edit"
-                                           asp-area="Admin"
-                                           asp-route-id="@room.Id"
-                                           class="btn btn-primary">Chỉnh sửa</a>
-                                        <a href="#modal-delete" onclick="setDeleteItem(@room.Id)" class="btn btn-danger open-modal">Xóa</a>
+                id="tab-@cinema.Id"
+                role="tabpanel"
+                aria-labelledby="cinema-tab-@cinema.Id">
+                    <div class="cinema-details-container mb-4">
+                        <div class="cinema-details-header">
+                            <h3><i class="fas fa-film"></i> @cinema.Name</h3>
+                            <div class="cinema-details-actions">
+                                <button id="quick-create-room-@cinema.Id" class="btn quick-create-room" data-cinema-id="@cinema.Id">
+                                    <i class="fas fa-plus"></i> Thêm phòng mới
+                                </button>
+                                <a asp-action="Edit" asp-route-id="@cinema.Id" class="cinema-details-edit">
+                                    <i class="fas fa-edit"></i> Sửa
+                                </a>
+                                <a href="#" class="cinema-details-delete" data-cinema-id="@cinema.Id" data-cinema-name="@cinema.Name">
+                                    <i class="fas fa-trash"></i> Xóa
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="cinema-details-content">
+                            <div class="cinema-details-row">
+                                <div class="cinema-details-text-col">
+                                    <div class="cinema-details-meta">
+                                        <div class="cinema-details-id">
+                                            <i class="fas fa-hashtag"></i>
+                                            <span>ID: @cinema.Id</span>
+                                        </div>
+                                        <div class="cinema-details-location">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <span>@cinema.Location</span>
+                                        </div>
+                                        <div class="cinema-details-location">
+                                            <i class="fa-solid fa-map"></i>        
+                                            <span>@cinema.Map</span>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="cinema-details-map">
+                                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4241674197956!2d106.69877!3d10.775844!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ2JzM1LjgiTiAxMDbCsDQxJzU1LjYiRQ!5e0!3m2!1svi!2s!4v1620000000000!5m2!1svi!2s" allowfullscreen="" loading="lazy"></iframe>
+                                </div>
                             </div>
-                        }
+
+                            <div class="rooms-section">
+                                <h3><i class="fas fa-door-open"></i> Danh sách phòng chiếu</h3>
+                                @if (cinema.Rooms != null && cinema.Rooms.Any())
+                                {
+                                    <div class="rooms-grid">
+                                        @foreach (var room in cinema.Rooms)
+                                        {
+                                            <div class="room-card">
+                                                <div class="room-card-header">
+                                                    <h4 class="room-card-title">@room.Name</h4>
+                                                    <span class="room-card-id">#@room.Id</span>
+                                                </div>
+                                                <div class="room-card-content">
+                                                    <div class="room-card-info">
+                                                        <i class="fas fa-chair"></i>
+                                                        <span>Số ghế: @(room.Seats?.Count() ?? 0)</span>
+                                                    </div>
+                                                   
+                                                </div>
+                                                <div class="room-card-actions">
+                                                    <a asp-controller="Rooms" asp-action="Details" asp-route-id="@room.Id" class="view">
+                                                        <i class="fas fa-eye"></i>
+                                                        <span>Xem</span>
+                                                    </a>
+                                                    <a asp-controller="Rooms" asp-action="Edit" asp-route-id="@room.Id" class="edit">
+                                                        <i class="fas fa-edit"></i>
+                                                        <span>Sửa</span>
+                                                    </a>
+                                                    <a href="#modal-delete" onclick="setDeleteItem(@room.Id)" class="delete open-modal">
+                                                        <i class="fas fa-trash"></i>
+                                                        <span>Xóa</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="rooms-empty">
+                                        <i class="fas fa-info-circle"></i>
+                                        <p>Chưa có phòng chiếu nào</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             }
@@ -117,8 +155,33 @@
     </div>
 </div>
 
+<!-- Delete Cinema Modal -->
+<div class="modal fade" id="modal-delete-cinema" tabindex="-1" role="dialog" aria-labelledby="modal-delete-cinema-label" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content custom-modal-content">
+            <div class="modal-header custom-modal-header">
+                <h5 class="modal-title custom-modal-title" id="modal-delete-cinema-label">Xác nhận xóa rạp phim</h5>
+                <button type="button" class="close custom-modal-close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body custom-modal-body">
+                Bạn có chắc chắn muốn xóa rạp phim này không? Hành động này sẽ xóa tất cả các phòng chiếu thuộc rạp và không thể hoàn tác.
+            </div>
+            <div class="modal-footer custom-modal-footer">
+                <button type="button" class="btn custom-btn-secondary" data-dismiss="modal">Hủy</button>
+                <form id="delete-cinema-form" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn custom-btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="~/js/admin/js/cinema.js"></script>
+
 }
 @section Styles {
     <style>
@@ -160,4 +223,6 @@
             margin-right: 10px;
         }
     </style>
+    <link rel="stylesheet" href="~/css/admin/css/cinema-detail.css" />
+
 }

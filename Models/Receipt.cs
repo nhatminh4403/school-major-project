@@ -22,11 +22,11 @@ namespace school_major_project.Models
         
         public int ComboFoodId { get; set; }
         [ForeignKey(nameof(ComboFoodId))]
-        public virtual Food GetFood { get; set; }
+        public virtual Food? GetFood { get; set; }
 
         [Required]
         public string UserId { get; set; }
         [ForeignKey("UserId")]
-        public virtual User GetUser { get; set; }
+        public virtual User? GetUser { get; set; }
     }
 }
