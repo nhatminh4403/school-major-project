@@ -255,19 +255,14 @@ namespace school_major_project.Areas.Admin.Controllers
         }
 
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var room = await _context.Rooms.FindAsync(id);
+            
+            var room = await _roomRepository.GetByIdAsync(id);
             if (room == null)
             {
                 return NotFound();
             }
-            ViewData["CinemaId"] = new SelectList(_context.Cinemas, "Id", "Location", room.CinemaId);
             return View(room);
         }
 
@@ -276,7 +271,8 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,CinemaId")] Room room)
+        [Route("chinh-sua/{id}")]
+        public async Task<IActionResult> Edit(int id, Room room)
         {
             if (id != room.Id)
             {
@@ -287,8 +283,10 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(room);
-                    await _context.SaveChangesAsync();
+                    Room currentRoom = await _roomRepository.GetByIdAsync(id);
+                    currentRoom.Name = room.Name;
+                    currentRoom.Description = room.Description;
+                    await _roomRepository.UpdateAsync(currentRoom);
                 }
                 catch (DbUpdateConcurrencyException)
                 {

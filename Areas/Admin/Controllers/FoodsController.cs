@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using school_major_project.Areas.Admin.HelperClasses;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using Tesseract;
 
 namespace school_major_project.Areas.Admin.Controllers
 {

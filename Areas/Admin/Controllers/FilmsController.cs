@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
@@ -68,10 +63,25 @@ namespace school_major_project.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Film film, IFormFile PosterUrl, int[] SelectedCategoryIds)
         {
+            
+
             if (ModelState.IsValid)
             {
                 if (PosterUrl != null)
                 {
+                    if (ValidateImageExtension(PosterUrl.FileName))
+                    {
+                        if (!ValidatImageSize(PosterUrl, 5242880))
+                        {
+                            ModelState.AddModelError("PosterUrl", "Image size is too big. The limit is only 5MB");
+                            return View(film);
+                        }
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("PosterUrl", "Invalid image format for main image. Please upload a jpg, jpeg, jfif, or png file.");
+                        return View(film);
+                    }
                     film.PosterUrl = await SaveImage(PosterUrl);
                 }
                 else
@@ -107,18 +117,20 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Films/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var categories = await _categoryRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
+            ViewBag.Categories = categories;
+            ViewBag.Countries = countries;
 
-            var film = await _context.Films.FindAsync(id);
+            var film = await _filmRepository.GetByIdAsync(id);
             if (film == null)
             {
                 return NotFound();
             }
+            ViewBag.SelectedCategoryIds = film.Categories?.Select(c => c.Id).ToArray() ?? Array.Empty<int>();
+
             return View(film);
         }
 
@@ -127,19 +139,66 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,PosterUrl,TrailerUrl,DirectorName,Language,FilmRated,FilmDuration,Actors,Quality,StartTime,CountryId")] Film film)
+        [Route("chinh-sua/{id}")]
+        public async Task<IActionResult> Edit(int id, int[] SelectedCategoryIds, Film film,IFormFile PosterUrl)
         {
+            ModelState.Remove("PosterUrl");
             if (id != film.Id)
             {
                 return NotFound();
             }
-
+            if (SelectedCategoryIds == null || !SelectedCategoryIds.Any())
+            {
+                ModelState.AddModelError("SelectedCategoryIds", "Bạn phải chọn ít nhất một thể loại.");
+            }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(film);
-                    await _context.SaveChangesAsync();
+                    Film currentFilm = await _filmRepository.GetByIdAsync(id);
+                    if (PosterUrl == null)
+                    {
+                        film.PosterUrl = currentFilm.PosterUrl;
+                    }
+                    else 
+                    {
+                        if (ValidateImageExtension(PosterUrl.FileName))
+                        {
+                            if (!ValidatImageSize(PosterUrl, 5242880))
+                            {
+                                ModelState.AddModelError("PosterUrl", "Image size is too big. The limit is only 5MB");
+                                return View(film);
+                            }
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("PosterUrl", "Invalid image format for main image. Please upload a jpg, jpeg, jfif, or png file.");
+                            return View(film);
+                        }
+                        film.PosterUrl = await SaveImage(PosterUrl);
+                        currentFilm.PosterUrl = film.PosterUrl;
+                    }
+
+                    currentFilm.Actors = film.Actors;
+                    currentFilm.Name = film.Name;
+                    currentFilm.Description = film.Description;
+                    currentFilm.TrailerUrl = film.TrailerUrl;
+                    currentFilm.DirectorName = film.DirectorName;
+                    currentFilm.Language = film.Language;
+                    currentFilm.FilmRated = film.FilmRated;
+                    currentFilm.FilmDuration = film.FilmDuration;
+                    currentFilm.Quality = film.Quality;
+                    currentFilm.StartTime = film.StartTime;
+                    currentFilm.CountryId = film.CountryId;
+
+                    var selectedCategories = await _categoryRepository.GetByIdsAsync(SelectedCategoryIds); // Assuming you have/create this method
+
+                    currentFilm.Categories.Clear(); 
+                    foreach (var category in selectedCategories)
+                    {
+                        currentFilm.Categories.Add(category); 
+                    }
+                    await _filmRepository.UpdateAsync(currentFilm);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -154,6 +213,10 @@ namespace school_major_project.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            var categories = await _categoryRepository.GetAllAsync();
+            var countries = await _countryRepository.GetAllAsync();
+            ViewBag.Categories = categories;
+            ViewBag.Countries = countries;
             return View(film);
         }
 
@@ -170,6 +233,16 @@ namespace school_major_project.Areas.Admin.Controllers
         private bool FilmExists(int id)
         {
             return _context.Films.Any(e => e.Id == id);
+        }
+       
+        private bool ValidateImageExtension(string fileName)
+        {
+            var allowedExtensions = new string[] { ".jpg", ".jpeg", ".png", ".jfif" };
+            return allowedExtensions.Contains(Path.GetExtension(fileName).ToLower());
+        }
+        private bool ValidatImageSize(IFormFile file, long maximumSize)
+        {
+            return file.Length <= maximumSize;
         }
         private async Task<string> SaveImage(IFormFile image)
         {

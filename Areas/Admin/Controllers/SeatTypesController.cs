@@ -99,7 +99,7 @@ namespace school_major_project.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id,  SeatType seatType, IFormFile ImageDescription)
+        public async Task<IActionResult> Edit(int id, SeatType seatType, IFormFile ImageDescription)
         {
             if (id != seatType.Id)
             {
@@ -110,9 +110,9 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 try
                 {
-                    if(ImageDescription != null)
+                    if (ImageDescription != null)
                     {
-                        seatType.ImageDescription= await SaveImage(ImageDescription);
+                        seatType.ImageDescription = await SaveImage(ImageDescription);
                     }
                     await _seatTypeRepository.UpdateAsync(seatType);
 
@@ -142,7 +142,7 @@ namespace school_major_project.Areas.Admin.Controllers
             var seatType = await _seatTypeRepository.GetByIdAsync(id);
             if (seatType != null)
             {
-               await _seatTypeRepository.DeleteAsync(seatType.Id);
+                await _seatTypeRepository.DeleteAsync(seatType.Id);
             }
 
             return RedirectToAction(nameof(Index));

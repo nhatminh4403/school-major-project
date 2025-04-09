@@ -10,12 +10,13 @@
     <link rel="stylesheet" href="~/css/admin/css/magnific-popup.css">
     <link rel="stylesheet" href="~/css/admin/css/jquery.mCustomScrollbar.min.css">
     <link rel="stylesheet" href="~/css/admin/css/select2.min.css">
-    <link rel="stylesheet" href="~/css/admin/css/admin.css">
     <link rel="stylesheet" href="~/css/admin/css/sidebarNav.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
           integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
           crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/admin/css/admin.css">
+
     <link href="~/css/admin/index.css" rel="stylesheet" asp-append-version="true" />
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="~/imgs/admin/img/icon/cake2.png" sizes="32x32" />
@@ -115,15 +116,17 @@
                 <p>Admin</p>
             </div>
             @*  style="display:none" *@
-            <form id="logoutForm" class="form-inline"
+            <form id="logoutForm" style="display:none"
                   asp-area="Identity" asp-page="/Account/Logout" method="post"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="sidebar__user-btn" title="Đăng xuất">
-                <button type="submit">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path d="M4,12a1,1,0,0,0,1,1h7.59l-2.3,2.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0l4-4a1,1,0,0,0,.21-.33,1,1,0,0,0,0-.76,1,1,0,0,0-.21-.33l-4-4a1,1,0,1,0-1.42,1.42L12.59,11H5A1,1,0,0,0,4,12ZM17,2H7A3,3,0,0,0,4,5V8A1,1,0,0,0,6,8V5A1,1,0,0,1,7,4H17a1,1,0,0,1,1,1V19a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V5A3,3,0,0,0,17,2Z"></path>
-                    </svg>
-                </button>
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" class="sidebar__user-btn form-inline" title="Đăng xuất">
+               
             </form>
+            <a href="javascript:void(0);" id="logoutLink" class="sidebar__user-btn">
+
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M4,12a1,1,0,0,0,1,1h7.59l-2.3,2.29a1,1,0,0,0,0,1.42,1,1,0,0,0,1.42,0l4-4a1,1,0,0,0,.21-.33,1,1,0,0,0,0-.76,1,1,0,0,0-.21-.33l-4-4a1,1,0,1,0-1.42,1.42L12.59,11H5A1,1,0,0,0,4,12ZM17,2H7A3,3,0,0,0,4,5V8A1,1,0,0,0,6,8V5A1,1,0,0,1,7,4H17a1,1,0,0,1,1,1V19a1,1,0,0,1-1,1H7a1,1,0,0,1-1-1V16a1,1,0,0,0-2,0v3a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V5A3,3,0,0,0,17,2Z"></path>
+                </svg>
+            </a>
         </div>
         <!-- end sidebar user -->
         <!-- sidebar nav -->
@@ -486,6 +489,7 @@
     <script src="~/js/admin/js/jquery.mCustomScrollbar.min.js"></script>
     <script src="~/js/admin/js/select2.min.js"></script>
     <script src="~/js/admin/js/admin.js"></script>
+
     <script>
         // Ensure Select2 is loaded before any page scripts
         $(document).ready(function() {
@@ -493,6 +497,12 @@
                 console.error('Select2 is not loaded properly');
             }
         });
+
+         document.getElementById('logoutLink').addEventListener('click', function (event) {
+                event.preventDefault();
+                document.getElementById('logoutForm').submit();
+        });
+
     </script>
     <script src="~/js/admin/index.js"></script>
     @RenderSection("Scripts", required: false)
