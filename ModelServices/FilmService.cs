@@ -15,7 +15,7 @@ namespace school_major_project.Services
         }
         public async Task<IEnumerable<Film>> GetAllAsync()
         {
-            return await _context.Films.Include(p => p.Categories).Include(p=> p.Rating).Include(p=>p.Schedules).Include(p=>p.Country).ToListAsync();
+            return await _context.Films.Include(p => p.Categories).Include(p => p.Rating).Include(p => p.Schedules).Include(p => p.Country).ToListAsync();
         }
         public async Task<Film> GetByIdAsync(int id)
         {
@@ -50,13 +50,13 @@ namespace school_major_project.Services
         {
             List<string> ActorsList;
             Film film = await GetByIdAsync(filmId);
-            if(film.Actors == null)
+            if (film.Actors == null)
             {
                 return new List<string>();
             }
 
             ActorsList = new List<string>(film.Actors.Split(',').Select(x => x.Trim()).ToArray());
-            
+
             return ActorsList;
         }
 

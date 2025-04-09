@@ -7,82 +7,7 @@
     var countries = ViewBag.Countries as IEnumerable<Country>;
 }
 
-@section Styles {
-    <style>
-        /* Select2 container styles */
-        .select2-container {
-            width: 100% !important;
-        }
-        
-        /* Multiple select styles */
-        .select2-container--default .select2-selection--multiple {
-            background-color: #2f3640;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            min-height: 38px;
-            max-height: none;
-            overflow-y: auto;
-        }
-        
-        /* Selected choice styles */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: #ffd700;
-            color: #2f3640;
-            border: none;
-            margin: 4px;
-            padding: 2px 8px;
-        }
-        
-        /* Remove button styles */
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: #2f3640;
-            margin-right: 5px;
-        }
-        
-        /* Highlighted option styles */
-        .select2-container--default .select2-results__option--highlighted[aria-selected] {
-            background-color: #ffd700;
-            color: #2f3640;
-        }
-        
-        /* Dropdown styles */
-        .select2-dropdown {
-            background-color: #2f3640;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        /* Option styles */
-        .select2-container--default .select2-results__option {
-            color: #fff;
-            padding: 8px 12px;
-        }
-        
-        /* Search field styles */
-        .select2-container--default .select2-search--dropdown .select2-search__field {
-            background-color: #2f3640;
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px;
-        }
-        
-        /* Make the selection area expandable */
-        .select2-container--default .select2-selection--multiple .select2-selection__rendered {
-            display: flex;
-            flex-wrap: wrap;
-            padding: 4px;
-            min-height: 38px;
-            max-height: none;
-            overflow-y: auto;
-        }
-        
-        /* Ensure the dropdown is visible */
-        .select2-container--open .select2-dropdown {
-            z-index: 9999;
-        }
-    </style>
-}
+
 
 <section>
     <main class="main">
@@ -98,6 +23,8 @@
                 <!--normal form -->
                 <div class="col-12">
                     <form asp-action="Create" enctype="multipart/form-data" method="post" class="form">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+
                         <div class="row">
                             <div class="col-12 col-md-5 form__cover">
                                 <div class="row">
@@ -146,7 +73,7 @@
                                                asp-for="FilmRated" required />
                                     </div>
                                     <div class="col-12 col-lg-6">
-                                        <select class="js-example-basic-multiple form-control" name="CategoryIds" multiple="multiple" required>
+                                        <select class="js-example-basic-multiple form-control" name="SelectedCategoryIds" multiple="multiple" required>
                                             @foreach (var category in categories)
                                             {
                                                 <option value="@category.Id">@category.CategoryDescription</option>
@@ -230,3 +157,79 @@
     </script>
 }
 
+@section Styles {
+@* <style> *@
+@*     /* Select2 container styles */ *@
+@*     .select2-container { *@
+@*         width: 100% !important; *@
+@*     } *@
+
+@*     /* Multiple select styles */ *@
+@*     .select2-container--default .select2-selection--multiple { *@
+@*         background-color: #2f3640; *@
+@*         border: 1px solid rgba(255, 255, 255, 0.1); *@
+@*         color: #fff; *@
+@*         min-height: 38px; *@
+@*         max-height: none; *@
+@*         overflow-y: auto; *@
+@*     } *@
+
+@*     /* Selected choice styles */ *@
+@*     .select2-container--default .select2-selection--multiple .select2-selection__choice { *@
+@*         background-color: #ffd700; *@
+@*         color: #2f3640; *@
+@*         border: none; *@
+@*         margin: 4px; *@
+@*         padding: 2px 8px; *@
+@*     } *@
+
+@*     /* Remove button styles */ *@
+@*     .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { *@
+@*         color: #2f3640; *@
+@*         margin-right: 5px; *@
+@*     } *@
+
+@*     /* Highlighted option styles */ *@
+@*     .select2-container--default .select2-results__option--highlighted[aria-selected] { *@
+@*         background-color: #ffd700; *@
+@*         color: #2f3640; *@
+@*     } *@
+
+@*     /* Dropdown styles */ *@
+@*     .select2-dropdown { *@
+@*         background-color: #2f3640; *@
+@*         border: 1px solid rgba(255, 255, 255, 0.1); *@
+@*         max-height: 300px; *@
+@*         overflow-y: auto; *@
+@*     } *@
+
+@*     /* Option styles */ *@
+@*     .select2-container--default .select2-results__option { *@
+@*         color: #fff; *@
+@*         padding: 8px 12px; *@
+@*     } *@
+
+@*     /* Search field styles */ *@
+@*     .select2-container--default .select2-search--dropdown .select2-search__field { *@
+@*         background-color: #2f3640; *@
+@*         color: #fff; *@
+@*         border: 1px solid rgba(255, 255, 255, 0.1); *@
+@*         padding: 8px; *@
+@*     } *@
+
+@*     /* Make the selection area expandable */ *@
+@*     .select2-container--default .select2-selection--multiple .select2-selection__rendered { *@
+@*         display: flex; *@
+@*         flex-wrap: wrap; *@
+@*         padding: 4px; *@
+@*         min-height: 38px; *@
+@*         max-height: none; *@
+@*         overflow-y: auto; *@
+@*     } *@
+
+@*     /* Ensure the dropdown is visible */ *@
+@*     .select2-container--open .select2-dropdown { *@
+@*         z-index: 9999; *@
+@*     } *@
+@* </style> *@
+}

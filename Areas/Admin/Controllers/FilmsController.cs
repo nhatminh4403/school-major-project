@@ -19,7 +19,7 @@ namespace school_major_project.Areas.Admin.Controllers
         private readonly IFilmRepository _filmRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ICategoryRepository _categoryRepository;
-        public FilmsController(ApplicationDbContext context,IFilmRepository filmRepository,ICountryRepository countryRepository,ICategoryRepository categoryRepository)
+        public FilmsController(ApplicationDbContext context, IFilmRepository filmRepository, ICountryRepository countryRepository, ICategoryRepository categoryRepository)
         {
             _context = context;
             _filmRepository = filmRepository;
@@ -39,15 +39,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         // GET: Admin/Films/Details/5
         [Route("chi-tiet/{id}")]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var film = await _context.Films
-                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var film = await _filmRepository.GetByIdAsync(id);
             if (film == null)
             {
                 return NotFound();
@@ -62,20 +58,39 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             var categories = await _categoryRepository.GetAllAsync();
             var countries = await _countryRepository.GetAllAsync();
-            ViewBag.Categories =categories;
+            ViewBag.Categories = categories;
             ViewBag.Countries = countries;
             return View();
         }
 
-        // POST: Admin/Films/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Route("tao-moi")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Film film,IFormFile PosterUrl)
+        public async Task<IActionResult> Create(Film film, IFormFile PosterUrl, int[] SelectedCategoryIds)
         {
             if (ModelState.IsValid)
             {
+                if (PosterUrl != null)
+                {
+                    film.PosterUrl = await SaveImage(PosterUrl);
+                }
+                else
+                {
+                    ModelState.Remove("PosterUrl");
+                }
+                if (SelectedCategoryIds != null && SelectedCategoryIds.Length > 0)
+                {
+                    film.Categories = new List<Category>();
+
+                    foreach (var categoryId in SelectedCategoryIds)
+                    {
+                        var category = await _categoryRepository.GetByIdAsync(categoryId);
+                        if (category != null)
+                        {
+                            film.Categories.Add(category);
+                        }
+                    }
+                }
                 await _filmRepository.AddAsync(film);
                 return RedirectToAction(nameof(Index));
             }
@@ -83,8 +98,8 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 var countries = await _countryRepository.GetAllAsync();
                 var categories = await _categoryRepository.GetAllAsync();
-                ViewBag.Categories = new SelectList(categories, "Id", "CategoryDescription");
-                ViewBag.Countries = new SelectList(countries, "Id", "Name");
+                ViewBag.Categories = categories;
+                ViewBag.Countries = countries;
                 return View(film);
 
             }
@@ -155,6 +170,24 @@ namespace school_major_project.Areas.Admin.Controllers
         private bool FilmExists(int id)
         {
             return _context.Films.Any(e => e.Id == id);
+        }
+        private async Task<string> SaveImage(IFormFile image)
+        {
+            var directoryPath = Path.Combine("wwwroot/admin/images/films");
+
+            // Create directory if it doesn't exist
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            var savePath = Path.Combine(directoryPath, image.FileName);
+            using (var fileStream = new FileStream(savePath, FileMode.Create))
+            {
+                await image.CopyToAsync(fileStream);
+            }
+
+            return "/admin/images/films/" + image.FileName;
         }
     }
 }

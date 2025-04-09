@@ -61,21 +61,34 @@ $(document).ready(function () {
 	/*==============================
 	Select2
 	==============================*/
-	$('#country').select2({
-		placeholder: "Chọn quốc gia"
-	});
-    $('#category').select2({
-    		placeholder: "Chọn thể loại"
-    });
-	$('#rated').select2({
-		placeholder: "Choose rated"
-	});
+	if ($('#country').length) {
+		$('#country').select2({
+			placeholder: "Chọn quốc gia"
+		});
+	}
+	if ($('#category').length) {
+		$('#category').select2({
+			placeholder: "Chọn thể loại",
+			multiple: true
+		});
+	}
+	if ($('#rated').length) {
+		$('#rated').select2({
+			placeholder: "Choose rated"
+		});
+	}
+	if ($('#genre').length) {
+		$('#genre').select2({
+			placeholder: "Choose genre / genres"
+		});
+	}
 
-	$('#genre').select2({
-		placeholder: "Choose genre / genres"
+	// Initialize other selects only if they exist
+	$('#cinema, #room, #seat_type').each(function() {
+		if ($(this).length) {
+			$(this).select2();
+		}
 	});
-
-	$('#category, #cinema, #room, #seat_type').select2();
 
 	/*==============================
 	Upload cover

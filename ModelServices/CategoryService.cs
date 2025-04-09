@@ -37,5 +37,9 @@ namespace school_major_project.Services
                 await _context.SaveChangesAsync();
             }
         }
+        public async Task<IEnumerable<Category>> GetByIdsAsync(int[] ids)
+        {
+            return await _context.Categories.Where(c => ids.Contains(c.Id)).ToListAsync();
+        }
     }
 }
