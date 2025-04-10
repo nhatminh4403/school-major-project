@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Chatbot";
+}
+<style>
+    .message {
+        margin-bottom: 5px;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .user {
+        text-align: right;
+        background-color: #e1f5fe;
+        margin-left: 40px;
+    }
+
+    .bot {
+        text-align: left;
+        background-color: #f1f1f1;
+        margin-right: 40px;
+    }
+</style>
+<h2>Chat with our Bot</h2>
+
+<div id="chatbox" style="height: 400px; width: 500px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px;">
+    <!-- Chat messages will appear here -->
+    <div class="message bot">Bot: Hello! How can I help you today?</div>
+</div>
+
+<div id="userInput">
+    <input type="text" id="message" placeholder="Type your message..." style="width: 400px; padding: 8px;" />
+    <button id="sendBtn" style="padding: 8px;">Send</button>
+</div>
+
+@section Scripts {
+                     // Put this section in your _Layout.cshtml if not already there
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> // Include jQuery
+    <script>
+        $(document).ready(function () {
+
+            // Generate or retrieve a unique session ID for this user session
+            let sessionId = sessionStorage.getItem('chatbotSessionId');
+            if (!sessionId) {
+                sessionId = generateGuid(); // Use a simple GUID generator
+                sessionStorage.setItem('chatbotSessionId', sessionId);
+            }
+            console.log("Chat Session ID:", sessionId);
+
+            $('#sendBtn').click(sendMessage);
+            $('#message').keypress(function (e) {
+                if (e.which === 13) { // Enter key pressed
+                    sendMessage();
+                    return false; // Prevent form submission if it's in a form
+                }
+            });
+
+            function sendMessage() {
+                const messageText = $('#message').val().trim();
+                if (!messageText) {
+                    return; // Don't send empty messages
+                }
+
+                // Display user message
+                appendMessage('user', messageText);
+                $('#message').val(''); // Clear input
+
+                // --- Prepare data for backend ---
+                const chatRequest = {
+                    message: messageText,
+                    sessionId: sessionId
+                };
+
+                // Display thinking indicator (optional)
+                 appendMessage('bot', 'Bot: Thinking...');
+                 let thinkingMessage = $('#chatbox .message').last(); // Get reference to remove later
+
+                // --- Send message to backend controller ---
+                $.ajax({
+                    url: '@Url.Action("SendMessage", "Chatbot")', // Use Url.Action for correct path
+                    type: 'POST',
+                    contentType: 'application/json', // Specify content type
+                    data: JSON.stringify(chatRequest), // Convert JS object to JSON string
+                    // dataType: 'json', // Expect JSON response (optional but good practice)
+
+                    // --- Handle Response ---
+                    success: function (response) {
+                        thinkingMessage.remove(); // Remove thinking indicator
+                        if (response && response.reply) {
+                             appendMessage('bot', 'Bot: ' + response.reply);
+                        } else {
+                             appendMessage('bot', 'Bot: Sorry, I didn\'t get a valid response.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                         thinkingMessage.remove(); // Remove thinking indicator
+                        console.error("Error sending message:", status, error, xhr.responseText);
+                         appendMessage('bot', 'Bot: Oops! Something went wrong connecting to me.');
+                    }
+                });
+            }
+
+            function appendMessage(sender, text) {
+                const messageClass = sender === 'user' ? 'user' : 'bot';
+                const messageDiv = `<div class="message ${messageClass}">${escapeHtml(text)}</div>`;
+                $('#chatbox').append(messageDiv);
+                // Scroll to the bottom
+                $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+            }
+
+            // Simple GUID generator (replace with a more robust one if needed)
+            function generateGuid() {
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
+                return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+            }
+
+            // Basic HTML escaping
+            function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        });
+    </script>
+
+
+}

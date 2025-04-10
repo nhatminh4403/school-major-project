@@ -53,6 +53,8 @@ namespace school_major_project.Controllers
                 }
 
             }
+            string credentialPath = Path.Combine(Directory.GetCurrentDirectory(), "credentials", "movie-443702-0294fc382c0a.json");
+            Console.WriteLine("credential" + credentialPath);
             ViewBag.HeaderCategories = _categoryRepository.GetAllAsync();
             return View(viewModel);
         }

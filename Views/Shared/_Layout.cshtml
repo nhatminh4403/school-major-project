@@ -33,6 +33,7 @@
     <link href="~/css/css/animate.css" rel="stylesheet" />
 
     <link rel="stylesheet" href="~/css/css/userprofile.css" />
+    <link href="~/css/chatbot.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/school_major_project.styles.css" asp-append-version="true" />
     <link href="~/imgs/img/movie/cake2.png" rel="shortcut icon" type="image/x-icon" />
@@ -262,6 +263,75 @@
         </div>
     </footer>
 
+    <div id="chat-widget-container">
+        <!-- The actual chat window -->
+        <div id="chat-interface">
+
+            <div id="chat-title-bar">
+                <span id="chat-title">Chat bot hỗ tor75</span>
+                <a id="chat-close-button" title="Close chat">×</a>
+            </div>
+
+            <div id="chatbox">
+            </div>
+
+            <div id="chat-input-area">
+                <input type="text" id="chat-message-input" placeholder="Nhập nội dung" />
+                <button id="chat-send-button">
+
+                    <svg fill="#000000" height="24" width="24" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-174.08 -174.08 860.16 860.16" xml:space="preserve" transform="rotate(0)" stroke="#000000" stroke-width="0.0051200099999999995">
+
+                    <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+                    <g id="SVGRepo_iconCarrier"> <g> <g> <path d="M483.927,212.664L66.967,25.834C30.95,9.695-7.905,42.023,1.398,80.368l21.593,89.001 c3.063,12.622,11.283,23.562,22.554,30.014l83.685,47.915c6.723,3.85,6.738,13.546,0,17.405l-83.684,47.915 c-11.271,6.452-19.491,17.393-22.554,30.015l-21.594,89c-9.283,38.257,29.506,70.691,65.569,54.534l416.961-186.83 C521.383,282.554,521.333,229.424,483.927,212.664z M359.268,273.093l-147.519,66.1c-9.44,4.228-20.521,0.009-24.752-9.435 c-4.231-9.44-0.006-20.523,9.434-24.752l109.37-49.006l-109.37-49.006c-9.44-4.231-13.665-15.313-9.434-24.752 c4.229-9.44,15.309-13.666,24.752-9.435l147.519,66.101C373.996,245.505,374.007,266.49,359.268,273.093z" /> </g> </g> </g>
+
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="chat-toggle-button">
+            <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+            <!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+            <svg width="160px" height="160px" viewBox="-2.4 -2.4 28.80 28.80" id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" fill="#9b2222" stroke="#9b2222" transform="rotate(-45)">
+
+                <g id="SVGRepo_bgCarrier" stroke-width="0" transform="translate(0,0), scale(1)" />
+
+                <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" stroke="#ffffff" stroke-width="0.288" />
+
+                <g id="SVGRepo_iconCarrier">
+
+                    <defs>
+
+                        <style>
+                            .cls-1 {
+                                fill: none;
+                                stroke: #020202;
+                                stroke-miterlimit: 10;
+                                stroke-width: 2.4;
+                            }</style>
+
+                    </defs>
+
+                    <path class="cls-1" d="M20.48,10a2.82,2.82,0,0,0-.84,2,2.86,2.86,0,0,0,2.86,2.86v4.78H1.5V14.86a2.82,2.82,0,0,0,2-.84,2.85,2.85,0,0,0,0-4,2.82,2.82,0,0,0-2-.84V4.36h21V9.14A2.82,2.82,0,0,0,20.48,10Z" />
+
+                    <rect class="cls-1" x="13.91" y="8.18" width="1.91" />
+
+                    <rect class="cls-1" x="13.91" y="12" width="1.91" />
+
+                    <rect class="cls-1" x="13.91" y="15.82" width="1.91" />
+
+                </g>
+
+            </svg>
+        </div>
+    </div>
+
+    @* @await Html.PartialAsync("_ChatPartial") *@
+
     <div>
         <!-- contact social media animation -->
         <div id="button-contact-vr" class="">
@@ -344,7 +414,7 @@
                 event.preventDefault();
                 document.getElementById('logoutForm').submit();
         });
-        
+
     </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -368,6 +438,8 @@
 
 
     <script src="~/js/js/qrcode.js"></script>
+
+    <script src="~/js/chatbot.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

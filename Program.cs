@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.GlobalServices;
-using school_major_project.Services;
 using school_major_project.Interfaces;
-using school_major_project.ModelServices;
-using Microsoft.AspNetCore.Identity;
 using school_major_project.Models;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Authentication.Cookies;
-
-
+using school_major_project.ModelServices;
+using school_major_project.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +21,9 @@ builder.Services.AddIdentity<User, IdentityRole>()
        .AddDefaultUI();
 
 builder.Services.AddRazorPages();
+
+// Add Chat Services
+
 
 builder.Services.AddScoped<IFilmRepository, FilmService>();
 builder.Services.AddScoped<ICategoryRepository, CategoryService>();
