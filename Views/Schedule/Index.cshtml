@@ -9,7 +9,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var film = ViewBag.Film as Film;
+    var film = TempData["Film"] as Film;
     var user = await userManager.GetUserAsync(User);
 }
 

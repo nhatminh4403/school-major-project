@@ -42,7 +42,7 @@ namespace school_major_project.Controllers
 
             var schedules = await _scheduleRepository.GetSchedulesByFilmId(film.Id);
 
-            ViewBag.Film = film;
+            TempData["Film"] = film;
             return View(schedules);
         }
     }

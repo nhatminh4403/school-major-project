@@ -1,45 +1,254 @@
-﻿@model school_major_project.Models.Room
+﻿@using school_major_project.HelperClass
+@model school_major_project.ViewModel.SeatListVM
 
 @{
-    ViewData["Title"] = "ChooseSeat";
+    ViewData["Title"] = "Chọn ghế";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var film = Model.Film as Film;
+    var schedule = Model.Schedule;
+    var cinema = Model.Cinema;
+    var room = Model.Room;
+
+    // Helper function - good practice to check for null Model/Dictionary
+    List<Seat> GetSeatsForType(string typeKey)
+    {
+        var seatDict = Model?.SeatsByType ?? new Dictionary<string, List<Seat>>();
+        return seatDict.TryGetValue(typeKey, out var seats) ? seats : new List<Seat>();
+    }
+    var regularSeats = GetSeatsForType("Regular".ToLower());
+    var vipSeats = GetSeatsForType("VIP".ToLower());
+    var coupleSeats = GetSeatsForType("Couple".ToLower());
+}
+@section Styles {
+    <style>
+        .format_seat {
+            margin: 0 auto;
+            width: 70%;
+        }
+
+        .seat-area .seat-line ul {
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        li > img.disabled,
+        li > img.disabled + .sit-num {
+            opacity: 0.4;
+            pointer-events: none;
+            color: orange;
+        }
+
+        #clock {
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 1);
+        }
+
+
+    </style>
 }
 
-<h1>ChooseSeat</h1>
 
-<div>
-    <h4>Room</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cinema)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cinema.Location)
-        </dd>
-    </dl>
-</div>
-@if(Model.Seats == null)
-{
-    <h2> Trống</h2>
-}
-else
-{
-    @foreach(var seat in Model.Seats)
-{
-    
-}
-}
 
+<section>
+    @{
+        await Html.RenderPartialAsync("_Preloader");
+    }
+
+    @if (film != null)
+    {
+        <section class="details-banner hero-area bg_img seat-plan-banner" data-background="@Url.Content(film.PosterUrl)"
+                 style="background-image: url('@Url.Content(film.PosterUrl)');">
+            <div class="container">
+                <div class="details-banner-wrapper">
+                    <div class="details-banner-content style-two" style="padding-bottom:20px">
+                        <h3 class="title">@film.Name</h3>
+                        <div class="tags">
+                            <a href="#0">@film.Language</a>
+                            <a href="#0">@film.Quality</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    @if (schedule != null && film != null)
+    {
+        <section class="page-title bg-one" th:if="${schedule != null}">
+            <div class="container">
+                <div class="page-title-area">
+                    <div class="item md-order-1">
+                        <a asp-action="Index" asp-controller="Schedule" asp-route-name="@Model.Film.Name.RemoveDiacritics()" class="custom-button back-button">
+                            <i class="flaticon-double-right-arrows-angles"></i>
+                            Trở về
+                        </a>
+                    </div>
+                    <div class="item date-item">
+                        <span class="date">Thời gian chiếu: @Model.Schedule.ScheduleTime</span>
+                    </div>
+                    <div class="item">
+                        <div id="clock"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <div class="seat-plan-section padding-bottom padding-top">
+            <div class="container">
+                <div class="screen-area">
+                    <h4 class="screen">Màn hình</h4>
+                    <div class="screen-thumb">
+                        <img src="~/imgs/img/movie/screen-thumb.png" alt="movie">
+                    </div>
+                    <h5 class="subtitle">Ghế thường</h5>
+                    <div class="screen-wrapper">
+                        <ul class="seat-area">
+                            <li class="seat-line" >
+                                <ul class="format_seat" style="gap: 20px">
+                                    <li class="front-seat">
+                                        <ul>
+                                            @foreach (var seat in regularSeats)
+                                            {
+                                                <li class="single-seat seat-free">
+                                                    <img class="seat-img" alt="seat"
+                                                         src="@seat.SeatImage"
+                                                         data-src2="/imgs/img/seat/regularchoose.png"
+                                                         data-src="@seat.SeatImage"
+                                                         data-id="@seat.SeatId"
+                                                         data-symbol="@seat.SeatNumber"
+                                                         data-price="@(seat.SeatType?.Price)"
+                                                    @(seat.Status ? "disabled" : "")>
+                                                    <span class="sit-num">@seat.SeatNumber</span>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <h5 class="subtitle">Ghế VIP</h5>
+                    <div class="screen-wrapper">
+                        <ul class="seat-area">
+                            <li class="seat-line">
+                                <ul class="format_seat" style="gap: 20px">
+                                    <li class="front-seat">
+                                        <ul>
+                                            @foreach (var seat in vipSeats)
+                                            {
+                                                <li class="single-seat seat-free">
+                                                    <img class="seat-img" alt="seat"
+                                                         src="@seat.SeatImage"
+                                                         data-src2="/imgs/img/seat/VIPchoose.png"
+                                                         data-src="@seat.SeatImage"
+                                                         data-id="@seat.SeatId"
+                                                         data-symbol="@seat.SeatNumber"
+                                                         data-price="@(seat.SeatType?.Price)"
+                                                    @(seat.Status ? "disabled" : "")>
+                                                    <span class="sit-num">@seat.SeatNumber</span>
+                                                </li>
+                                            }
+
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                    <h5 class="subtitle">SweetBox</h5>
+                    <div class="screen-wrapper">
+                        <ul class="seat-area couple">
+                            <li class="seat-line">
+                                <ul class="seat--area">
+                                    <li class="front-seat" style="gap: 20px">
+                                        <ul style="margin-left: 60px">
+
+                                            @foreach (var seat in coupleSeats)
+                                            {
+                                                <li class="single-seat seat-free">
+                                                    <img class="seat-img" alt="seat"
+                                                         src="@seat.SeatImage"
+                                                         data-src2="/imgs/img/seat/couplechoose.png"
+                                                         data-src="@seat.SeatImage"
+                                                         data-id="@seat.SeatId"
+                                                         data-symbol="@seat.SeatNumber"
+                                                         data-price="@(seat.SeatType?.Price)"
+                                                    @(seat.Status ? "disabled" : "")>
+                                                    <span class="sit-num">@seat.SeatNumber</span>
+                                                </li>
+                                            }
+
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            @if (schedule != null && film != null && cinema != null && room != null)
+            {
+                <div class="container">
+                    <div class="proceed-book bg_img" data-background="@Url.Content("~/imgs/img/movie/movie-bg-proceed.jpg")"
+                         style="background-image: url('@Url.Content("~/imgs/img/movie/movie-bg-proceed.jpg")');">
+                        <div class="proceed-to-book">
+                            <div class="book-item">
+                                <span>Bạn đã chọn ghế</span>
+                                <h3 class="title selected-seats"></h3>
+                                <div class="error-message" style="display: none; color: red;"></div>
+                            </div>
+                            <div class="book-item">
+                                <span>Tổng tiền</span>
+                                <h3 class="title total-price">0 VND</h3> @* Populated by JS *@
+                            </div>
+                            <form id="checkout-form" asp-controller="Purchase" asp-action="Add" method="post">
+                                <input type="hidden" id="selectedSeatsInput" name="seatSymbol">
+                                <input type="hidden" id="totalPriceInput" name="totalPrice">
+
+                                <input type="hidden" id="startTimeInput" name="startTime" value="@schedule.ScheduleTime.ToString("o")">
+                                <input type="hidden" id="filmTitleInput" name="filmTitle" value="@film.Name">
+                                <input type="hidden" id="posterInput" name="poster" value="@film.PosterUrl">
+
+                                @if (film.Categories != null)
+                                {
+                                    @foreach (var category in film.Categories)
+                                    {
+                                        <input type="hidden" name="category" value="@category.CategoryDescription">
+                                    }
+                                }
+
+                                <input type="hidden" id="cinemaNameInput" name="cinemaName" value="@cinema.Name">
+                                <input type="hidden" id="cinemaAddressInput" name="cinemaAddress" value="@cinema.Location">
+                                <input type="hidden" id="roomNameInput" name="roomName" value="@room.Name">
+                                <input type="hidden" id="scheduleIdInput" name="scheduleId" value="@schedule.Id">
+
+                                <div class="book-item">
+                                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                                    {
+                                        <button type="submit" class="custom-button" id="checkout-button">
+                                            Tiếp tục
+                                        </button>
+                                    }
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+
+        </div>
+
+
+    }
+</section>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js" integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="~/js/js/clock.js"></script>
+    <script src="~/js/js/seat.js"></script>
+}

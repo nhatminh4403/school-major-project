@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -41,10 +42,9 @@ namespace school_major_project.ModelServices
         }
         public async Task<Room> GetByScheduleIdAsync(int id)
         {
-            var schedule = _context.Schedules.FirstOrDefaultAsync(p => p.Id == id).Result;
-            var room = await _context.Rooms.Include(p => p.Schedules).Include(p => p.Cinema).
-                FirstOrDefaultAsync(p => p.Id == schedule.RoomId);
-            return room;
+            return await _context.Rooms
+                                 .Include(r => r.Cinema) 
+                                 .FirstOrDefaultAsync(r => r.Schedules.Any(s => s.Id == id));
         }
 
     }

@@ -1368,8 +1368,8 @@ input {
         right: 0;
         left: 0;
         top: 80px;
-        -webkit-mask-image: url(../../assets/img/footer/footer-shape.png);
-        mask-image: url(../../assets/img/footer/footer-shape.png);
+        -webkit-mask-image: url(../../imgs/img/footer/footer-shape.png);
+        mask-image: url(../../imgs/img/footer/footer-shape.png);
         -webkit-mask-position: top center;
         mask-position: top center;
         -webkit-mask-repeat: no-repeat;

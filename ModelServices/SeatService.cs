@@ -41,12 +41,15 @@ namespace school_major_project.ModelServices
                 await _context.SaveChangesAsync();
             }
         }
-        // Gets all seats for a room, mapping to DTO. Status defaults to 'available' (false).
+        public async Task<IEnumerable<Seat>> GetByRoomIdAsync(int id)
+        {
+            return await _context.Seats.Include(p => p.SeatType).Include(p=>p.Room).ThenInclude(p=> p.Schedules).Where(p => p.RoomId == id).ToListAsync();
+        }
         public async Task<IEnumerable<SeatDTO>> GetSeatsByRoomId(int roomId)
         {
             var seatsInRoom = await _context.Seats
-                                         .Include(s => s.SeatType) // Need SeatType for TypeDescription, Price, Image
-                                         .Include(s => s.Room)     // Need Room for Name
+                                         .Include(s => s.SeatType)
+                                         .Include(s => s.Room)    
                                          .Where(s => s.RoomId == roomId)
                                          .ToListAsync();
 
