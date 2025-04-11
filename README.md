@@ -4,7 +4,7 @@
 BaAnhEm là website đặt vé xem phim trực tuyến cho phép người dùng duyệt phim, đặt vé và quản lý đặt vé của họ. Dự án này là phiên bản được phát triển lại từ ngôn ngữ Java sang C# ASP.NET.
 
 ## Dự án tham khảo
-Dự án này là phiên bản C# ASP.NET dựa trên dự án Java gốc. Bạn có thể tìm thấy dự án gốc tại đây:
+Dự án này là phiên bản C# ASP.NET dựa trên dự án Java gốc - một đồ án chuyên ngành tại trường mà tôi đóng góp và thực hiện. Bạn có thể tìm thấy dự án gốc tại đây:
 [Dự án Java gốc](https://github.com/baobui166/Ba-Anh-Em-Movies)
 
 ## Tính năng
@@ -91,7 +91,7 @@ Tên của bạn - nhatminh4403@gmail.com
 BaAnhEm is a movie ticket booking website that allows users to browse movies, book tickets, and manage their bookings online. This project is a C# ASP.NET implementation of a previously developed Java-based project.
 
 ## Reference Project
-This project is a C# ASP.NET implementation based on the original Java project. You can find the original project here:
+This project is a C# ASP.NET implementation based on the original Java project - a school major project that I contributed to and implemented. You can find the original project here:
 [Original Java Project Link](https://github.com/baobui166/Ba-Anh-Em-Movies)
 
 ## Features
