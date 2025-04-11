@@ -1,45 +1,82 @@
-﻿@using Microsoft.AspNetCore.Identity
-@using school_major_project.Models
-@using school_major_project.ViewModel
+﻿@using school_major_project.Areas.Admin.Data
 @using school_major_project.HelperClass
-
-@inject SignInManager<User> SignInManager
-@inject UserManager<User> UserManager
-@model IEnumerable<User>
+@model AccountVM
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Quản lý người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    
+    var users = Model.Users;
 }
 
-<h1>Index</h1>
-@if (Model.Any())
-{
-    <a asp-action="Register" asp-controller="Account"
-       class="btn btn-primary mb-3" style="width:auto">
-        Add New User
-    </a>
-    foreach (var user in Model)
-    {
-        <div class="card mb-3">
-            <div class="card-header">
-                User Id : @user.Id
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">@user.UserName</h5>
-            </div>
-            <div class="card-footer">
-                <a href="#" class="btn btn-primary">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
+
+
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <!--<span class="main__title-stat">14,452 Total</span>-->
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="main__table-wrap">
+                        <table class="main__table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>HỌ TÊN</th>
+                                    <th>EMAIL</th>
+                                    <th>SĐT</th>
+                                    <th>HÀNH ĐỘNG</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in users)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="main__table-text">@user.Id</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@user.FullName</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@user.Email</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@user.PhoneNumber</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-btns">
+                                                <a asp-action="Details" asp-controller="Account" asp-route-name="@user.FullName.RemoveDiacritics()"
+                                                   class="main__table-btn main__table-btn--view">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                                        <path d="M21.92,11.6C19.9,6.91,16.1,4,12,4S4.1,6.91,2.08,11.6a1,1,0,0,0,0,.8C4.1,17.09,7.9,20,12,20s7.9-2.91,9.92-7.6A1,1,0,0,0,21.92,11.6ZM12,18c-3.17,0-6.17-2.29-7.9-6C5.83,8.29,8.83,6,12,6s6.17,2.29,7.9,6C18.17,15.71,15.17,18,12,18ZM12,8a4,4,0,1,0,4,4A4,4,0,0,0,12,8Zm0,6a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z" />
+                                                    </svg>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- end users -->
             </div>
         </div>
-    }
-}
-else
-{
-    <div class="card">
-        <div class="card-header">
-            No Users Added Yet
-        </div>
-    </div>
-}
+    </main>
+    <!-- end main content -->
+</section>
+
+@section Styles {
+    <style>
+        section {
+            user-select: none;
+        }
+    </style>
+}                                }

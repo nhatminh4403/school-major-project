@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
+using school_major_project.HelperClass;
 using school_major_project.Models;
-using System.Threading.Tasks;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -25,37 +24,26 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var users = await _userManager.Users.ToListAsync();
-            return View(users);
+            var users = await _userManager.GetUsersInRoleAsync("Customer");
+            AccountVM accountVM = new AccountVM
+            {
+                Users = users,
+            };
+            return View(accountVM);
         }
 
         // GET: UserController/Details/5
-        [Route("chi-tiet/{id}")]
-        public ActionResult Details(int id)
+        [Route("chi-tiet-tai-khoan/{name}")]
+        public async Task<IActionResult> Details(string name)
         {
-            return View();
-        }
-
-        // GET: UserController/Create
-        [Route("tao-moi")]
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UserController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            var users = await _userManager.GetUsersInRoleAsync("Customer");
+            var user = users.ToList().FirstOrDefault(u => u.FullName.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
+            AccountVM accountVM = new AccountVM
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                Users = users,
+                User = user,
+            };
+            return View(accountVM);
         }
 
         // GET: UserController/Edit/5
@@ -65,7 +53,8 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        // POST: UserController/Edit/5
+        
+        [Route("chinh-sua/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -80,15 +69,8 @@ namespace school_major_project.Areas.Admin.Controllers
             }
         }
 
-        // GET: UserController/Delete/5
-        [Route("xoa/{id}")]
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
-
-        // POST: UserController/Delete/5
         [HttpPost]
+        [Route("xoa/{id}")]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
         {

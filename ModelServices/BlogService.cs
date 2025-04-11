@@ -8,18 +8,18 @@ namespace school_major_project.Services
     public class BlogService : IBlogRepository
     {
         private readonly ApplicationDbContext _context;
-        public BlogService( ApplicationDbContext context)
+        public BlogService(ApplicationDbContext context)
         {
             _context = context;
         }
         public async Task<IEnumerable<Blog>> GetAllAsync()
         {
-            return await _context.Blogs.Include(p=> p.comments).ToListAsync();
+            return await _context.Blogs.Include(p => p.comments).ToListAsync();
         }
 
         public async Task<Blog> GetByIdAsync(int id)
         {
-         
+
             return await _context.Blogs.Include(p => p.comments).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<Blog> GetByNameAsync(string title_name)

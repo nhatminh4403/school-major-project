@@ -5,7 +5,6 @@ using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ViewModel;
 using System.Diagnostics;
-using System.Net.Mail;
 namespace school_major_project.Controllers
 {
     public class HomeController : BaseController
@@ -16,7 +15,7 @@ namespace school_major_project.Controllers
         private readonly ApplicationDbContext _applicationDbContext;
         private readonly IEmailService _emailService;
         private readonly UserManager<User> _userManager;
-        public HomeController(IFilmRepository ifilm,ApplicationDbContext applicationDbContext,ICountryRepository country, IEmailService emailService,
+        public HomeController(IFilmRepository ifilm, ApplicationDbContext applicationDbContext, ICountryRepository country, IEmailService emailService,
             UserManager<User> userManager,
             ICategoryRepository categoryRepository) : base(applicationDbContext)
         {
@@ -28,7 +27,7 @@ namespace school_major_project.Controllers
             _emailService = emailService;
         }
 
-        public async Task<IActionResult> Index(int page =1,int pageSize = 6)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 6)
         {
             var films = await _filmRepository.GetAllAsync();
             var totalFilms = films.Count();

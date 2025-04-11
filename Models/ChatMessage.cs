@@ -1,5 +1,3 @@
-using System;
-
 namespace school_major_project.Models
 {
     public class ChatMessage
@@ -10,4 +8,4 @@ namespace school_major_project.Models
         public DateTime Timestamp { get; set; }
         public bool IsUser { get; set; }
     }
-} 
+}

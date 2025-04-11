@@ -6,6 +6,8 @@
     <RootNamespace>school_major_project</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Google.Apis" Version="1.69.0" />
+    <PackageReference Include="Google.Apis.Core" Version="1.69.0" />
     <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="4.26.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.0" />

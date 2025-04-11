@@ -1,10 +1,9 @@
-﻿using Google.Apis.Auth.OAuth2; // Needed for GoogleCredential
+﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Dialogflow.V2;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-// Assuming you have this using statement for your DbContext if needed
-// using school_major_project.Data; 
-using school_major_project.DataAccess; // Needed for Task
+
+using school_major_project.DataAccess;
 
 
 namespace school_major_project.Controllers
@@ -12,14 +11,64 @@ namespace school_major_project.Controllers
     [AllowAnonymous]
     public class ChatbotController : Controller
     {
-        // Your existing Project ID and DbContext injection
-        private const string _googleProjectId = "movie-vaqw";
+        //private const string _googleProjectId = "movie-vaqw";
+        private readonly string _googleProjectId;
+        private readonly string _languageCode;
+        private readonly SessionsClient _sessionsClient;
         private readonly ApplicationDbContext _applicationDbContext;
 
-        public ChatbotController(ApplicationDbContext context)
+        public ChatbotController(IConfiguration configuration, ApplicationDbContext context)
         {
             _applicationDbContext = context;
-        }   
+
+
+            _googleProjectId = configuration["Dialogflow:ProjectId"];
+            _languageCode = configuration["Dialogflow:LanguageCode"];
+            string relativeCredentialsPath = configuration["Dialogflow:CredentialsPath"];
+
+
+            if (string.IsNullOrEmpty(_googleProjectId))
+            {
+                throw new ArgumentNullException(nameof(_googleProjectId),
+                    "Dialogflow Project ID ('Dialogflow:ProjectId') is not configured in appsettings.json.");
+            }
+            if (string.IsNullOrEmpty(_languageCode))
+            {
+
+                _languageCode = "en-US";
+                Console.WriteLine("Warning: Dialogflow Language Code ('Dialogflow:LanguageCode') not found in appsettings.json. Defaulting to 'en-US'.");
+            }
+            if (string.IsNullOrEmpty(relativeCredentialsPath))
+            {
+                throw new ArgumentNullException(nameof(relativeCredentialsPath),
+                    "Dialogflow Credentials Path ('Dialogflow:CredentialsPath') is not configured in appsettings.json.");
+            }
+
+
+            string absoluteCredentialPath = Path.Combine(Directory.GetCurrentDirectory(), relativeCredentialsPath);
+
+            if (!System.IO.File.Exists(absoluteCredentialPath))
+            {
+                throw new FileNotFoundException($"Google Cloud credentials file not found at resolved path: '{absoluteCredentialPath}'. " +
+                                                "Check 'Dialogflow:CredentialsPath' in appsettings.json, ensure the file exists, " +
+                                                "and set 'Copy to Output Directory' to 'Copy if newer' or 'Copy always' in Visual Studio properties for the file.");
+            }
+
+            try
+            {
+                var credentials = GoogleCredential.FromFile(absoluteCredentialPath)
+                                      .CreateScoped(SessionsClient.DefaultScopes);
+                _sessionsClient = new SessionsClientBuilder { Credential = credentials }.Build();
+                Console.WriteLine($"Dialogflow SessionsClient initialized successfully for project '{_googleProjectId}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"FATAL ERROR: Failed to initialize Dialogflow SessionsClient: {ex.Message}");
+
+                throw new InvalidOperationException("Failed to initialize Dialogflow client. Check credentials and configuration.", ex);
+            }
+        }
+
 
         [HttpGet]
         public IActionResult Chat()
@@ -28,77 +77,45 @@ namespace school_major_project.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessage([FromBody] ChatRequest request) // Use the MODIFIED ChatRequest below
+        public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
         {
-            // --- MODIFIED Validation: Check SessionId and (Message OR EventName) ---
             if (request == null || string.IsNullOrWhiteSpace(request.SessionId))
             {
-                // Return error in the new format
                 return BadRequest(new { replies = new List<string> { "Lỗi: SessionId là bắt buộc." } });
             }
             if (string.IsNullOrWhiteSpace(request.Message) && string.IsNullOrWhiteSpace(request.EventName))
             {
-                // Return error in the new format
                 return BadRequest(new { replies = new List<string> { "Lỗi: Message hoặc EventName là bắt buộc." } });
             }
-            // --- END MODIFIED Validation ---
 
             try
             {
-                // --- Keep your existing credential loading ---
-                string _googleCredentialPath = Path.Combine(Directory.GetCurrentDirectory(), "credentials", "movie-vaqw-ebd6910c61fd.json");
-
-                if (string.IsNullOrEmpty(_googleProjectId)) // This check is slightly redundant as it's a const
-                {
-                    throw new ArgumentNullException(nameof(_googleProjectId), "Google Cloud Project ID is not configured.");
-                }
-                if (string.IsNullOrEmpty(_googleCredentialPath) || !System.IO.File.Exists(_googleCredentialPath))
-                {
-                    // Ensure 'Copy to Output Directory' is set for the credentials file in VS.
-                    throw new FileNotFoundException($"Google Cloud credentials file not found at: '{_googleCredentialPath}'.");
-                }
-
-                var credentials = GoogleCredential.FromFile(_googleCredentialPath)
-                                   .CreateScoped(SessionsClient.DefaultScopes);
-                var sessionsClient = new SessionsClientBuilder
-                {
-                    Credential = credentials
-                }.Build();
-                // The System.Environment calls are generally not needed when passing credentials directly
-                // System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", _googleCredentialPath);
-                // -------------------------------------------------
-
                 var sessionName = new SessionName(_googleProjectId, request.SessionId);
-
-                // --- *** MODIFIED: Create QueryInput based on Event or Text *** ---
                 QueryInput queryInput;
                 if (!string.IsNullOrWhiteSpace(request.EventName))
                 {
-                    // Create EventInput if EventName is provided
                     Console.WriteLine($"Processing EVENT: {request.EventName} for session: {request.SessionId}");
                     queryInput = new QueryInput
                     {
                         Event = new EventInput
                         {
                             Name = request.EventName,
-                            LanguageCode = "vi"
+                            LanguageCode = _languageCode
                         }
                     };
                 }
                 else
                 {
-                    // Otherwise, create TextInput using the Message
                     Console.WriteLine($"Processing TEXT: '{request.Message}' for session: {request.SessionId}");
                     queryInput = new QueryInput
                     {
                         Text = new TextInput
                         {
                             Text = request.Message,
-                            LanguageCode = "vi" // Assuming Vietnamese
+                            LanguageCode = _languageCode
                         }
                     };
                 }
-                // --- *** END MODIFIED QueryInput *** ---
 
                 var detectIntentRequest = new DetectIntentRequest
                 {
@@ -106,12 +123,10 @@ namespace school_major_project.Controllers
                     QueryInput = queryInput
                 };
 
-                DetectIntentResponse response = await sessionsClient.DetectIntentAsync(detectIntentRequest);
+                DetectIntentResponse response = await _sessionsClient.DetectIntentAsync(detectIntentRequest);
                 Console.WriteLine($"DetectIntent successful. Intent: {response.QueryResult?.Intent?.DisplayName}");
 
-                // --- *** MODIFIED: Extract Multiple Replies *** ---
                 List<string> botReplies = new List<string>();
-                // Use null-conditional operator ?. to safely access properties
                 if (response.QueryResult?.FulfillmentMessages != null && response.QueryResult.FulfillmentMessages.Any())
                 {
                     Console.WriteLine($"Found {response.QueryResult.FulfillmentMessages.Count} fulfillment messages.");
@@ -126,55 +141,41 @@ namespace school_major_project.Controllers
                                 botReplies.AddRange(texts);
                             }
                         }
-                        // TODO: Handle other message types (cards, quick replies) if needed
                     }
                 }
                 else
                 {
                     Console.WriteLine("No structured FulfillmentMessages found.");
                 }
-
-                // Fallback to FulfillmentText if no structured messages were added
                 if (!botReplies.Any() && !string.IsNullOrWhiteSpace(response.QueryResult?.FulfillmentText))
                 {
                     Console.WriteLine($"Using FulfillmentText fallback: '{response.QueryResult.FulfillmentText}'");
                     botReplies.Add(response.QueryResult.FulfillmentText);
                 }
-                // --- *** END MODIFIED Reply Extraction *** ---
 
-
-                // --- *** MODIFIED: Return Replies Array *** ---
                 Console.WriteLine($"Returning {botReplies.Count} replies.");
                 return Ok(new { replies = botReplies });
-                // --- *** END MODIFIED Return *** ---
-
             }
             catch (Exception ex)
             {
-                // --- Keep your existing logging ---
-                Console.Error.WriteLine("------ DIALOGFLOW ERROR ------");
+                Console.Error.WriteLine("------ DIALOGFLOW SENDMESSAGE ERROR ------");
                 Console.Error.WriteLine($"Timestamp: {DateTime.UtcNow}");
-                Console.Error.WriteLine($"SessionId: {request?.SessionId}"); // Add SessionId context
+                Console.Error.WriteLine($"SessionId: {request?.SessionId}");
                 Console.Error.WriteLine($"Exception Type: {ex.GetType().FullName}");
                 Console.Error.WriteLine($"Message: {ex.Message}");
                 Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
-                if (ex.InnerException != null) { /* Log inner */ }
-                Console.Error.WriteLine("------ END DIALOGFLOW ERROR ------");
-                // --- END Logging ---
+                if (ex.InnerException != null)
+                    Console.Error.WriteLine("------ END DIALOGFLOW SENDMESSAGE ERROR ------");
 
-                // --- MODIFIED: Return error in the new format ---
                 return StatusCode(500, new { replies = new List<string> { "Xin lỗi, tôi gặp lỗi nội bộ khi xử lý yêu cầu." } });
-                // --- END MODIFIED Error Return ---
             }
         }
 
-        // --- MODIFIED ChatRequest class ---
         public class ChatRequest
         {
-            public string Message { get; set; }     // User's text input
-            public string EventName { get; set; }   // Event name input (e.g., "WELCOME")
-            public string SessionId { get; set; }   // Conversation session ID (Required)
+            public string Message { get; set; }
+            public string EventName { get; set; }
+            public string SessionId { get; set; }
         }
-        // --- END MODIFIED ChatRequest ---
     }
 }

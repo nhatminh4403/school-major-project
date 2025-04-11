@@ -1,39 +1,77 @@
-﻿@model school_major_project.Models.Schedule
+﻿@using school_major_project.Areas.Admin.Data
+@model AddingScheduleVM
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm lịch chiếu";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
 
-<h4>Schedule</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ScheduleTime" class="control-label"></label>
-                <input asp-for="ScheduleTime" class="form-control" />
-                <span asp-validation-for="ScheduleTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FilmId" class="control-label"></label>
-                <select asp-for="FilmId" class ="form-control" asp-items="ViewBag.FilmId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="RoomId" class="control-label"></label>
-                <select asp-for="RoomId" class ="form-control" asp-items="ViewBag.RoomId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        @* Use ViewData or Model.PageTitle if you added it *@
+                        <h2>@ViewData["Title"]</h2>
+                    </div>
+                </div>
+                <!-- end main title -->
+                <!-- form -->
+                <div class="col-12">
+                    <div class="row">
+                        <form asp-action="Create" asp-controller="Schedules" asp-area="Admin" method="post"
+                              class="profile__form">
+                            <div asp-validation-summary="All" class="text-danger"></div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+                            @Html.AntiForgeryToken()
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <h4 class="profile__title">Thông tin</h4>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-12 col-xl-6">
+                                    <div class="profile__group">
+                                        <label class="profile__label" asp-for="Schedule.FilmId">ID phim</label> 
+
+                                        <div>
+                                            <select asp-items="Model.FilmList" asp-for="Schedule.FilmId" class="profile__input">
+                                                <option value="">-- Chọn Phim --</option>
+                                            </select>
+                                            <span asp-validation-for="Schedule.FilmId" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-6 col-lg-12 col-xl-6">
+                                    <div class="profile__group">
+                                        <label class="profile__label" asp-for="Schedule.RoomId">Phòng</label> @* Update asp-for *@
+                                        @* Update asp-items and asp-for *@
+                                        <select class="js-example-basic-single profile__input" asp-for="Schedule.RoomId" asp-items="Model.RoomList">
+                                            <option value="">-- Chọn Phòng --</option>
+                                        </select>
+                                        <span asp-validation-for="Schedule.RoomId" class="text-danger"></span> @* Update asp-validation-for *@
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6 col-lg-12 col-xl-3">
+                                    <div class="profile__group">
+                                        <label class="profile__label" asp-for="Schedule.ScheduleTime">Ngày và giờ bắt đầu</label> @* Update asp-for *@
+                                        <input id="date" type="datetime-local" class="profile__input"
+                                               asp-for="Schedule.ScheduleTime" /> @* Update asp-for *@
+                                        <span asp-validation-for="Schedule.ScheduleTime" class="text-danger"></span> @* Add/Update asp-validation-for *@
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button class="profile__btn" type="submit">Thực hiện</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
 

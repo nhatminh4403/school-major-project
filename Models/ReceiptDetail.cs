@@ -11,7 +11,7 @@ namespace school_major_project.Models
         public int Id { get; set; }
         [Required]
         public string FilmName { get; set; }
-        [Required] 
+        [Required]
         public string CinemaName { get; set; }
         [Required]
         public string RoomName { get; set; }

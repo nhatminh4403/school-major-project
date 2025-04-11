@@ -133,7 +133,8 @@
                                         </td>
                                         <td>
                                             <div class="main__table-btns">
-                                                <a href="/admin/schedules/add/@film.Id" class="main__table-btn main__table-btn--edit">
+                                                <a href="@Url.Action("CreateFromFilm", "Schedules", new { filmId = film.Id })"
+                                                class="main__table-btn main__table-btn--edit">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                         <path d="M19,11H13V5a1,1,0,0,0-2,0v6H5a1,1,0,0,0,0,2h6v6a1,1,0,0,0,2,0V13h6a1,1,0,0,0,0-2Z" />
                                                     </svg>
@@ -209,7 +210,7 @@
         <h6 class="modal__title">Thông báo</h6>
         <p class="modal__text">Bạn có muốn xoá lịch chiếu này không?</p>
         <div class="modal__btns">
-            <button class="modal__btn modal__btn--apply" type="button" onclick="deleteItem('/admin/lich-chieu/xoa/' + item_id, '/admin/lich-chieu' )">
+            <button class="modal__btn modal__btn--apply" type="button" onclick="deleteItem('/admin/lich-chieu/xoa/' + deleteItemId, '/admin/lich-chieu' )">
                 Xoá
             </button>
             <button class="modal__btn modal__btn--dismiss" type="button">Đóng</button>

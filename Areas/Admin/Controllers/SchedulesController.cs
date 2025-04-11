@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using school_major_project.Areas.Admin.Data;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
@@ -15,11 +14,16 @@ namespace school_major_project.Areas.Admin.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IScheduleRepository _scheduleRepository;
         private readonly IFilmRepository _filmRepository;
-        public SchedulesController(ApplicationDbContext context, IFilmRepository filmRepository,IScheduleRepository scheduleRepository)
+        private readonly IRoomRepository _roomRepository;
+        private readonly ICinemaRepository _cinemaRepository;
+        public SchedulesController(ApplicationDbContext context, IFilmRepository filmRepository,
+            IScheduleRepository scheduleRepository, IRoomRepository roomRepository, ICinemaRepository cinemaRepository)
         {
             _context = context;
             _filmRepository = filmRepository;
             _scheduleRepository = scheduleRepository;
+            _roomRepository = roomRepository;
+            _cinemaRepository = cinemaRepository;
         }
 
         // GET: Admin/Schedules
@@ -30,78 +34,95 @@ namespace school_major_project.Areas.Admin.Controllers
 
             var filmSchedules = await _scheduleRepository.GetAllAsync();
             var films = await _filmRepository.GetAllAsync();
-            var GetReleasedFilmsWithoutSchedules =films.Where(film => film.StartTime <= today).Where(film => film.Schedules == null || !film.Schedules.Any()).ToList();
+            var GetReleasedFilmsWithoutSchedules = films.Where(film => film.StartTime <= today).Where(film => film.Schedules == null || !film.Schedules.Any()).ToList();
             var upcoming = films.Where(film => film.StartTime > today).ToList();
 
 
             var viewModel = new ScheduleVM
             {
-                Schedules =filmSchedules,
+                Schedules = filmSchedules,
                 UpcomingFilms = upcoming,
                 ReleasedFilmsWithoutSchedules = GetReleasedFilmsWithoutSchedules,
             };
             return View(viewModel);
         }
 
-        // GET: Admin/Schedules/Details/5
-        [Route("chi-tiet/{id}")]
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var schedule = await _context.Schedules
-                .Include(s => s.Film)
-                .Include(s => s.Room)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (schedule == null)
-            {
-                return NotFound();
-            }
-
-            return View(schedule);
-        }
-
-
-        // GET: Admin/Schedules/Create
         [Route("tao-moi")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["FilmId"] = new SelectList(_context.Films, "Id", "Actors");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Description");
-            return View();
+            var rooms = await _roomRepository.GetAllRoomAsync();
+            var films = await _filmRepository.GetAllAsync();
+            var viewModel = new AddingScheduleVM();
+
+            viewModel.RoomList = new SelectList(rooms.Select(r => new
+            {
+                r.Id,
+                DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+            }), "Id", "DisplayText");
+
+            viewModel.FilmList = new SelectList(films, "Id", "Name");
+
+            return View(viewModel);
         }
 
-        // POST: Admin/Schedules/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ScheduleTime,FilmId,RoomId")] Schedule schedule)
+        [Route("tao-moi-tu-phim/{filmId}")]
+        public async Task<IActionResult> CreateFromFilm(int filmId)
         {
+            var rooms = await _roomRepository.GetAllRoomAsync();
+            var films = await _filmRepository.GetAllAsync();
+            var viewModel = new AddingScheduleVM();
+
+            viewModel.RoomList = new SelectList(rooms.Select(r => new
+            {
+                r.Id,
+                DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+            }), "Id", "DisplayText");
+
+            viewModel.FilmList = new SelectList(films, "Id", "Name", filmId);
+            viewModel.Schedule.FilmId = filmId;
+
+            return View("Create", viewModel);
+        }
+
+        [HttpPost("tao-moi")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(AddingScheduleVM viewModel)
+        {
+            ModelState.Remove("Schedule.Film");
+            ModelState.Remove("Schedule.Room");
+            ModelState.Remove("Schedule.Id");
             if (ModelState.IsValid)
             {
-                _context.Add(schedule);
-                await _context.SaveChangesAsync();
+                await _scheduleRepository.AddAsync(viewModel.Schedule);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["FilmId"] = new SelectList(_context.Films, "Id", "Actors", schedule.FilmId);
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Description", schedule.RoomId);
-            return View(schedule);
+            else
+            {
+                ViewData["Title"] = "Tạo Lịch Chiếu Mới";
+
+                var rooms = await _roomRepository.GetAllRoomAsync();
+                var films = await _filmRepository.GetAllAsync();
+
+                viewModel.RoomList = new SelectList(rooms.Select(r => new
+                {
+                    r.Id,
+                    DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+                }), "Id", "DisplayText", viewModel.Schedule.RoomId);
+
+                viewModel.FilmList = new SelectList(films, "Id", "Name", viewModel.Schedule.FilmId);
+
+                TempData["Error"] = "Tạo lịch chiếu thất bại. Vui lòng kiểm tra lại thông tin.";
+                return View(viewModel);
+            }
         }
 
-        // GET: Admin/Schedules/Edit/5
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var schedule = await _context.Schedules.FindAsync(id);
+
+            var schedule = await _scheduleRepository.GetByIdAsync(id);
             if (schedule == null)
             {
                 return NotFound();
@@ -116,7 +137,7 @@ namespace school_major_project.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ScheduleTime,FilmId,RoomId")] Schedule schedule)
+        public async Task<IActionResult> Edit(int id, Schedule schedule)
         {
             if (id != schedule.Id)
             {

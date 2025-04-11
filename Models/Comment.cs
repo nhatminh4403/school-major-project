@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace school_major_project.Models
 {
@@ -25,6 +25,6 @@ namespace school_major_project.Models
         [ForeignKey("UserId")]
         public virtual User? User { get; set; }
         [ForeignKey("BlogId")]
-        public virtual Blog? Blog { get; set; }  
+        public virtual Blog? Blog { get; set; }
     }
 }

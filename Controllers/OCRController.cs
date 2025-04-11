@@ -15,7 +15,7 @@ namespace school_major_project.Controllers
             {
                 // Lưu tạm hình ảnh vào thư mục uploads
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/cards", file.FileName);
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath)); // Đảm bảo thư mục tồn tại
+                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
                     file.CopyTo(stream);
@@ -24,7 +24,7 @@ namespace school_major_project.Controllers
                 // Thực hiện OCR để trích xuất văn bản
                 string extractedText;
                 using (var engine = new TesseractEngine(_tesseractDataPath,
-                    "vie+eng+fra+por+spa+pol+deu+hun+tur+ita", EngineMode.Default)) // Thay "eng" bằng "vie" nếu cần tiếng Việt
+                    "vie+eng+fra+por+spa+pol+deu+hun+tur+ita", EngineMode.Default)) 
                 {
                     using (var img = Pix.LoadFromFile(filePath))
                     {

@@ -68,10 +68,10 @@
                                         </td>
                                         <td>
                                             <div class="main__table-text">@film.FilmRated</div>
-                                         </td>
+                                        </td>
                                         <td>
                                             <div class="main__table-btns">
-                                                <a href="/admin/lich-chieu/tao-moi/{filmId}(filmId=${item.id})}"
+                                                <a href="@Url.Action("CreateFromFilm", "Schedules", new { filmId = film.Id })" 
                                                    class="main__table-btn main__table-btn--banned"
                                                    title="Thêm lịch chiếu phim này">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

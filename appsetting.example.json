@@ -16,5 +16,10 @@
     "Username": "",
     "Password": ""
   },
+  "Dialogflow": {
+    "ProjectId": "",
+    "LanguageCode": "",
+    "CredentialsPath": ""
+  },
   "AllowedHosts": "*"
 }

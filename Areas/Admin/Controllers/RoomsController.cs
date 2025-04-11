@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.Areas.Admin.Data;
@@ -10,7 +6,6 @@ using school_major_project.DataAccess;
 using school_major_project.DTO;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using school_major_project.ModelServices;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -54,67 +49,63 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("chi-tiet/{id}")]
         public async Task<IActionResult> Details(int id, [FromQuery] int? scheduleId)
         {
-
             var room = await _roomRepository.GetByIdAsync(id);
             if (room == null)
             {
                 return NotFound();
             }
+
             var viewModel = new RoomDetailVM
             {
                 Room = room,
                 RoomName = room.Name,
+                Seats = Enumerable.Empty<SeatDTO>()
             };
-            var schedules = await _scheduleRepository.GetSchedulesByRoomId(room.Id);
 
-            viewModel.Schedules = schedules ?? new List<Schedule>();
+            // 3. Lấy danh sách lịch chiếu cho phòng này
+            var schedules = await _scheduleRepository.GetSchedulesByRoomId(room.Id);
+            viewModel.Schedules = schedules?.OrderBy(s => s.ScheduleTime).ToList() ?? new List<Schedule>();
+
             if (!viewModel.Schedules.Any())
             {
                 viewModel.HasNoSchedules = true;
-                viewModel.Seats = await _seatRepository.GetSeatsByRoomId(room.Id); // Show all seats (as available)
-                viewModel.SelectedScheduleId = null;
-                // Path assumes Views/Room/RoomDetail.cshtml or Views/Shared/RoomDetail.cshtml
-                // Or specify full path if needed: return View("~/Views/Admin/Room/RoomDetail.cshtml", viewModel);
-                return View(nameof(Details), viewModel);
-                
-            }
 
-            // If no scheduleId is provided via query string, default to the first schedule
-            if (scheduleId == null)
-            {
-                scheduleId = viewModel.Schedules.First().Id;
-            }
-            else
-            {
-                viewModel.SelectedScheduleId = scheduleId;
-            }
-            if (scheduleId.HasValue && scheduleId.Value == 0)
-            {
                 viewModel.Seats = await _seatRepository.GetSeatsByRoomId(room.Id);
+                viewModel.SelectedScheduleId = null;
             }
-            else if (scheduleId.HasValue) // Must have a value here (either from query or defaulted)
-            {
-                // Fetch seats with status specific to the selected schedule
-                viewModel.Seats = await _seatRepository.GetSeatsByScheduleIdAndRoomId( scheduleId.Value, id);
-            }
+
             else
             {
-                // Should not happen if schedules exist due to defaulting logic, but handle defensively
-                viewModel.Seats = new List<SeatDTO>() as IEnumerable<Seat>; // Or fetch all as default? Depends on requirement.
-            }
-            //var seats = await _seatRepository.GetSeatsByRoomId(room.Id);
-            //var viewModel = new RoomDetailVM {
-            //   Room = room,
-            //   HasNoSchedules = true,
-            //   SelectedScheduleId = 0,
-            //   Schedules = schedules,
-            //   Seats = seats,
-            //   RoomName = room.Name
-            //};
+                viewModel.HasNoSchedules = false;
 
-            return View(nameof(Details),viewModel);
+
+                int? targetScheduleId = scheduleId;
+
+                if (targetScheduleId == null)
+                {
+                    targetScheduleId = viewModel.Schedules.First().Id;
+                }
+
+                viewModel.SelectedScheduleId = targetScheduleId;
+
+                if (targetScheduleId.HasValue && targetScheduleId.Value == 0)
+                {
+                    viewModel.Seats = await _seatRepository.GetSeatsByRoomId(room.Id);
+                }
+                else if (targetScheduleId.HasValue)
+                {
+
+                    viewModel.Seats = await _seatRepository.GetSeatsByScheduleIdAndRoomId(room.Id, targetScheduleId.Value);
+                }
+            }
+
+
+            viewModel.Seats ??= Enumerable.Empty<SeatDTO>();
+
+            return View("Details", viewModel);
         }
-        
+
+
         private void CreateSeatsForRoom(Room room)
         {
             List<Seat> seats = new List<Seat>();
@@ -196,11 +187,11 @@ namespace school_major_project.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("tao-moi/{id}")] // Route này khớp với JS
+        [Route("tao-moi/{id}")]
         public async Task<IActionResult> Create(int id, string roomName = null)
         {
-      
-            var cinema = await _cinemaRepository.GetByIdAsync(id); 
+
+            var cinema = await _cinemaRepository.GetByIdAsync(id);
 
             if (cinema == null)
             {
@@ -211,7 +202,7 @@ namespace school_major_project.Areas.Admin.Controllers
             if (string.IsNullOrWhiteSpace(finalRoomName))
             {
                 int roomCount = await _context.Rooms.CountAsync(r => r.CinemaId == id);
-                finalRoomName = $"Phòng {roomCount + 1}"; 
+                finalRoomName = $"Phòng {roomCount + 1}";
             }
 
 
@@ -219,13 +210,13 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 CinemaId = id,
                 Name = finalRoomName,
-                Description = "Phòng mới tạo", 
+                Description = "Phòng mới tạo",
             };
 
             try
             {
                 _context.Add(room);
-                await _context.SaveChangesAsync(); // Lưu phòng để lấy được room.Id
+                await _context.SaveChangesAsync();
 
                 CreateSeatsForRoom(room);
 
@@ -233,14 +224,14 @@ namespace school_major_project.Areas.Admin.Controllers
                 {
                     success = true,
                     message = $"Đã tạo phòng '{room.Name}' thành công!",
-                    room = new 
+                    room = new
                     {
                         id = room.Id,
                         name = room.Name,
-                        
-                        cinemaLocation = cinema.Location, 
-                        cinemaMap = cinema.Map,       
-                                                      
+
+                        cinemaLocation = cinema.Location,
+                        cinemaMap = cinema.Map,
+
                         detailsUrl = Url.Action("Details", "Rooms", new { area = "Admin", id = room.Id }),
                         editUrl = Url.Action("Edit", "Rooms", new { area = "Admin", id = room.Id })
                     }
@@ -248,7 +239,7 @@ namespace school_major_project.Areas.Admin.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating room: {ex.Message}"); 
+                Console.WriteLine($"Error creating room: {ex.Message}");
 
                 return Json(new { success = false, message = "Có lỗi xảy ra khi tạo phòng hoặc tạo ghế: " + ex.Message });
             }
@@ -257,7 +248,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("chinh-sua/{id}")]
         public async Task<IActionResult> Edit(int id)
         {
-            
+
             var room = await _roomRepository.GetByIdAsync(id);
             if (room == null)
             {

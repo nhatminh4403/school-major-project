@@ -5,7 +5,7 @@
 namespace school_major_project.Migrations
 {
     /// <inheritdoc />
-    public partial class updateDB : Migration
+    public partial class addlichChieu : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

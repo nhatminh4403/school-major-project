@@ -25,7 +25,7 @@ namespace school_major_project.HelperClass
 
             return slug.Replace("-", " ");
         }
-        
+
         public static string RemoveDiacritics(this string text)
         {
             if (string.IsNullOrWhiteSpace(text))

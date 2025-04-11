@@ -15,7 +15,7 @@ namespace school_major_project.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
-        public UserController(ApplicationDbContext context, UserManager<User> userManager, 
+        public UserController(ApplicationDbContext context, UserManager<User> userManager,
             SignInManager<User> signInManager, ILogger<UserController> logger, IWebHostEnvironment environment) : base(context)
         {
             _userManager = userManager;
@@ -57,7 +57,7 @@ namespace school_major_project.Controllers
         public async Task<IActionResult> Edit()
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
@@ -142,28 +142,28 @@ namespace school_major_project.Controllers
             return View();
         }
 
-/*        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        /*        [HttpPost]
+                [ValidateAntiForgeryToken]
+                public ActionResult Delete(int id, IFormCollection collection)
+                {
+                    try
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    catch
+                    {
+                        return View();
+                    }
+                }
 
-*/
+        */
         [Route("lich-su-dat-ve")]
         public IActionResult History()
         {
             return View();
         }
 
-        
+
 
     }
 }

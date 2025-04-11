@@ -1,6 +1,6 @@
 ﻿using school_major_project.Interfaces;
-using System.Net.Mail;
 using System.Net;
+using System.Net.Mail;
 
 namespace school_major_project.ModelServices
 {

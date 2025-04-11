@@ -13,10 +13,10 @@ namespace school_major_project.Controllers
         private readonly IFilmRepository _filmRepository;
         private readonly ICinemaRepository _cinemaRepository;
         private readonly ISeatRepository _seatRepository;
-        
-        public ScheduleController(ApplicationDbContext context,IScheduleRepository scheduleRepository,
-            IRoomRepository roomRepository, IFilmRepository filmRepository, 
-            ICinemaRepository cinemaRepository,ISeatRepository seatRepository) : base(context)
+
+        public ScheduleController(ApplicationDbContext context, IScheduleRepository scheduleRepository,
+            IRoomRepository roomRepository, IFilmRepository filmRepository,
+            ICinemaRepository cinemaRepository, ISeatRepository seatRepository) : base(context)
         {
             _context = context;
             _scheduleRepository = scheduleRepository;

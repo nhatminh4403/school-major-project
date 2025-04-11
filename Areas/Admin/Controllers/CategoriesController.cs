@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -79,8 +73,8 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 return NotFound();
             }
-            
-                return View(category);
+
+            return View(category);
         }
 
         // POST: Admin/Categories/Edit/5
@@ -106,10 +100,10 @@ namespace school_major_project.Areas.Admin.Controllers
                         // Category đã bị xóa sau khi mở form Edit?
                         ModelState.AddModelError("", "Không tìm thấy thể loại để cập nhật.");
                         return View(category); // Quay lại view với lỗi
-                                                // Hoặc return NotFound();
+                                               // Hoặc return NotFound();
                     }
-                 
-                    currentCategory.CategoryDescription =  category.CategoryDescription;
+
+                    currentCategory.CategoryDescription = category.CategoryDescription;
                     await _categoryRepository.UpdateAsync(currentCategory);
                 }
                 catch (DbUpdateConcurrencyException)

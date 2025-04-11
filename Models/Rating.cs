@@ -15,7 +15,7 @@ namespace school_major_project.Models
         [Required]
         public DateTime RatingDate { get; set; }
         [Required]
-        public int Star {  get; set; }
+        public int Star { get; set; }
 
         [Required]
         public int FilmId { get; set; }

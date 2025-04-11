@@ -14,7 +14,7 @@ namespace school_major_project.Services
         }
         public async Task<IEnumerable<Rating>> GetAllAsync()
         {
-            return await _context.Ratings.Include(p=>p.User).ToListAsync();
+            return await _context.Ratings.Include(p => p.User).ToListAsync();
         }
         public async Task<Rating> GetByIdAsync(int id)
         {

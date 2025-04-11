@@ -15,7 +15,7 @@ namespace school_major_project.Services
 
         public async Task<IEnumerable<Category>> GetAllAsync()
         {
-            return await _context.Categories.Include(p=>p.Films).ToListAsync();
+            return await _context.Categories.Include(p => p.Films).ToListAsync();
         }
         public async Task<Category> GetByIdAsync(int id) => await _context.Categories.Include(p => p.Films).FirstOrDefaultAsync(p => p.Id == id);
         public async Task AddAsync(Category filmCategory)

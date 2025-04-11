@@ -48,7 +48,7 @@ namespace school_major_project.Services
 
         public async Task<Cinema> GetSelectedCinema(int? id = null)
         {
-            if(id.HasValue)
+            if (id.HasValue)
             {
                 var cinema = await GetByIdAsync(id.Value);
                 return cinema;

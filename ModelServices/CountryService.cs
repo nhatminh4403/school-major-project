@@ -14,7 +14,7 @@ namespace school_major_project.ModelServices
         }
         public async Task<IEnumerable<Country>> GetAllAsync()
         {
-            return await _context.Countries.Include(p=>p.films).ToListAsync();
+            return await _context.Countries.Include(p => p.films).ToListAsync();
         }
         public async Task<Country> GetByIdAsync(int id)
         {

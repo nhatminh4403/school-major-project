@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -27,7 +26,6 @@ namespace school_major_project.Areas.Admin.Controllers
             }
             return "/admin/images/seattypes/" + image.FileName; // Trả về đường dẫn tương đối
         }
-        // GET: Admin/SeatTypes
         [Route("")]
         public async Task<IActionResult> Index()
         {
@@ -36,21 +34,8 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(types);
         }
 
-        // GET: Admin/SeatTypes/Details/5
-        [Route("chi-tiet-loai-ghe/{id}")]
-        public async Task<IActionResult> Details(int id)
-        {
 
-            var seatType = await _seatTypeRepository.GetByIdAsync(id);
-            if (seatType == null)
-            {
-                return NotFound();
-            }
 
-            return View(seatType);
-        }
-
-        // GET: Admin/SeatTypes/Create
         [Route("tao-moi")]
         public IActionResult Create()
         {
@@ -80,60 +65,6 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(seatType);
         }
 
-        // GET: Admin/SeatTypes/Edit/5
-        [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var seatType = await _context.SeatTypes.FindAsync(id);
-            if (seatType == null)
-            {
-                return NotFound();
-            }
-            return View(seatType);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, SeatType seatType, IFormFile ImageDescription)
-        {
-            if (id != seatType.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    if (ImageDescription != null)
-                    {
-                        seatType.ImageDescription = await SaveImage(ImageDescription);
-                    }
-                    await _seatTypeRepository.UpdateAsync(seatType);
-
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!SeatTypeExists(seatType.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(seatType);
-        }
-
-        // GET: Admin/SeatTypes/Delete/5
         [Route("xoa/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]

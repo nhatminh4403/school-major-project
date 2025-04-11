@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using school_major_project.Models;
+﻿using school_major_project.Models;
 
 namespace school_major_project.Interfaces
 {

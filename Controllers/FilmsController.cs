@@ -9,7 +9,7 @@ using school_major_project.ViewModel;
 
 namespace school_major_project.Controllers
 {
-    
+
     public class FilmsController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -129,7 +129,7 @@ namespace school_major_project.Controllers
 
             if (!string.IsNullOrEmpty(searchname))
             {
-                string normalizedName =  UrlHelper.RemoveDiacritics(searchname).ToLower();
+                string normalizedName = UrlHelper.RemoveDiacritics(searchname).ToLower();
                 films = films.Where(f => UrlHelper.RemoveDiacritics(f.Name).ToLower().Contains(normalizedName)).ToList();
             }
             var filmspaging = films.Skip(((page ?? 1) - 1) * pageSize).Take(pageSize).ToList();

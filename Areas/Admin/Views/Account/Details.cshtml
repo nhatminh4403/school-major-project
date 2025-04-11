@@ -1,0 +1,197 @@
+﻿@using school_major_project.Areas.Admin.Data
+@model AccountVM
+@{
+    ViewData["Title"] = "Chi tiết tài khoản";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    int stt = 0;
+}
+
+<section>
+    <main class="main">
+        <div class="container-fluid">
+            <div class="row">
+                <!-- main title -->
+                <div class="col-12">
+                    <div class="main__title">
+                        <h2>@ViewData["Title"]</h2>
+                        <a asp-controller="Account" asp-action="Index" class="main__title-link back-button" style="margin-left: auto">
+                            <span>Trở về</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- User Info Card -->
+                <div class="col-12">
+                    <div class="user-info-card">
+                        <div class="user-info-header">
+                            <h3>Thông tin người dùng</h3>
+                        </div>
+
+                        <div class="user-info-content">
+                            <div class="user-info-row">
+                                <div class="user-info-label">ID:</div>
+                                <div class="user-info-value">@Model.User.Id</div>
+                            </div>
+
+                            <div class="user-info-row">
+                                <div class="user-info-label">Họ tên:</div>
+                                <div class="user-info-value">@Model.User.FullName</div>
+                            </div>
+
+                            <div class="user-info-row">
+                                <div class="user-info-label">Email:</div>
+                                <div class="user-info-value">@Model.User.Email</div>
+                            </div>
+
+                            <div class="user-info-row">
+                                <div class="user-info-label">Số điện thoại:</div>
+                                <div class="user-info-value">@(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Chưa cập nhật" : Model.User.PhoneNumber)</div>
+                            </div>
+
+                            <div class="user-info-row">
+                                <div class="user-info-label">Số điểm tích lũy:</div>
+                                <div class="user-info-value">@Model.User.PointSaving</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-12">
+                            <h4 class="user-info-header" style="color:white">Khuyến mãi hiện có</h4>
+                        </div>
+                        <div class="col-12">
+                            <div class="promotion__list">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Mã khuyến mãi</th>
+                                            <th>Mô tả</th>
+                                            <th>Ngày bắt đầu</th>
+                                            <th>Ngày kết thúc</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.User.Promotions == null || Model.User.Promotions.Count() == 0 || !Model.User.Promotions.Any())
+                                        {
+                                            <tr>
+                                                <td colspan="5">
+                                                    <h2 style="text-align: center;color:white" class="text-center">Không có khuyến mãi nào</h2>
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            @foreach (var promotion in Model.User.Promotions)
+                                            {
+                                                stt++;
+                                                <tr>
+                                                    <td>@stt</td>
+                                                    <td>@promotion.Code</td>
+                                                    <td>@promotion.Description</td>
+                                                    <td>
+                                                        @promotion.StartDate.ToString("dd/MM/yyyy")
+                                                    </td>
+                                                    <td>@promotion.EndDate.ToString("dd/MM/yyyy")</td>
+                                                </tr>
+                                            }
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+
+@section Styles {
+    <style>
+        .promotion__list {
+            color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+            .promotion__list table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .promotion__list th, .promotion__list td {
+                padding: 10px;
+                text-align: left;
+                border-bottom: 1px solid #444;
+                background-color: #2b2b31;
+                color: #fff;
+            }
+
+            .promotion__list th {
+                font-weight: bold;
+                background-color: #3d3d45;
+            }
+
+            .promotion__list tr:hover {
+                background-color: #414147;
+            }
+
+        .user-info-card, .user-activity-card {
+            background-color: #2b2b31;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .user-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+            .user-info-header h3, .user-info-header h4 {
+                color: #fff;
+                font-size: 18px;
+                margin: 0;
+            }
+
+        .user-info-content {
+            margin-bottom: 20px;
+        }
+
+        .user-info-row {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .user-info-label {
+            width: 150px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .user-info-value {
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .user-activity-card h3 {
+            color: #fff;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .empty-message {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 30px 0;
+        }
+    </style>
+}
+

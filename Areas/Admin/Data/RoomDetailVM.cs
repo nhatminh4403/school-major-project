@@ -1,4 +1,5 @@
-﻿using school_major_project.Models;
+﻿using school_major_project.DTO;
+using school_major_project.Models;
 namespace school_major_project.Areas.Admin.Data
 {
     public class RoomDetailVM
@@ -9,6 +10,6 @@ namespace school_major_project.Areas.Admin.Data
         public Room Room { get; set; }
         public IEnumerable<Schedule> Schedules { get; set; }
 
-        public IEnumerable<Seat> Seats { get; set; }
+        public IEnumerable<SeatDTO> Seats { get; set; }
     }
 }

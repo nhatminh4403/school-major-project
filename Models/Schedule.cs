@@ -15,7 +15,7 @@ namespace school_major_project.Models
 
         [Required]
         public int FilmId { get; set; }
-        [ForeignKey(nameof(FilmId))]    
+        [ForeignKey(nameof(FilmId))]
         public virtual Film Film { get; set; }
         [Required]
         public int RoomId { get; set; }

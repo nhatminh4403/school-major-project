@@ -19,7 +19,7 @@ namespace school_major_project.Models
         public string SeatName { get; set; }
 
         public ICollection<ReceiptDetail>? ReceiptDetails { get; set; }
-        
+
         public int ComboFoodId { get; set; }
         [ForeignKey(nameof(ComboFoodId))]
         public virtual Food? GetFood { get; set; }

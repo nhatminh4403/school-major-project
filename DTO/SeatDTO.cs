@@ -8,6 +8,6 @@
         public string RoomName { get; set; }
         public int Price { get; set; }
         public string Image { get; set; }
-        public bool Status { get; set; } // 
+        public bool Status { get; set; }
     }
 }

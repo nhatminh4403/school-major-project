@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-
-namespace school_major_project.ViewModel
+﻿namespace school_major_project.ViewModel
 {
     public class UserVM
     {

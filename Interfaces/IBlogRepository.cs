@@ -11,6 +11,6 @@ namespace school_major_project.Interfaces
         Task AddAsync(Blog blog);
         Task UpdateAsync(Blog blog);
         Task DeleteAsync(int id);
-        
+
     }
 }

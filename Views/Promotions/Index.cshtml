@@ -4,7 +4,8 @@
 @inject SignInManager<school_major_project.Models.User> signInManager
 @{
     ViewData["Title"] = "Đổi Thưởng";
-    var user = userManager.GetUserAsync(User);
+    var user = await userManager.GetUserAsync(User);
+    var currentUser = ViewBag.CurrentUser as User;
 }
 
 
@@ -15,7 +16,11 @@
     await Html.RenderPartialAsync("_Preloader");
     await Html.RenderPartialAsync("_Banner");
 }
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js" integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
+    <script src="~/js/js/promotionRedemption.js"></script>
+}
 
 <section class="redemption-section">
     <div class="container">
@@ -28,19 +33,19 @@
             {
                 <div class="promotion-section__container">
                     <div class="promotion-section__items">
-                        @foreach(var promotion in Model) {
-                            <div class="promotion-item">
+                        @foreach (var promotion in Model)
+                        {
+                            <div class="promotion-item" id="promotion-@promotion.Id">
                                 <div class="promotion-item__info">
                                     <img src="~/imgs/img/Percentage.png" alt=" % Image" class="promotion-item__image" />
                                     <p>
-                                        <!--th:if="${promotion.promotionCode != null and !promotion.promotionCode.contains('SV')}" >-->
                                         <strong>Mã khuyến mãi:</strong>
                                         <span>@promotion.Code</span>
                                     </p>
 
                                     <p>
                                         <strong>Mô tả:</strong>
-                                        <span >@promotion.Description</span>
+                                        <span>@promotion.Description</span>
                                     </p>
                                     <p>
                                         <strong>Giá trị khuyến mãi:</strong>
@@ -55,17 +60,43 @@
                                             <span>@promotion.RedemptionPoint</span>
                                         </p>
                                     }
-                                    
+
                                     <p>
                                         <strong>Thời gian khuyến mãi:</strong> <br>
-                                        <span >
+                                        <span>
                                             @promotion.StartDate.ToString("dd/MM/yyyy") - @promotion.EndDate.ToString("dd/MM/yyyy")
                                         </span>
                                     </p>
                                 </div>
-                                @if(signInManager.IsSignedIn(User)) {
+                                @if (signInManager.IsSignedIn(User) && currentUser != null)
+                                {
                                     <div class="promotion-item__actions">
-                                        @if (user.Result.PointSaving >= promotion.RedemptionPoint)
+
+                                        @if (currentUser.Promotions != null && currentUser.Promotions.Any(p => p.Id == promotion.Id))
+                                        {
+                                            <button class="btn btn-success"
+                                                     type="button" disabled>
+                                                Đã quy đổi
+                                            </button>
+                                            
+                                        }
+                                        else if (promotion.RedemptionPoint != null && currentUser.PointSaving < promotion.RedemptionPoint)
+                                        {
+                                            <button class="btn btn-secondary disabled" type="button" disabled title="Bạn không đủ @promotion.RedemptionPoint điểm">
+                                                Bạn không đủ điểm để quy đổi! (@currentUser.PointSaving / @promotion.RedemptionPoint)
+                                            </button>
+                                          
+                                        }
+                                        
+                                        else if (promotion.RedemptionPoint != null && currentUser.PointSaving >= promotion.RedemptionPoint)
+                                        {
+                                            <button class="btn btn-primary"
+                                                    onclick="redeemPromotion(@promotion.Id)"
+                                                    type="button">
+                                                Quy đổi (@promotion.RedemptionPoint điểm)
+                                            </button>
+                                        }
+                                        else if (promotion.RedemptionPoint == null || promotion.RedemptionPoint==0)
                                         {
                                             <button class="btn btn-primary"
                                                     onclick="redeemPromotion(@promotion.Id)"
@@ -73,12 +104,6 @@
                                                 Quy đổi
                                             </button>
                                         }
-                                        else {
-                                            <span class="text-danger">
-                                                Bạn không đủ điểm để quy đổi!
-                                            </span>
-                                        }
-                                       
                                     </div>
                                 }
                             </div>

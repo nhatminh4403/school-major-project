@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using System.Threading.Tasks;
 
 namespace school_major_project.Controllers
 {
@@ -18,7 +16,7 @@ namespace school_major_project.Controllers
         private readonly IRoomRepository _roomRepository;
         private readonly IFilmRepository _filmRepository;
 
-        public SeatController(ISeatRepository repository, ApplicationDbContext context, 
+        public SeatController(ISeatRepository repository, ApplicationDbContext context,
             IScheduleRepository scheduleRepository, IRoomRepository roomRepository, IFilmRepository filmRepository) : base(context)
         {
             _repository = repository;
@@ -42,6 +40,6 @@ namespace school_major_project.Controllers
         {
             return View();
         }
- 
+
     }
 }

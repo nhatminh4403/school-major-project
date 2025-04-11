@@ -63,7 +63,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Film film, IFormFile PosterUrl, int[] SelectedCategoryIds)
         {
-            
+
 
             if (ModelState.IsValid)
             {
@@ -140,7 +140,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int id, int[] SelectedCategoryIds, Film film,IFormFile PosterUrl)
+        public async Task<IActionResult> Edit(int id, int[] SelectedCategoryIds, Film film, IFormFile PosterUrl)
         {
             ModelState.Remove("PosterUrl");
             if (id != film.Id)
@@ -160,7 +160,7 @@ namespace school_major_project.Areas.Admin.Controllers
                     {
                         film.PosterUrl = currentFilm.PosterUrl;
                     }
-                    else 
+                    else
                     {
                         if (ValidateImageExtension(PosterUrl.FileName))
                         {
@@ -193,10 +193,10 @@ namespace school_major_project.Areas.Admin.Controllers
 
                     var selectedCategories = await _categoryRepository.GetByIdsAsync(SelectedCategoryIds); // Assuming you have/create this method
 
-                    currentFilm.Categories.Clear(); 
+                    currentFilm.Categories.Clear();
                     foreach (var category in selectedCategories)
                     {
-                        currentFilm.Categories.Add(category); 
+                        currentFilm.Categories.Add(category);
                     }
                     await _filmRepository.UpdateAsync(currentFilm);
                 }
@@ -234,7 +234,7 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             return _context.Films.Any(e => e.Id == id);
         }
-       
+
         private bool ValidateImageExtension(string fileName)
         {
             var allowedExtensions = new string[] { ".jpg", ".jpeg", ".png", ".jfif" };

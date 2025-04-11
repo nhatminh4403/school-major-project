@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using school_major_project.Services;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -31,12 +25,12 @@ namespace school_major_project.Areas.Admin.Controllers
         }
 
         [Route("")]
-        public async Task<IActionResult> Index(int? id =null)
+        public async Task<IActionResult> Index(int? id = null)
         {
             var cinemas = await _cinemaRepository.GetAllAsync();
             var selectedCinema = id.HasValue ? await _cinemaRepository.GetByIdAsync(id.Value)
                 : (cinemas.Any() ? cinemas.ElementAt(0) : null);
-            if(selectedCinema == null)
+            if (selectedCinema == null)
             {
                 return NotFound();
             }
@@ -103,7 +97,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("tao-moi")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create( Cinema cinema)
+        public async Task<IActionResult> Create(Cinema cinema)
         {
             if (ModelState.IsValid)
             {
@@ -149,7 +143,7 @@ namespace school_major_project.Areas.Admin.Controllers
                     currentCinema.Map = cinema.Map;
                     currentCinema.Name = cinema.Name;
                     await _cinemaRepository.UpdateAsync(currentCinema);
-                    
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {

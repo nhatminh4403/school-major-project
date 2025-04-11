@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using school_major_project.HelperClass;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 namespace school_major_project.Controllers
@@ -12,7 +11,7 @@ namespace school_major_project.Controllers
         private readonly IRatingRepository _ratingRepository;
         private readonly IFilmRepository _filmRepository;
         private readonly UserManager<User> _userManager;
-        public RatingController(IRatingRepository ratingRepository, IFilmRepository filmRepository,UserManager<User> userManager)
+        public RatingController(IRatingRepository ratingRepository, IFilmRepository filmRepository, UserManager<User> userManager)
         {
             _ratingRepository = ratingRepository;
             _userManager = userManager;

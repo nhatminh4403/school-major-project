@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -18,7 +17,7 @@ namespace school_major_project.Areas.Admin.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IReceiptRepository _receiptRepository;
 
-        public HomeController(ApplicationDbContext context, UserManager<User> userManager,IReceiptRepository receiptRepository)
+        public HomeController(ApplicationDbContext context, UserManager<User> userManager, IReceiptRepository receiptRepository)
         {
             _context = context;
             _userManager = userManager;
@@ -29,7 +28,7 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             var users = await _userManager.GetUsersInRoleAsync(Role.Role_Customer);
             var receipts = await _receiptRepository.GetAllAsync();
-            var total = receipts.Sum(p=> p.TotalPrice);
+            var total = receipts.Sum(p => p.TotalPrice);
             ViewBag.TotalPrice = total;
             ViewBag.TotalReceiptCount = receipts.Count();
             ViewBag.TotalUserCount = users.Count;

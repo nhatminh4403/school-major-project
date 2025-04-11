@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
-using school_major_project.HelperClass;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 

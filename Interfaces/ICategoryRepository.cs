@@ -9,6 +9,6 @@ namespace school_major_project.Interfaces
         Task AddAsync(Category filmCategory);
         Task UpdateAsync(Category filmCategory);
         Task DeleteAsync(int id);
-        Task <IEnumerable<Category>> GetByIdsAsync(int[] ids);
+        Task<IEnumerable<Category>> GetByIdsAsync(int[] ids);
     }
 }

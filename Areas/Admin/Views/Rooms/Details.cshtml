@@ -52,105 +52,105 @@
                             @* Thêm style container cho nhất quán *@
                             <h4 class="seat-section__title">Thông tin ghế</h4>
                             <p>Phòng này hiện chưa có ghế nào được tạo.</p>
-                            
+
                             <div style="margin-top: 20px; text-align:center;">
                                 <a asp-action="GenerateSeats" asp-controller="Rooms" asp-route-roomId="@Model.Room.Id" class="btn btn-success">
                                     <i class="fa-solid fa-couch"></i>
                                 </a>
                             </div>
-                           
+
                         </div>
                     }
                     else
                     {
                         <div class="seat-section__container">
-                        <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="regular-seats-content">
-                            Ghế Thường <span class="toggle-indicator"></span>
-                        </button>
-                        <div id="regular-seats-content" class="seat-section__items collapsible-content">
-                            @foreach (var item in Model.Seats.Where(s => s.SeatType.TypeDescription.Equals("regular", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <div class="seat-item" data-status="@item.Status">
-                                    <div class="seat-item__info">
-                                        <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
-                                        <p><strong>Giá ghế:</strong> <span>@item.SeatType.Price.ToString("N0")</span></p>
-                                        <img src="@Url.Content(item.SeatImage ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
-                                        <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
-                                        <p><span>@item.Room.Name</span></p>
+                            <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="regular-seats-content">
+                                Ghế Thường <span class="toggle-indicator"></span>
+                            </button>
+                            <div id="regular-seats-content" class="seat-section__items collapsible-content">
+                                @foreach (var item in Model.Seats.Where(s => s.SeatType.Equals("regular", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <div class="seat-item" data-status="@item.Status">
+                                        <div class="seat-item__info">
+                                            <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
+                                            <p><strong>Giá ghế:</strong> <span>@item.Price.ToString("N0")</span></p>
+                                            <img src="@Url.Content(item.Image ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
+                                            <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
+                                            <p><span>@item.RoomName</span></p>
+                                        </div>
+                                        <div class="seat-item__actions">
+                                            @* This onclick still needs the global setDeleteItem function to exist *@
+                                            <a href="#modal-delete" onclick="setDeleteItem(@item.Id)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
+                                        </div>
                                     </div>
-                                    <div class="seat-item__actions">
-                                        @* This onclick still needs the global setDeleteItem function to exist *@
-                                        <a href="#modal-delete" onclick="setDeleteItem(@item.SeatId)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
-                                    </div>
-                                </div>
-                            }
-                            @if (!Model.Seats.Any(s => s.SeatType.TypeDescription.Equals("regular", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <p class="no-seats-message">Không có ghế thường trong phòng này.</p>
-                            }
+                                }
+                                @if (!Model.Seats.Any(s => s.SeatType.Equals("regular", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <p class="no-seats-message">Không có ghế thường trong phòng này.</p>
+                                }
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- VIP Seats -->
-                    <div class="seat-section__container">
-                        <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="vip-seats-content">
-                            Ghế VIP <span class="toggle-indicator"></span>
-                        </button>
-                        <div id="vip-seats-content" class="seat-section__items collapsible-content">
-                            @foreach (var item in Model.Seats.Where(s => s.SeatType.TypeDescription.Equals("VIP", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <div class="seat-item" data-status="@item.Status">
-                                    <div class="seat-item__info">
-                                        <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
-                                        <p><strong>Giá ghế:</strong> <span>@item.SeatType.Price.ToString("N0")</span></p>
-                                        <img src="@Url.Content(item.SeatImage ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
-                                        <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
-                                        <p><span>@item.Room.Name</span></p>
+                        <!-- VIP Seats -->
+                        <div class="seat-section__container">
+                            <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="vip-seats-content">
+                                Ghế VIP <span class="toggle-indicator"></span>
+                            </button>
+                            <div id="vip-seats-content" class="seat-section__items collapsible-content">
+                                @foreach (var item in Model.Seats.Where(s => s.SeatType.Equals("VIP", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <div class="seat-item" data-status="@item.Status">
+                                        <div class="seat-item__info">
+                                            <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
+                                            <p><strong>Giá ghế:</strong> <span>@item.Price.ToString("N0")</span></p>
+                                            <img src="@Url.Content(item.Image ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
+                                            <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
+                                            <p><span>@item.RoomName</span></p>
+                                        </div>
+                                        <div class="seat-item__actions">
+                                            @* This onclick still needs the global setDeleteItem function to exist *@
+                                            <a href="#modal-delete" onclick="setDeleteItem(@item.Id)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
+                                        </div>
                                     </div>
-                                    <div class="seat-item__actions">
-                                        @* This onclick still needs the global setDeleteItem function to exist *@
-                                        <a href="#modal-delete" onclick="setDeleteItem(@item.SeatId)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
-                                    </div>
-                                </div>
-                            }
-                            @if (!Model.Seats.Any(s => s.SeatType.TypeDescription.Equals("VIP", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <p class="no-seats-message">Không có ghế VIP trong phòng này.</p>
-                            }
+                                }
+                                @if (!Model.Seats.Any(s => s.SeatType.Equals("VIP", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <p class="no-seats-message">Không có ghế VIP trong phòng này.</p>
+                                }
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- Couple Seats -->
-                    <div class="seat-section__container">
-                        <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="couple-seats-content">
-                            Ghế Couple <span class="toggle-indicator"></span>
-                        </button>
-                        <div id="couple-seats-content" class="seat-section__items collapsible-content">
-                            @foreach (var item in Model.Seats.Where(s => s.SeatType.TypeDescription.Equals("couple", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <div class="seat-item" data-status="@item.Status">
-                                    <div class="seat-item__info">
-                                        <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
-                                        <p><strong>Giá ghế:</strong> <span>@item.SeatType.Price.ToString("N0")</span></p>
-                                        <img src="@Url.Content(item.SeatImage ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
-                                        <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
-                                        <p><span>@item.Room.Name</span></p>
+                        <!-- Couple Seats -->
+                        <div class="seat-section__container">
+                            <button type="button" class="seat-section__title seat-section__toggle" aria-expanded="true" aria-controls="couple-seats-content">
+                                Ghế Couple <span class="toggle-indicator"></span>
+                            </button>
+                            <div id="couple-seats-content" class="seat-section__items collapsible-content">
+                                @foreach (var item in Model.Seats.Where(s => s.SeatType.Equals("couple", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <div class="seat-item" data-status="@item.Status">
+                                        <div class="seat-item__info">
+                                            <p><strong>Số ghế:</strong> <span>@item.SeatNumber</span></p>
+                                            <p><strong>Giá ghế:</strong> <span>@item.Price.ToString("N0")</span></p>
+                                            <img src="@Url.Content(item.Image ?? "/assets/img/seat/default.png")" alt="Seat Image" class="seat-item__image" />
+                                            <p><strong>Trạng thái:</strong> <span>@(item.Status ? "Đã đặt" : "Trống")</span></p>
+                                            <p><span>@item.RoomName</span></p>
+                                        </div>
+                                        <div class="seat-item__actions">
+                                            @* This onclick still needs the global setDeleteItem function to exist *@
+                                            <a href="#modal-delete" onclick="setDeleteItem(@item.Id)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
+                                        </div>
                                     </div>
-                                    <div class="seat-item__actions">
-                                        @* This onclick still needs the global setDeleteItem function to exist *@
-                                        <a href="#modal-delete" onclick="setDeleteItem(@item.SeatId)" class="main__table-btn main__table-btn--delete open-modal">Xóa</a>
-                                    </div>
-                                </div>
-                            }
-                            @if (!Model.Seats.Any(s => s.SeatType.TypeDescription.Equals("couple", StringComparison.OrdinalIgnoreCase)))
-                            {
-                                <p class="no-seats-message">Không có ghế Couple trong phòng này.</p>
-                            }
+                                }
+                                @if (!Model.Seats.Any(s => s.SeatType.Equals("couple", StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    <p class="no-seats-message">Không có ghế Couple trong phòng này.</p>
+                                }
+                            </div>
                         </div>
-                    </div>
-                        
+
                     }
-                    
+
                 </div>
 
             </div>
@@ -203,8 +203,56 @@
 @section Styles {
     <link rel="stylesheet" href="~/css/admin/css/roomdetail.css" />
     <style>
-        .main__table-btn{
+        .main__table-btn {
             text-decoration: none;
+        }
+
+        .schedule-selector {
+            background-color: #2b2b31;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .schedule-selector form {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .schedule-selector label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .schedule-selector select {
+            background-color: #28282d;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            min-width: 200px;
+            font-size: 14px;
+        }
+
+        .schedule-selector select:focus {
+            border-color: #ff55a5;
+            outline: none;
+        }
+
+        .schedule-selector .btn-primary {
+            background-image: linear-gradient(90deg, #ff55a5 0%, #ff5860 100%);
+            border: none;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px;
+            box-shadow: 0 0 20px 0 rgba(255,88,96,0.5);
+        }
+
+        .schedule-selector .btn-primary:hover {
+            opacity: 0.9;
         }
     </style>
 }

@@ -12,8 +12,8 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250408134519_updateDB")]
-    partial class updateDB
+    [Migration("20250411063907_addlichChieu")]
+    partial class addlichChieu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

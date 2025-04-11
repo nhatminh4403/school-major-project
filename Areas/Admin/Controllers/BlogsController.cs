@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
@@ -17,7 +12,7 @@ namespace school_major_project.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IBlogRepository _blogRepository;
-        public BlogsController(ApplicationDbContext context,IBlogRepository blogRepository)
+        public BlogsController(ApplicationDbContext context, IBlogRepository blogRepository)
         {
             _context = context;
             _blogRepository = blogRepository;
