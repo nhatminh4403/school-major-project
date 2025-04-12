@@ -8,10 +8,9 @@ using school_major_project.ViewModel;
 namespace school_major_project.Controllers
 {
     [Route("chon-ghe")]
-    [Authorize(Roles = Role.Role_Customer)]
+    [Authorize]
     public class SeatController : BaseController
     {
-        private readonly ISeatRepository _repository;
         private readonly ApplicationDbContext _context;
         private readonly IScheduleRepository _scheduleRepository;
         private readonly IRoomRepository _roomRepository;
@@ -19,10 +18,9 @@ namespace school_major_project.Controllers
         private readonly ISeatRepository _seatRepository;
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
 
-        public SeatController(ISeatRepository repository, ApplicationDbContext context,IScheduleRepository scheduleRepository, 
+        public SeatController(ApplicationDbContext context,IScheduleRepository scheduleRepository, 
             IRoomRepository roomRepository, IFilmRepository filmRepository,ISeatRepository seatRepository,IReceiptDetailsRepository receiptDetailsRepository) : base(context)
         {
-            _repository = repository;
             _context = context;
             _scheduleRepository = scheduleRepository;
             _roomRepository = roomRepository;

@@ -1,0 +1,238 @@
+﻿@model school_major_project.ViewModel.PurchaseViewModel
+@using school_major_project.HelperClass
+@using school_major_project.ViewModel
+@{
+    ViewData["Title"] = "Xác nhận đặt vé";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <style>
+        /* Add these styles to your site.css or create a new CSS file */
+
+        .booking-information {
+            margin-top: 30px;
+        }
+
+            .booking-information .info-item {
+                display: flex;
+                border-bottom: 1px dashed #ddd;
+                padding: 10px 0;
+            }
+
+            .booking-information .info-name {
+                font-weight: bold;
+                width: 30%;
+            }
+
+            .booking-information .info-value {
+                width: 70%;
+            }
+
+        .badge-primary {
+            background-color: #31d7a9;
+            color: #ffffff;
+        }
+
+        .checkout-widget {
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+            .checkout-widget .title {
+                border-bottom: 1px solid #e5e5e5;
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+        .booking-summery {
+            background-color: #032055;
+            border-radius: 10px;
+            padding: 30px;
+            color: white;
+        }
+
+            .booking-summery .title {
+                border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+                padding-bottom: 15px;
+                margin-bottom: 20px;
+            }
+
+            .booking-summery ul li {
+                padding: 15px 0;
+                border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+            }
+
+            .booking-summery .subtitle {
+                font-size: 16px;
+                font-weight: 600;
+                margin-bottom: 8px;
+            }
+
+            .booking-summery .info {
+                font-size: 14px;
+                color: #9aace5;
+            }
+
+            .booking-summery .side-shape {
+                margin-top: 30px;
+                position: relative;
+            }
+
+                .booking-summery .side-shape:before {
+                    position: absolute;
+                    content: "";
+                    width: 100%;
+                    height: 10px;
+                    background-image: url(../imgs/img/ticket/side-shape.png);
+                    background-size: contain;
+                    background-repeat: repeat-x;
+                    left: 0;
+                    top: -5px;
+                }
+
+        .custom-button {
+            background-color: #31d7a9;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: inline-block;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+            .custom-button:hover {
+                background-color: #008462;
+                color: #ffffff;
+                text-decoration: none;
+            }
+
+        .movie-details-content {
+            background: #1f1f1f;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .movie-details-thumb img {
+            width: 100%;
+            border-radius: 10px;
+        }
+        .movie-details-info {
+            margin-top: 20px;
+        }
+        .info-item {
+            margin-bottom: 15px;
+        }
+        .info-title {
+            color: #999;
+            margin-right: 10px;
+        }
+        .booking-summary {
+            background: #1f1f1f;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-control {
+            background: #2f2f2f;
+            border: 1px solid #3f3f3f;
+            color: #fff;
+        }
+        .form-control:focus {
+            background: #2f2f2f;
+            border-color: #e2d703;
+            color: #fff;
+        }
+    </style>
+}
+
+<section class="page-title bg-one">
+    <div class="container">
+        <div class="page-title-area">
+            <div class="item md-order-1">
+                <a asp-action="ChooseSeat" asp-controller="Seat" class="custom-button back-button">
+                    <i class="flaticon-double-right-arrows-angles"></i>
+                    Quay lại
+                </a>
+            </div>
+            <div class="item">
+                <h1 class="title">Xác nhận đặt vé</h1>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="movie-details-section padding-bottom padding-top">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="movie-details-content">
+                    <div class="movie-details-thumb">
+                        <img src="@Model.PosterUrl" alt="movie">
+                    </div>
+                    <div class="movie-details-info">
+                        <h3 class="title">@Model.FilmTitle</h3>
+                        <div class="movie-details-info-content">
+                            <div class="info-item">
+                                <span class="info-title">Thời gian chiếu:</span>
+                                <span class="info-content">@Model.StartTime.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Rạp:</span>
+                                <span class="info-content">@Model.CinemaName</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Địa chỉ:</span>
+                                <span class="info-content">@Model.CinemaAddress</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Phòng chiếu:</span>
+                                <span class="info-content">@Model.RoomName</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Ghế đã chọn:</span>
+                                <span class="info-content">@string.Join(", ", Model.SelectedSeats)</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-title">Tổng tiền:</span>
+                                <span class="info-content">@Model.TotalPrice.ToString("N0") VND</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="booking-summary">
+                    <h4 class="title">Thông tin thanh toán</h4>
+                    <form asp-action="Confirm" asp-controller="Purchase" method="post">
+                        <input type="hidden" name="scheduleId" value="@Model.ScheduleId" />
+                        <input type="hidden" name="selectedSeats" value="@string.Join(",", Model.SelectedSeats)" />
+                        <input type="hidden" name="totalPrice" value="@Model.TotalPrice" />
+                        
+                        <div class="form-group">
+                            <label>Họ và tên</label>
+                            <input type="text" class="form-control" name="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" class="form-control" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Số điện thoại</label>
+                            <input type="tel" class="form-control" name="phone" required>
+                        </div>
+                        <button type="submit" class="custom-button">Xác nhận đặt vé</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

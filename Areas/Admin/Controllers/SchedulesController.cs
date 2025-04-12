@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.Areas.Admin.Data;
@@ -9,6 +10,8 @@ namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("admin/lich-chieu")]
+    [Authorize(Roles = "Admin")]
+
     public class SchedulesController : Controller
     {
         private readonly ApplicationDbContext _context;

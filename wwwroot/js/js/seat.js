@@ -1,22 +1,6 @@
 let selectedSeats = [];
 let totalPrice = 0;
 window.onload = function () {
-    var pTags = document.querySelectorAll(".chonViTri");
-    var getLink = document.querySelector(".seatPlanButton");
-    for (var i = 0; i < pTags.length; i++) {
-        pTags[i].addEventListener('click', function () {
-            var link = this.getAttribute('data-id');
-
-            if (!isSignedIn) {  // Use the JavaScript variable
-                getLink.setAttribute('href', '/chon-ghe/lich-chieu/'+link);
-            } else {
-                getLink.setAttribute('href', '/chon-ghe/lich-chieu/' + link);
-                console.log('data-vi-tri' + link);
-            }
-
-        });
-    }
-
     var seatImages = document.getElementsByClassName('seat-img');
     for (var i = 0; i < seatImages.length; i++) {
         seatImages[i].setAttribute('data-src-original', seatImages[i].src);
@@ -77,7 +61,19 @@ window.onload = function () {
         document.querySelector('.selected-seats').textContent = selectedSeatSymbols;
         document.querySelector('.total-price').textContent = totalPrice.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     }
-
+    var checkoutForm = document.querySelector('#checkout-form');
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', function (event) {
+            if (selectedSeats.length === 0) {
+                event.preventDefault();
+                hienThiThongBao("Vui lòng chọn ít nhất một ghế trước khi tiếp tục", 3000, 'bg-danger');
+                document.querySelector('.error-message').textContent = 'Bạn chưa chọn ghế nào.';
+                document.querySelector('.error-message').style.display = 'block';
+                return false;
+            }
+            return true;
+        });
+    }
     document.querySelector('#checkout-button').addEventListener('click', function () {
         const selectedSeatSymbols = selectedSeats.map(seat => ({
             id: seat.id,

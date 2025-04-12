@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
@@ -9,6 +10,8 @@ namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("admin/nguoi-dung")]
+    [Authorize(Roles = "Admin")]
+
     public class AccountController : Controller
     {
         // GET: UserController

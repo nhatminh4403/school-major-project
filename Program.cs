@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<ApplicationDbContext>(option =>
+    option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<User, IdentityRole>()
        .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -44,6 +45,12 @@ builder.Services.AddScoped<IPromotionRepository, PromotionService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<ExpiredItemCleanupService>();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(20);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddRazorPages(options =>
 {
@@ -59,13 +66,13 @@ builder.Services.AddRazorPages(options =>
    );
 });
 
-builder.Services.ConfigureApplicationCookie(option =>
-{
-    option.LoginPath = $"/dang-nhap";
-    option.LogoutPath = $"/dang-ky";
-    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
-});
+//builder.Services.ConfigureApplicationCookie(option =>
+//{
+//    option.LoginPath = $"/dang-nhap";
+//    option.LogoutPath = $"/dang-ky";
+//    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+//    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
+//});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -96,6 +103,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllers();
 

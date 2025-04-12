@@ -47,7 +47,8 @@ namespace school_major_project.Controllers
             };
             ViewBag.PointSaving = user.PointSaving;
             ViewBag.UserName = user.UserName;
-            ViewBag.Promotions = user.Promotions;
+            ViewBag.Promotions = user.Promotions.ToList();
+            ViewBag.ToTalPromotion = user.Promotions.Count();
             return View(userVM);
         }
 

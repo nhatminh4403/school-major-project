@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.Areas.Admin.Data;
 using school_major_project.DataAccess;
@@ -9,6 +10,8 @@ namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("admin/rap-phim")]
+    [Authorize(Roles = "Admin")]
+
     public class CinemasController : Controller
     {
         private readonly ApplicationDbContext _context;

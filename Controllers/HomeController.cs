@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
@@ -7,6 +8,7 @@ using school_major_project.ViewModel;
 using System.Diagnostics;
 namespace school_major_project.Controllers
 {
+    [AllowAnonymous]
     public class HomeController : BaseController
     {
         private readonly IFilmRepository _filmRepository;

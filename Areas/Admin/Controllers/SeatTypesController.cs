@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
@@ -7,6 +8,8 @@ namespace school_major_project.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("admin/loai-ghe")]
+    [Authorize(Roles = "Admin")]
+
     public class SeatTypesController : Controller
     {
         private readonly ApplicationDbContext _context;
