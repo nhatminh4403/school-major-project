@@ -30,7 +30,7 @@ Dự án này là phiên bản C# ASP.NET dựa trên dự án Java gốc - mộ
 ## Hướng dẫn cài đặt
 
 ### Yêu cầu hệ thống
-- .NET 6.0 trở lên
+- .NET 6.0 trở lên (khuyến nghị dùng .NET 9.0 vì project sử dụng các gói NuGet từ phiên bản 9.0 trở lên)
 - SQL Server
 - Visual Studio 2022 trở lên
 
@@ -119,7 +119,7 @@ This project is a C# ASP.NET implementation based on the original Java project -
 ## Getting Started
 
 ### Prerequisites
-- .NET 6.0 or later
+- .NET 6.0 or later (recommended to use .NET 9.0 as the project uses NuGet packages from version 9.0 and above)
 - SQL Server
 - Visual Studio 2022 or later
 
