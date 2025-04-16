@@ -7,5 +7,7 @@ namespace school_major_project.Interfaces
         Task<IEnumerable<ReceiptDetail>> GetAllAsync();
         Task<ReceiptDetail> GetByIdAsync(int id);
         Task<IEnumerable<ReceiptDetail>> FindByScheduleId(int scheduleId);
+
+        Task AddAsync(ReceiptDetail receiptDetail);
     }
 }

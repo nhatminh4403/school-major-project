@@ -49,8 +49,8 @@
             <div class="container">
                 <div class="page-title-area">
                     <div class="item md-order-1">
-                        <a asp-action="Index" asp-controller="Schedule" 
-                        asp-route-name="@Model.Film.Name.RemoveDiacritics()" class="custom-button back-button">
+                        <a asp-action="Index" asp-controller="Schedule"
+                           asp-route-name="@Model.Film.Name.RemoveDiacritics()" class="custom-button back-button">
                             <i class="flaticon-double-right-arrows-angles"></i>
                             Trở về
                         </a>
@@ -175,7 +175,7 @@
                                 <span>Tổng tiền</span>
                                 <h3 class="title total-price">0 VND</h3>
                             </div>
-                            <form id="checkout-form" asp-controller="Purchase" asp-action="Add" method="get">
+                            <form id="checkout-form" asp-controller="Purchase" asp-action="Add" method="post">
                                 <input type="hidden" id="selectedSeatsInput" name="seatSymbol">
                                 <input type="hidden" id="totalPriceInput" name="totalPrice">
 
@@ -244,5 +244,14 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js" integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="~/js/js/clock.js"></script>
-    <script src="~/js/js/seat.js"></script>
+
+   <script src="~/js/js/seat.js"></script>
 }
+
+
+
+
+
+
+
+

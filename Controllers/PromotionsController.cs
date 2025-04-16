@@ -45,7 +45,7 @@ namespace school_major_project.Controllers
 
         [HttpPost]
         [Route("doi-khuyen-mai/{id}")]
-        public async Task<IActionResult> Redeem(int id)
+        public async Task<IActionResult> RedeemById(int id)
         {
 
             var user = await _context.Users
@@ -83,6 +83,21 @@ namespace school_major_project.Controllers
 
             }
             return Ok(new { message = "Quy đổi khuyến mãi thành công!", newPoints = user.PointSaving });
+        }
+
+        [HttpGet]
+        [Route("doi-ma/{code}")]
+        public async Task<IActionResult> RedeemByCode(string code)
+        {
+            
+            var promotion = await _promotionRepository.GetByCodeAsync(code);
+
+            if (promotion == null)
+            {
+                return NotFound(new { message = "Khuyến mãi không tồn tại." });
+            }
+
+            return Json(new {Promotion = promotion });
         }
     }
 }

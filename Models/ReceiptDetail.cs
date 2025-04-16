@@ -15,14 +15,16 @@ namespace school_major_project.Models
         public string CinemaName { get; set; }
         [Required]
         public string RoomName { get; set; }
-
+        [Required]
+        public string? PosterUrl { get; set; }
         [Required]
         public string CinemaAddress { get; set; }
         [Required]
         public DateTime? StartTime { get; set; }
         [Required]
         public int PricePerSeat { get; set; }
-
+        [Required]
+        public string SeatName { get; set; }
         [Required]
         public int ReceiptId { get; set; }
         [Required]

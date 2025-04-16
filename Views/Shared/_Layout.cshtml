@@ -10,6 +10,11 @@
     var user = await UserManager.GetUserAsync(User);
     var model = ViewData["LayoutViewModel"] as BaseFilmVM;
     // var categories = ViewBag.HeaderCategories as IEnumerable<Category>;
+
+    var title = ViewData["Title"] as string;
+
+    title = title.ToLower().Contains("lỗi") ? title : title += " - Ba Anh Em - Online Ticket Booking Website";
+    
 }
 
 
@@ -18,7 +23,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ba Anh Em - Online Ticket Booking Website</title>
+    <title>@title</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/css/jquery.animatedheadline.css" />
     <link rel="stylesheet" href="~/css/css/all.min.css" />
@@ -436,7 +441,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
 
 
-    <script src="~/js/js/qrcode.js"></script>
 
     <script src="~/js/chatbot.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

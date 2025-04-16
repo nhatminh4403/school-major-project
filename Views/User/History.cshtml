@@ -1,8 +1,216 @@
-﻿
+﻿@using Microsoft.AspNetCore.Identity
+@using school_major_project.ViewModel
+@inject UserManager<User> UserManager
+@inject SignInManager<User> SignInManager
+
+@model HistoryVM
 @{
-    ViewData["Title"] = "History";
+    ViewData["Title"] = "Lịch sử đặt vé";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    await Html.RenderPartialAsync("_Preloader");
 }
 
-<h1>History</h1>
+<section class="banner-section">
+    <div class="banner-bg bg_img bg-fixed" data-background="/imgs/img/history/history-bg.jpg"
+         style="background-image: url('/imgs/img/history/history-bg.jpg');"></div>
+    <div class="container">
+        <div class="banner-content">
+            <h1 class="title cd-headline clip">
+                <span class="d-block">Lịch sử đặt vé</span>
+                <span class="color-theme cd-words-wrapper p-0 m-0">
+                    <b class="is-hidden pb-3">Rõ ràng</b>
+                    <b class="is-hidden pb-3">Nhanh chóng</b>
+                    <b class="is-visible pb-3">Tối ưu</b>
+                </span>
+            </h1>
+            <p>Cám ơn bạn đã đồng hành cùng Ba Anh Em. Chúc bạn xem phim vui vẻ!</p>
+        </div>
+    </div>
+</section>
 
+
+
+<!-- ========== Movie History Section ========== -->
+<section class="movie-section padding-top padding-bottom">
+    <div class="container">
+        <div class="row flex-wrap-reverse justify-content-center">
+        <div class="row flex-wrap-reverse justify-content-center">
+            <div class="col-lg-12 mb-50 mb-lg-0">
+                <!-- List of Bookings -->
+                @if (Model.Receipts == null || Model.Receipts.Count() == 0 || !Model.Receipts.Any())
+                {
+                    <div class="movie-area mb-10">
+                        <h2 style="text-align: center"></h2>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var receipt in Model.Receipts)
+                    {
+                        @foreach (var detail in receipt.ReceiptDetails)
+                        {
+                            <div class="movie-area mb-10">
+                                <div class="movie-list">
+                                    <!-- Movie Thumbnail -->
+                                    <div class="movie-thumb c-thumb">
+                                        <a href="#0" class="w-100 bg_img h-100" data-background="@detail.PosterUrl">
+                                            <img class="d-sm-none" src="@detail.PosterUrl" alt="movie" />
+                                        </a>
+                                    </div>
+                                    <!-- Movie Content -->
+                                    <div class="movie-content bg-one">
+                                        <div class="history-qrcode">
+                                            <!-- Booking Info -->
+                                            <div>
+                                                <h5 class="title">
+                                                    <a href="#">@detail.FilmName</a>
+                                                </h5>
+                                                <p class="duration">Ngày đặt:  @receipt.Date</p>
+                                                <div class="movie-tags">
+                                                    <a href="#0">
+                                                        Tên khách hàng:  @receipt.GetUser?.FullName
+
+                                                    </a>
+                                                </div>
+                                                <div class="release">
+                                                    <a href="#0">Suất chiếu: @detail.StartTime</a>
+                                                </div>
+                                                <div class="movie-tags">
+                                                    <a href="#0">Rạp phim: @detail.CinemaName</a>
+                                                </div>
+                                            </div>
+                                            <!-- QR Code -->
+                                            <div class="thumb">
+                                                <img class="comboFood" data-booking-id="@receipt.Id" alt="QR Code" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Movie Rating Percent & Info -->
+                                        <ul class="movie-rating-percent">
+                                            <li>
+                                                <div class="thumb history-ticket">
+                                                    <img src="~/imgs/img/history/stat01.png" alt="movie" />
+                                                </div>
+                                                <span class="content">Ghế đã đặt:  @detail.SeatName</span>
+                                            </li>
+                                            @if (receipt.GetFood != null)
+                                            {
+                                                <li style="display: block;">
+                                                    <div class="thumb">
+                                                        <img src="@receipt.GetFood.Poster" alt="combo" class="comboFood" />
+                                                    </div>
+                                                    <span class="mt-3 content">
+                                                        @receipt.GetFood.ComboName - @receipt.GetFood.Description
+                                                    </span>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <span class="content">Không có combo nào được chọn</span>
+                                                </li>
+                                            }
+
+                                            <li>
+                                                <div class="thumb">
+                                                    <img src="~/imgs/img/movie/cake.png" alt="movie" />
+                                                </div>
+                                                <span class="content">
+                                                    @receipt.TotalPrice.ToString("N0") VND
+
+                                                </span>
+                                            </li>
+                                            <li>
+                                                <div class="thumb">
+                                                    <img src="~/imgs/img/movie/tomato.png" alt="movie" />
+                                                </div>
+                                                <span class="content">
+                                                    @receipt.PaymentType
+                                                </span>
+                                            </li>
+                                            <li>
+                                                @if (receipt.IsPaid)
+                                                {
+                                                    <span class="content" style="color: #31d7a9">
+                                                        Đã thanh toán
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="content" style="color: #31d7a9">
+                                                        Chưa thanh toán
+                                                    </span>
+                                                }
+                                            </li>
+                                        </ul>
+
+                                        <!-- Additional Info -->
+                                        <div class="book-area">
+                                            <div class="book-ticket">
+                                                <div class="react-item mr-auto">
+                                                    <a href="#0">
+                                                        <div class="thumb">
+                                                            <img src="~/imgs/img/history/event-icon02.png" alt="icons" />
+                                                        </div>
+                                                        <span>Vị trí: @detail.CinemaAddress</span>
+                                                    </a>
+                                                </div>
+                                                <div class="react-item">
+                                                    <a href="#0" class="popup-video">
+                                                        <div class="thumb">
+                                                            <img src="~/imgs/img/history/event-icon03.png" alt="icons" />
+                                                        </div>
+                                                        <span>Phòng chiếu: @detail.RoomName</span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- End Additional Info -->
+                                    </div>
+                                </div>
+                                <br>
+                            </div>
+
+                            @* </div> *@
+                        }
+
+
+                    }
+                    <!-- End List of Bookings -->
+                }
+            </div>
+        </div>
+    </div>
+</section>
+<!-- ========== End Movie History Section ========== -->
+@section Styles {
+    <link href="~/css/css/bookingHistory.css" rel="stylesheet" />
+}
+@section Scripts {
+    <script>
+             document.addEventListener("DOMContentLoaded", function () {
+            // Lấy tất cả các phần tử mã QR trong trang
+            const qrImages = document.querySelectorAll(".comboFood");
+
+            // Duyệt qua từng ảnh QR và gọi API để lấy mã QR
+            qrImages.forEach((img) => {
+                const bookingId = img.getAttribute("data-booking-id");
+
+                // Gọi API để lấy mã QR và gán vào src của ảnh
+                fetch(`/tai-khoan/chi-tiet-hoa-don/${bookingId}`)
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        img.src = url;
+                    })
+                    .catch((error) => console.error("Lỗi khi tải mã QR:", error));
+            });
+        });
+    </script>
+
+
+   
+}
+
+
+@*  <script src="~/js/js/qrcode.js"></script> *@

@@ -98,5 +98,15 @@ namespace school_major_project.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult HandleError(int code)
+        {
+            if (code == 404)
+            {
+                return View("404");
+            }
+
+            return View("Error");
+        }
     }
 }

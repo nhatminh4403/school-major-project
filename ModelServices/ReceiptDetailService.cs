@@ -25,5 +25,10 @@ namespace school_major_project.ModelServices
         {
             return await _context.ReceiptDetails.Include(p => p.Receipt).Where(p => p.ScheduleId == scheduleId).ToListAsync();
         }
+        public async Task AddAsync(ReceiptDetail receiptDetail)
+        {
+            await _context.ReceiptDetails.AddAsync(receiptDetail);
+            await _context.SaveChangesAsync();
+        }
     }
 }

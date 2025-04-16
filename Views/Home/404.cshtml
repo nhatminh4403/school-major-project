@@ -1,0 +1,16 @@
+﻿@{
+    await Html.RenderPartialAsync("_Preloader");
+    Layout = "_Layout";
+    ViewData["Title"] = "Lỗi :(";
+}
+<section class="section-404 padding-top padding-bottom">
+    <div class="container">
+        <div class="thumb-404">
+            <img src="~/imgs/img/404.png" alt="404" />
+        </div>
+        <h3 class="title">Oop... Trang truy cập đã bị chặn:(</h3>
+        <a class="custom-button" href="/">
+            Trở về Trang Chủ <i class="flaticon-right"></i>
+        </a>
+    </div>
+</section>

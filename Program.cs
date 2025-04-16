@@ -66,13 +66,32 @@ builder.Services.AddRazorPages(options =>
    );
 });
 
-//builder.Services.ConfigureApplicationCookie(option =>
-//{
-//    option.LoginPath = $"/dang-nhap";
-//    option.LogoutPath = $"/dang-ky";
-//    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-//    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
-//});
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = $"/dang-nhap";
+    options.LogoutPath = $"/dang-ky";
+    options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    options.ReturnUrlParameter = "returnUrl";
+    options.Events.OnRedirectToAccessDenied = context =>
+    {
+
+        if (context.Request.Path.StartsWithSegments("/Admin", StringComparison.OrdinalIgnoreCase))
+        {
+
+            context.RedirectUri = "/Home/HandleError?code=404";
+            if (context.Response.HasStarted)
+            {
+
+                return Task.CompletedTask;
+            }
+
+            context.Response.Redirect(context.RedirectUri);
+        }
+        return Task.CompletedTask;
+    };
+});
+
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -97,6 +116,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseStatusCodePagesWithReExecute("/Home/HandleError", "?code={0}");
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -113,7 +133,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapRazorPages();
     endpoints.MapControllerRoute(
         name: "Admin",
-        pattern: "admin/{controller=Home}/{action=Index}/{id?}",
+        pattern: "admin/{controller=AdminHome}/{action=Index}/{id?}",
         defaults: new { area = "Admin" });
 
     endpoints.MapControllerRoute(

@@ -15,12 +15,12 @@ namespace school_major_project.Models
         public int TotalPrice { get; set; }
         [Required]
         public string PaymentType { get; set; }
-        [Required]
-        public string SeatName { get; set; }
 
+        [Required]
+        public bool IsPaid { get; set; } = false;
         public ICollection<ReceiptDetail>? ReceiptDetails { get; set; }
 
-        public int ComboFoodId { get; set; }
+        public int? ComboFoodId { get; set; }
         [ForeignKey(nameof(ComboFoodId))]
         public virtual Food? GetFood { get; set; }
 

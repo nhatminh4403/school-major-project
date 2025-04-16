@@ -7,7 +7,7 @@
             const bookingId = img.getAttribute("data-booking-id");
 
             // Gọi API để lấy mã QR và gán vào src của ảnh
-            fetch(`/user/history/${bookingId}`)
+            fetch(`/tai-khoan/chi-tiet-hoa-don/${bookingId}`)
                 .then((response) => response.blob())
                 .then((blob) => {
                     const url = URL.createObjectURL(blob);

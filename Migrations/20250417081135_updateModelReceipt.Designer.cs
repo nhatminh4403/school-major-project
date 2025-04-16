@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using school_major_project.DataAccess;
 
@@ -11,13 +12,15 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250417081135_updateModelReceipt")]
+    partial class updateModelReceipt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.4")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -463,7 +466,7 @@ namespace school_major_project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ComboFoodId")
+                    b.Property<int>("ComboFoodId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
@@ -473,6 +476,10 @@ namespace school_major_project.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SeatName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -531,10 +538,6 @@ namespace school_major_project.Migrations
 
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
-
-                    b.Property<string>("SeatName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -881,7 +884,9 @@ namespace school_major_project.Migrations
                 {
                     b.HasOne("school_major_project.Models.Food", "GetFood")
                         .WithMany("Receipt")
-                        .HasForeignKey("ComboFoodId");
+                        .HasForeignKey("ComboFoodId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("school_major_project.Models.User", "GetUser")
                         .WithMany("Receipts")
