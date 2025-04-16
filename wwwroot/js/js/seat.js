@@ -1,4 +1,4 @@
-let selectedSeats = [];
+﻿let selectedSeats = [];
 let totalPrice = 0;
 window.onload = function () {
     var seatImages = document.getElementsByClassName('seat-img');
@@ -74,15 +74,24 @@ window.onload = function () {
             return true;
         });
     }
-    document.querySelector('#checkout-button').addEventListener('click', function () {
-        const selectedSeatSymbols = selectedSeats.map(seat => ({
-            id: seat.id,
-            symbol: seat.symbol,
-            price: seat.price
-        }));
-        document.getElementById('selectedSeatsInput').value = JSON.stringify(selectedSeatSymbols);
-        document.getElementById('totalPriceInput').value = totalPrice;
-        document.getElementById('checkout-form').submit();
+    document.querySelector('#checkout-button').addEventListener('click', function (event) {
+        event.preventDefault(); // Ngăn chặn hành vi submit mặc định
+
+        if (selectedSeats.length === 0) {
+            hienThiThongBao("Vui lòng chọn ít nhất một ghế trước khi tiếp tục", 3000, 'bg-danger');
+
+            return false;
+        } else {
+            // Nếu đã chọn ghế, tiến hành cập nhật input và submit form
+            const selectedSeatSymbols = selectedSeats.map(seat => ({
+                id: seat.id,
+                symbol: seat.symbol,
+                price: seat.price
+            }));
+            document.getElementById('selectedSeatsInput').value = JSON.stringify(selectedSeatSymbols);
+            document.getElementById('totalPriceInput').value = totalPrice;
+            document.getElementById('checkout-form').submit();
+        }
     });
 
     function hienThiThongBao(text, duration, className) {
@@ -102,4 +111,3 @@ window.onload = function () {
         }).showToast();
     }
 }
-

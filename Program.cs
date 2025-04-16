@@ -66,13 +66,13 @@ builder.Services.AddRazorPages(options =>
    );
 });
 
-//builder.Services.ConfigureApplicationCookie(option =>
-//{
-//    option.LoginPath = $"/dang-nhap";
-//    option.LogoutPath = $"/dang-ky";
-//    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
-//    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
-//});
+builder.Services.ConfigureApplicationCookie(option =>
+{
+    option.LoginPath = $"/dang-nhap";
+    option.LogoutPath = $"/dang-ky";
+    option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    option.ReturnUrlParameter = "returnUrl"; // Tên tham số returnUrl
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -113,7 +113,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapRazorPages();
     endpoints.MapControllerRoute(
         name: "Admin",
-        pattern: "admin/{controller=Home}/{action=Index}/{id?}",
+        pattern: "admin/{controller=AdminHome}/{action=Index}/{id?}",
         defaults: new { area = "Admin" });
 
     endpoints.MapControllerRoute(

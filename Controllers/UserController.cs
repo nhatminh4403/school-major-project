@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ViewModel;
 namespace school_major_project.Controllers
@@ -15,14 +16,20 @@ namespace school_major_project.Controllers
         private readonly ILogger<UserController> _logger;
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
+        private readonly IReceiptRepository _receiptRepository;
+        private readonly IReceiptDetailsRepository _receiptDetailsRepository;
         public UserController(ApplicationDbContext context, UserManager<User> userManager,
-            SignInManager<User> signInManager, ILogger<UserController> logger, IWebHostEnvironment environment) : base(context)
+            SignInManager<User> signInManager, ILogger<UserController> logger, 
+            IWebHostEnvironment environment, IReceiptDetailsRepository receiptDetailsRepository,
+            IReceiptRepository receiptRepository) : base(context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _context = context;
             _environment = environment;
+            _receiptDetailsRepository = receiptDetailsRepository;
+            _receiptRepository = receiptRepository;
         }
 
 
@@ -82,7 +89,6 @@ namespace school_major_project.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // Trả về view với model để giữ lại dữ liệu người dùng đã nhập
                 return View(model);
             }
 
@@ -159,12 +165,15 @@ namespace school_major_project.Controllers
 
         */
         [Route("lich-su-dat-ve")]
-        public IActionResult History()
+        public async Task<IActionResult> History()
         {
-            return View();
+            var user = await _userManager.GetUserAsync(User);
+            if(user ==null)
+            {
+                return NotFound();
+            }
+            var receipts = _receiptRepository.GetByUserIdAsync(user.Id);
+            return View(receipts);
         }
-
-
-
     }
 }

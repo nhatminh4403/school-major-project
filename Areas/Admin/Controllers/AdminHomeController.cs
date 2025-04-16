@@ -10,14 +10,14 @@ namespace school_major_project.Areas.Admin.Controllers
     [Area(Role.Role_Admin)]
     [Authorize(Roles = Role.Role_Admin)]
 
-    public class HomeController : Controller
+    public class AdminHomeController : Controller
     {
         // GET: HomeController
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
         private readonly IReceiptRepository _receiptRepository;
 
-        public HomeController(ApplicationDbContext context, UserManager<User> userManager, IReceiptRepository receiptRepository)
+        public AdminHomeController(ApplicationDbContext context, UserManager<User> userManager, IReceiptRepository receiptRepository)
         {
             _context = context;
             _userManager = userManager;

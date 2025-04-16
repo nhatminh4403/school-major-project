@@ -20,6 +20,12 @@ namespace school_major_project.Services
         {
             return await _context.Promotions.FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        public async Task<Promotion> GetByCodeAsync(string code)
+        {
+            return await _context.Promotions.FirstOrDefaultAsync(p => p.Code.ToLower() == code.ToLower());
+        }
+
         public async Task AddAsync(Promotion promotion)
         {
             _context.Promotions.Add(promotion);

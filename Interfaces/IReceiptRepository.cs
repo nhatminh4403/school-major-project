@@ -9,5 +9,7 @@ namespace school_major_project.Interfaces
         Task AddAsync(Receipt receipt);
         Task UpdateAsync(Receipt receipt);
         Task DeleteAsync(int id);
+
+        Task<IEnumerable<Receipt>> GetByUserIdAsync(string userId);
     }
 }

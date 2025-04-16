@@ -39,5 +39,10 @@ namespace school_major_project.ModelServices
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<IEnumerable<Receipt>> GetByUserIdAsync(string userId)
+        {
+            return await _context.Receipts.Include(p => p.GetUser).Include(p=>p.ReceiptDetails).Where(p => p.UserId == userId).ToListAsync();
+        }
     }
 }

@@ -1,238 +1,440 @@
-﻿@model school_major_project.ViewModel.PurchaseViewModel
-@using school_major_project.HelperClass
-@using school_major_project.ViewModel
+﻿@using school_major_project.HelperClass
+@model school_major_project.ViewModel.CheckoutSummaryVM
+
 @{
-    ViewData["Title"] = "Xác nhận đặt vé";
+    ViewData["Title"] = "Xác nhận thông tin";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string FormatCurrency(decimal amount) => amount.ToString("N0") + " VND";
+
+    // Extract selected seat symbols for display
+    var selectedSeatSymbols = Model.SelectedSeats != null && Model.SelectedSeats.Any()
+                              ? string.Join(", ", Model.SelectedSeats.Select(s => s.Symbol))
+                              : "Không có ghế";
+
+    await Html.RenderPartialAsync("_Preloader"); 
 }
 
-@section Styles {
-    <style>
-        /* Add these styles to your site.css or create a new CSS file */
 
-        .booking-information {
-            margin-top: 30px;
-        }
-
-            .booking-information .info-item {
-                display: flex;
-                border-bottom: 1px dashed #ddd;
-                padding: 10px 0;
-            }
-
-            .booking-information .info-name {
-                font-weight: bold;
-                width: 30%;
-            }
-
-            .booking-information .info-value {
-                width: 70%;
-            }
-
-        .badge-primary {
-            background-color: #31d7a9;
-            color: #ffffff;
-        }
-
-        .checkout-widget {
-            background-color: #ffffff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-            .checkout-widget .title {
-                border-bottom: 1px solid #e5e5e5;
-                padding-bottom: 15px;
-                margin-bottom: 20px;
-            }
-
-        .booking-summery {
-            background-color: #032055;
-            border-radius: 10px;
-            padding: 30px;
-            color: white;
-        }
-
-            .booking-summery .title {
-                border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
-                padding-bottom: 15px;
-                margin-bottom: 20px;
-            }
-
-            .booking-summery ul li {
-                padding: 15px 0;
-                border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
-            }
-
-            .booking-summery .subtitle {
-                font-size: 16px;
-                font-weight: 600;
-                margin-bottom: 8px;
-            }
-
-            .booking-summery .info {
-                font-size: 14px;
-                color: #9aace5;
-            }
-
-            .booking-summery .side-shape {
-                margin-top: 30px;
-                position: relative;
-            }
-
-                .booking-summery .side-shape:before {
-                    position: absolute;
-                    content: "";
-                    width: 100%;
-                    height: 10px;
-                    background-image: url(../imgs/img/ticket/side-shape.png);
-                    background-size: contain;
-                    background-repeat: repeat-x;
-                    left: 0;
-                    top: -5px;
-                }
-
-        .custom-button {
-            background-color: #31d7a9;
-            color: #ffffff;
-            padding: 12px 24px;
-            border-radius: 25px;
-            border: none;
-            font-weight: 600;
-            text-transform: uppercase;
-            cursor: pointer;
-            display: inline-block;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-            .custom-button:hover {
-                background-color: #008462;
-                color: #ffffff;
-                text-decoration: none;
-            }
-
-        .movie-details-content {
-            background: #1f1f1f;
-            padding: 30px;
-            border-radius: 10px;
-        }
-        .movie-details-thumb img {
-            width: 100%;
-            border-radius: 10px;
-        }
-        .movie-details-info {
-            margin-top: 20px;
-        }
-        .info-item {
-            margin-bottom: 15px;
-        }
-        .info-title {
-            color: #999;
-            margin-right: 10px;
-        }
-        .booking-summary {
-            background: #1f1f1f;
-            padding: 30px;
-            border-radius: 10px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-control {
-            background: #2f2f2f;
-            border: 1px solid #3f3f3f;
-            color: #fff;
-        }
-        .form-control:focus {
-            background: #2f2f2f;
-            border-color: #e2d703;
-            color: #fff;
-        }
-    </style>
-}
-
-<section class="page-title bg-one">
+<section class="details-banner hero-area bg_img seat-plan-banner" data-background="@Url.Content(Model.PosterUrl)"
+         style="background-image: url('@Url.Content(Model.PosterUrl)');">
     <div class="container">
-        <div class="page-title-area">
-            <div class="item md-order-1">
-                <a asp-action="ChooseSeat" asp-controller="Seat" class="custom-button back-button">
-                    <i class="flaticon-double-right-arrows-angles"></i>
-                    Quay lại
-                </a>
-            </div>
-            <div class="item">
-                <h1 class="title">Xác nhận đặt vé</h1>
+        <div class="details-banner-wrapper">
+            <div class="details-banner-content style-two">
+                <h3 class="title">@Model.FilmTitle</h3>
+                @if (Model.Categories != null && Model.Categories.Any())
+                {
+                    <div class="tags">
+                        @foreach (var category in Model.Categories)
+                        {
+                            <a href="#0">@category</a>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
 </section>
 
-<section class="movie-details-section padding-bottom padding-top">
+
+<div class="movie-facility padding-bottom padding-top">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8">
-                <div class="movie-details-content">
-                    <div class="movie-details-thumb">
-                        <img src="@Model.PosterUrl" alt="movie">
-                    </div>
-                    <div class="movie-details-info">
-                        <h3 class="title">@Model.FilmTitle</h3>
-                        <div class="movie-details-info-content">
-                            <div class="info-item">
-                                <span class="info-title">Thời gian chiếu:</span>
-                                <span class="info-content">@Model.StartTime.ToString("dd/MM/yyyy HH:mm")</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-title">Rạp:</span>
-                                <span class="info-content">@Model.CinemaName</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-title">Địa chỉ:</span>
-                                <span class="info-content">@Model.CinemaAddress</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-title">Phòng chiếu:</span>
-                                <span class="info-content">@Model.RoomName</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-title">Ghế đã chọn:</span>
-                                <span class="info-content">@string.Join(", ", Model.SelectedSeats)</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-title">Tổng tiền:</span>
-                                <span class="info-content">@Model.TotalPrice.ToString("N0") VND</span>
+            <div class="col-lg-7">
+                @if (Model.SelectedSeats != null && Model.SelectedSeats.Any())
+                {
+                    <form asp-action="Checkout" asp-controller="Purchase" method="post" id="checkout-main-form">
+
+                        @for (int i = 0; i < Model.SelectedSeats.Count; i++)
+                        {
+                            <input type="hidden" name="SelectedSeats[@i].Id" value="@Model.SelectedSeats[i].Id" />
+                            <input type="hidden" name="SelectedSeats[@i].Symbol" value="@Model.SelectedSeats[i].Symbol" />
+                            <input type="hidden" name="SelectedSeats[@i].Price" value="@Model.SelectedSeats[i].Price" />
+                        }
+                        
+                        <input type="hidden" asp-for="TotalPrice" id="hiddenTotalPrice" />
+                        <input type="hidden" asp-for="StartTime" />
+                        <input type="hidden" asp-for="FilmTitle" />
+                        <input type="hidden" asp-for="PosterUrl" />
+
+                        @for (int i = 0; i < Model.Categories.Count; i++)
+                        {
+                            <input type="hidden" name="Categories[@i]" value="@Model.Categories[i]" />
+                        }
+                        <input type="hidden" asp-for="CinemaName" />
+                        <input type="hidden" asp-for="CinemaAddress" />
+                        <input type="hidden" asp-for="RoomName" />
+                        <input type="hidden" asp-for="ScheduleId" />
+
+                        <input type="hidden" id="appliedPromoCode" name="AppliedPromoCode" value="" />
+                        <input type="hidden" id="appliedDiscountRate" name="AppliedDiscountRate" value="0" />
+
+                        <!-- Promo Code Input -->
+                        <div class="checkout-widget checkout-contact">
+                            <h5 class="title">Mã giảm giá</h5>
+                            <div class="form-group d-flex" style="flex-direction: column">
+
+                                <input type="text" id="promoCodeInput" style="text-transform: capitalize" placeholder="Nhập mã giảm giá" class="form-control me-2"> @* Removed name, value set by JS into hidden fields *@
+                                <button type="button" id="checkPromoBtn" class="custom-button">Kiểm tra mã</button>
                             </div>
                         </div>
+
+                        <!-- Available Promotions Dropdown -->
+                        <div class="checkout-widget checkout-contact">
+                            <h5 class="title">Khuyến mãi của bạn</h5>
+                            <div class="available-promotions">
+                                <div class="form-group">
+                                    <div class="custom-select-wrapper">
+                                        <select asp-for="PromotionCode" id="promotionSelect" class="form-control promotion-select">
+                                            <option value="0-0">Chọn khuyến mãi</option>
+                                            @if (Model.Promotions != null && Model.Promotions.Any()) // Check if the list is not null and has items
+                                            {
+                                                @foreach (var promo in Model.Promotions) // Looping through List<Promotion>
+                                                {
+                                                    // Access properties directly from the Promotion entity
+                                                    <option value="@promo.Code"
+                                                            data-percent="@promo.DiscountRate">
+                                                        @($"{promo.Code} - Giảm {(promo.DiscountRate * 100):F0}%")
+                                                    </option>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <option value="" disabled>Bạn không có khuyến mãi nào</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Payment Methods -->
+                        <div class="checkout-widget checkout-card mb-2">
+                            <h5 class="title">Đa dạng phương thức</h5>
+                            @* Visual display only - selection happens in dropdown below *@
+                            <ul class="payment-option">
+                                <li class="@(Model.PaymentMethod == "Debit Card" ? "active" : "")">
+                                    @* Example: Make active based on selection *@
+                                    <a><img src="~/imgs/img/payment/card.png" alt="payment" /><span>Debit Card</span></a>
+                                </li>
+                                <li class="@(Model.PaymentMethod == "momo" ? "active" : "")">
+                                    <a><img src="~/imgs/img/payment/momo.png" alt="payment" /><span>MOMO</span></a>
+                                </li>
+                                <li class="@(Model.PaymentMethod == "paypal" ? "active" : "")">
+                                    <a><img src="~/imgs/img/payment/paypal.png" alt="payment" /><span>paypal</span></a>
+                                </li>
+                                <li class="@(Model.PaymentMethod == "vnpay" ? "active" : "")">
+                                    <a><img src="~/imgs/img/payment/v-vnpay-svgrepo-com.svg" alt="payment" /><span>VNPAY</span></a>
+                                </li>
+                                @* Add more payment methods as needed *@
+                            </ul>
+
+                            @* Actual Selection Dropdown *@
+                            <div class="form-group mt-3">
+                                <label asp-for="PaymentMethod" class="form-label">Phương thức thanh toán:</label>
+                                <select asp-for="PaymentMethod" class="form-control" id="payment">
+                                    <option value="Cash">Trả tiền tại quầy</option>
+                                    <option value="momo">MOMO</option>
+                                    <option value="paypal">Paypal</option>
+                                    <option value="vnpay">VNPay</option>
+                                </select>
+                                <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                            </div>
+
+                            @* Combo Food Selection *@
+                            <div class="form-group mt-3">
+                                <label asp-for="ComboIdAndPrice" class="form-label">Combo Food:</label>
+                                <select asp-for="ComboIdAndPrice" id="comboFoodSelect" class="form-control">
+                                    <option value="0-0">Không chọn combo</option> @* Value format "Id-Price" *@
+                                    @if (Model.Foods != null)
+                                    {
+                                        @foreach (var combo in Model.Foods)
+                                        {
+                                            <option value="@($"{combo.Id}-{combo.Price}")">
+                                                @($"{combo.ComboName} - {combo.Description} - {FormatCurrency(combo.Price)}")
+                                           </option>
+                                        }
+                                    }
+                                </select>
+                                <span asp-validation-for="ComboIdAndPrice" class="text-danger"></span>
+                            </div>
+
+                            @* Submit Button *@
+                            <div class="form-group mt-5">
+                                <button type="submit" class="custom-button">Thanh toán</button>
+                            </div>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-warning">Không có thông tin vé để hiển thị. Vui lòng chọn lại ghế.</div>
+                    <a asp-action="Index" asp-controller="Home" class="custom-button">Về trang chủ</a>
+                }
+                @* Display Message (e.g., from TempData) *@
+                @if (TempData["Message"] != null)
+                {
+                    <div class="mt-5 alert alert-danger fw-bold">
+                        @TempData["Message"]
+                    </div>
+                }
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="mt-5 alert alert-success fw-bold">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+
+            </div>
+
+            <div class="col-lg-5">
+                <div class="booking-summery bg-one">
+                    <h4 class="title">Chi tiết vé</h4>
+                    <ul>
+                        <li>
+                            <h5 class="subtitle">@Model.FilmTitle</h5>
+                            @if (Model.Categories != null && Model.Categories.Any())
+                            {
+                                <span class="info">@string.Join(", ", Model.Categories)</span>
+                            }
+                        </li>
+                        <li>
+                            <h6 class="subtitle">
+                                <span>Rạp</span> <span>@Model.CinemaName</span>
+                            </h6>
+                            <div class="info">
+                                <span>Suất chiếu: </span> <span>@Model.StartTime.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                        </li>
+                        <li>
+                            <h6 class="subtitle">
+                                <span>Phòng: </span><span>@Model.RoomName</span>
+                            </h6>
+                            <div class="info">
+                                <span>Vị trí: </span> <span>@Model.CinemaAddress</span>
+                            </div>
+                        </li>
+                    </ul>
+                    <ul class="side-shape">
+                        <li>
+                            <h6 class="subtitle mb-0">
+                                <span>Ghế đã chọn</span>
+                                <span class="selected-seat-display">@selectedSeatSymbols</span>
+                            </h6>
+                        </li>
+                    </ul>
+                    <ul>
+                        <li>
+                            @* Keep static price display or make dynamic if needed *@
+                            <span class="info"><span>Ghế thường</span><span>80.000 VND</span></span>
+                            <span class="info"><span>Ghế VIP</span><span>100.000 VND</span></span>
+                            <span class="info"><span>SweetBox</span><span>120.000 VND</span></span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="proceed-area text-center">
+                    <h6 class="subtitle">
+                        <span>Tổng Cộng</span>
+                        <span id="originalPrice" style="display: none;">@Model.TotalPrice</span>
+                        <span class="totalCheckout">@FormatCurrency(Model.TotalPrice)</span>
+                    </h6>
+                    @* Discount info, shown by JS *@
+                    <div id="discountInfo" style="display: none;">
+                        <p class="text-success">Giảm giá (<span id="discountCodeApplied"></span>): -<span id="discountAmount">0</span> VND</p>
+                        
                     </div>
                 </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="booking-summary">
-                    <h4 class="title">Thông tin thanh toán</h4>
-                    <form asp-action="Confirm" asp-controller="Purchase" method="post">
-                        <input type="hidden" name="scheduleId" value="@Model.ScheduleId" />
-                        <input type="hidden" name="selectedSeats" value="@string.Join(",", Model.SelectedSeats)" />
-                        <input type="hidden" name="totalPrice" value="@Model.TotalPrice" />
-                        
-                        <div class="form-group">
-                            <label>Họ và tên</label>
-                            <input type="text" class="form-control" name="customerName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" class="form-control" name="email" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Số điện thoại</label>
-                            <input type="tel" class="form-control" name="phone" required>
-                        </div>
-                        <button type="submit" class="custom-button">Xác nhận đặt vé</button>
-                    </form>
+                <div class="proceed-area text-center" style="border-top: 1px dashed #11326f;background: #032055;">
+                    <h5 class="title"> Cập nhật thông tin để nhận được mã giảm giá</h5>
+                    <a asp-action="Profile" asp-controller="User" class="form-group btn btn-primary update-profile">
+                        <span>Đi đến trang cá nhân</span>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+                document.addEventListener('DOMContentLoaded', function () {
+            const promotionSelect = document.getElementById('promotionSelect');
+            const totalPriceElement = document.querySelector('.totalCheckout');
+            const originalPriceElement = document.getElementById('originalPrice');
+            const discountInfoElement = document.getElementById('discountInfo');
+            const discountAmountElement = document.getElementById('discountAmount');
+            const comboFoodSelect = document.getElementById('comboFoodSelect');
+            const promoCodeBtn = document.getElementById('checkPromoBtn');
+            const promoCodeInput = document.getElementById('promoCodeInput');
+            const checkoutForm = document.querySelector('form[action*="/purchase/checkout"]');
+            const codeAppliedElement = document.getElementById('discountCodeApplied');
+            const appliedPromoCodeInput = document.getElementById('appliedPromoCode');
+            const appliedDiscountRateInput = document.getElementById('appliedDiscountRate');
+            let originalPrice = parseFloat(originalPriceElement.textContent.replace('.', ''));
+            let currentDiscountRate = 0;
+
+            function updateTotalPrice(discountRate = 0) {
+                let currentPrice = originalPrice;
+
+                if (comboFoodSelect.value !== '0-0') {
+                    const comboPrice = parseFloat(comboFoodSelect.value.split('-')[1]);
+                    currentPrice += comboPrice;
+                }
+
+                if (promotionSelect.value !== '0-0') {
+                    const selectedOption = promotionSelect.options[promotionSelect.selectedIndex];
+                    const discountPercent = parseFloat(selectedOption.getAttribute('data-percent')) || 0;
+                    currentPrice -= currentPrice * discountPercent;
+                    appliedPromoCodeInput.value = promotionSelect.value;
+                    appliedDiscountRateInput.value = discountPercent;
+                } else if (discountRate > 0) {
+                    currentPrice -= currentPrice * discountRate;
+                    appliedPromoCodeInput.value = promoCodeInput.value.trim();
+                    appliedDiscountRateInput.value = discountRate;
+                } else {
+                    appliedPromoCodeInput.value = '';
+                    appliedDiscountRateInput.value = '0';
+                }
+
+                totalPriceElement.textContent = Math.round(currentPrice).toLocaleString() + ' VND';
+                discountInfoElement.style.display = (discountRate > 0 || promotionSelect.value !== '0-0') ? 'block' : 'none';
+                discountAmountElement.textContent = Math.round(originalPrice - currentPrice).toLocaleString();
+            }
+
+            promoCodeBtn.addEventListener('click', function () {
+                const promotionCode = promoCodeInput.value.trim();
+                console.log(promotionCode);
+                if (!promotionCode) {
+                    alert("Vui lòng nhập mã giảm giá!");
+                    return;
+                }
+                promotionSelect.value = '0-0';
+                fetch(`/khuyen-mai/doi-ma/${promotionCode}`).then(response => {
+                    if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+                    return response.json();
+                }).then(data => {
+                    if (data && data.promotion.discountRate) {
+                        currentDiscountRate = data.promotion.discountRate;
+                        codeAppliedElement.textContent = data.promotion.code;
+                        updateTotalPrice(currentDiscountRate);
+                    } else {
+                        alert(data.message || "Mã giảm giá không hợp lệ.");
+                        appliedPromoCodeInput.value = '';
+                        appliedDiscountRateInput.value = '0';
+                    }
+                }).catch(error => {
+                    console.error('Error fetching promotion:', error);
+                    alert("Có lỗi xảy ra khi kiểm tra mã giảm giá.");
+                    appliedPromoCodeInput.value = '';
+                    appliedDiscountRateInput.value = '0';
+                });
+            });
+
+            promotionSelect.addEventListener('change', () => {
+                promoCodeInput.value = ''; // Reset promo code input
+                updateTotalPrice();
+            });
+
+            promoCodeInput.addEventListener('focus', () => {
+                promotionSelect.value = '0-0'; // Reset promotion select
+                updateTotalPrice();
+            });
+
+            comboFoodSelect.addEventListener('change', () => {
+                updateTotalPrice(currentDiscountRate);
+            });
+
+            checkoutForm.addEventListener('submit', function (e) {
+                if (promotionSelect.value === '0-0' && !appliedPromoCodeInput.value) {
+                    appliedPromoCodeInput.value = '';
+                    appliedDiscountRateInput.value = '0';
+                }
+            });
+        })
+
+    </script>
+   
+}@*  
+
+
+
+<script src="~/js/js/purchase.js"></script> *@
+@section Styles {
+    <style>
+        .promotion-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+        }
+
+            .promotion-option img {
+                width: 24px;
+                height: 24px;
+                margin-right: 10px;
+            }
+
+        .promotion-select {
+            position: relative;
+            width: 100%;
+        }
+
+        .custom-select-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .promotion-list {
+            width: 100%;
+            padding: 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .promotion-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+            .promotion-item:hover {
+                background-color: #f5f5f5;
+            }
+
+            .promotion-item img {
+                width: 24px;
+                height: 24px;
+                margin-right: 10px;
+            }
+
+            .promotion-item .promotion-text {
+                flex-grow: 1;
+            }
+
+            .promotion-item .discount-badge {
+                background-color: #ff6b6b;
+                color: white;
+                padding: 2px 6px;
+                border-radius: 12px;
+                font-size: 12px;
+                margin-left: 10px;
+            }
+
+        .custom-button {
+            margin-top: 10px;
+        }
+
+        .update-profile {
+            margin: 16px auto;
+        }
+
+    </style>
+}
