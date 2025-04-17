@@ -1,4 +1,6 @@
 ﻿using school_major_project.Models;
+using System;
+using System.Collections.Generic;
 
 namespace school_major_project.ViewModel
 {

@@ -25,7 +25,7 @@ namespace school_major_project.Controllers
         private readonly IReceiptRepository _receiptRepository;
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
         public UserController(ApplicationDbContext context, UserManager<User> userManager,
-            SignInManager<User> signInManager, ILogger<UserController> logger,
+            SignInManager<User> signInManager, ILogger<UserController> logger, 
             IWebHostEnvironment environment, IReceiptDetailsRepository receiptDetailsRepository,
             IReceiptRepository receiptRepository) : base(context)
         {
@@ -174,97 +174,12 @@ namespace school_major_project.Controllers
         public async Task<IActionResult> History()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
+            if(user ==null)
             {
                 return NotFound();
             }
-            var receipts = await _receiptRepository.GetByUserIdAsync(user.Id);
-
-
-            var viewModel = new HistoryVM
-            {
-                User = user,
-                Receipts = receipts
-            };
-            return View(viewModel);
-        }
-        [SupportedOSPlatform("windows")]
-        [Route("chi-tiet-hoa-don/{id}")]
-        public async Task<IActionResult> QRCodeForReceipt(int id)
-        {
-            var receipt = await _receiptRepository.GetByIdAsync(id);
-            if (receipt == null)
-            {
-                return NotFound();
-            }
-            int width = 300;
-            int height = 300;
-
-            BitMatrix bitMatrix;
-            try
-            {
-                QRCodeWriter qRCodeWriter = new QRCodeWriter();
-                int qrData = receipt.Id;
-
-                var hints = new Dictionary<EncodeHintType, Object>
-                {   
-                    { EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H },
-                    { EncodeHintType.MARGIN, 2 },
-                    { EncodeHintType.CHARACTER_SET, "UTF-8" }
-                };
-
-
-
-                bitMatrix = qRCodeWriter.encode(
-                    $"BOOKING-{qrData}",
-                    BarcodeFormat.QR_CODE,
-                    width,
-                    height,
-                    hints
-                );
-            }
-            catch (Exception ex)
-            {
-                // Log error if needed
-                return BadRequest($"QR code generation failed: {ex.Message}");
-            }
-            using (Bitmap bitmap = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format24bppRgb))
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    for (int y = 0; y < height; y++)
-                    {
-                        Color color = bitMatrix[x, y] ? Color.Black : Color.White;
-                        bitmap.SetPixel(x, y, color);
-                    }
-                }
-
-                using (var stream = new MemoryStream())
-                {
-                    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    stream.Seek(0, SeekOrigin.Begin);
-                    return File(stream.ToArray(), "image/png");
-                }
-            }
+            var receipts = _receiptRepository.GetByUserIdAsync(user.Id);
+            return View(receipts);
         }
     }
 }
-/*QRCodeWriter qRCodeWriter = new QRCodeWriter();
-int qrData = receipt.Id;
-
-
-var hints = new Dictionary<EncodeHintType, Object>();
-hints.Add(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-hints.Add(EncodeHintType.MARGIN, 2);
-hints.Add(EncodeHintType.CHARACTER_SET, "UTF-8");
-
-int width = 300;  // Increased size
-int height = 300; // Increased size
-
-BitMatrix bitMatrix = qRCodeWriter.encode(
-    string.Format("BOOKING-%d", qrData),
-    BarcodeFormat.QR_CODE,
-    width,
-    height,
-    hints
-);*/

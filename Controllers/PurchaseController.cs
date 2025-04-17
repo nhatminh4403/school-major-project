@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ViewModel;
+using System.Net.Sockets;
 using System.Text.Json;
 
 namespace school_major_project.Controllers
@@ -21,7 +23,6 @@ namespace school_major_project.Controllers
         private readonly IFoodRepository _foodRepository;
         private readonly IReceiptRepository _receiptRepository;
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
-       
         public PurchaseController(ApplicationDbContext context, SignInManager<User> signInManager, IPromotionRepository promotionRepository,
             UserManager<User> userManager, IFoodRepository foodRepository, IReceiptRepository receiptRepository,
             IReceiptDetailsRepository receiptDetailsRepository) : base(context)
@@ -37,7 +38,6 @@ namespace school_major_project.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("")]
         public async Task<IActionResult> Add(string seatSymbol, decimal totalPrice, DateTime startTime, string filmTitle,
                                                 string poster, List<string> category, string cinemaName,
                                                 string cinemaAddress, string roomName, int scheduleId)
@@ -48,19 +48,18 @@ namespace school_major_project.Controllers
             {
                 try
                 {
-                    selectedSeatsList = JsonSerializer.Deserialize<List<SelectedSeatInfo>>(seatSymbol, 
-                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<SelectedSeatInfo>();
+                    selectedSeatsList = JsonSerializer.Deserialize<List<SelectedSeatInfo>>(seatSymbol, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<SelectedSeatInfo>();
                 }
                 catch (JsonException ex)
                 {
                     TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thông tin ghế đã chọn.";
-                    return NotFound("Invalid seat data format.");
+                    return BadRequest("Invalid seat data format.");
                 }
             }
             if (selectedSeatsList.Count == 0)
             {
                 TempData["ErrorMessage"] = "Vui lòng chọn ít nhất một ghế.";
-                return NotFound("No seats selected.");
+                return BadRequest("No seats selected.");
             }
 
             List<Promotion> userPromotions = new List<Promotion>();
@@ -85,7 +84,6 @@ namespace school_major_project.Controllers
             }
 
             var comboFoods = await _foodRepository.GetAllAsync();
-            ViewBag.ComboFoods = comboFoods;
             // --- Create ViewModel ---
             var checkoutViewModel = new CheckoutSummaryVM
             {
@@ -99,108 +97,147 @@ namespace school_major_project.Controllers
                 CinemaAddress = cinemaAddress,
                 RoomName = roomName,
                 ScheduleId = scheduleId,
+
+
                 Promotions = userPromotions,
-                
+                Foods = comboFoods
             };
 
             return View(checkoutViewModel);
         }
 
         [HttpPost]
-        [Route("thanh-toan")]
         public async Task<IActionResult> Checkout(CheckoutSummaryVM model)
         {
             if (!ModelState.IsValid)
             {
                 TempData["PurchaseMessage"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
-                return View("Add", model);
+                return View(model);
             }
-
-            // 1. Lấy user hiện tại
-            var userId = _userManager.GetUserId(User);
-            if (userId == null)
+            try
             {
-                TempData["Message"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
-                return RedirectToAction("Login", "Account");
+                // Get current user
+                var userId = _userManager.GetUserId(User);
+                if (userId == null)
+                {
+                    TempData["Message"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
+                    return RedirectToAction("Login", "Account");
+                }
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    TempData["Message"] = "Không tìm thấy thông tin người dùng.";
+                    return RedirectToAction("Login", "Account");
+                }
+
+                // Calculate final price with discount if applicable
+                decimal finalPrice = model.TotalPrice;
+
+                // Apply promo code discount if exists
+                if (!string.IsNullOrEmpty(model.AppliedPromoCode) && model.AppliedDiscountRate > 0)
+                {
+                    // Get the promotion from repository to verify it
+                    var promotion = await _promotionRepository.GetByCodeAsync(model.AppliedPromoCode);
+                    if (promotion != null && promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
+                    {
+                        finalPrice -= finalPrice * (decimal)model.AppliedDiscountRate;
+
+                        // Remove the used promotion from user
+                        if (user.Promotions != null)
+                        {
+                            var userPromotion = user.Promotions.FirstOrDefault(p => p.Code == model.AppliedPromoCode);
+                            if (userPromotion != null)
+                            {
+                                user.Promotions.Remove(userPromotion);
+                                await _userManager.UpdateAsync(user);
+                            }
+                        }
+                    }
+                }
+
+                // Handle combo food selection
+                int comboId = 0;
+                decimal comboPrice = 0;
+                if (!string.IsNullOrEmpty(model.ComboIdAndPrice) && model.ComboIdAndPrice != "0-0")
+                {
+                    var comboParts = model.ComboIdAndPrice.Split('-');
+                    if (comboParts.Length == 2 && int.TryParse(comboParts[0], out comboId) && decimal.TryParse(comboParts[1], out comboPrice))
+                    {
+                        finalPrice += comboPrice;
+                    }
+                }
+
+                // Create receipt
+                var receipt = new Receipt
+                {
+                    Date = DateTime.Now,
+                    TotalPrice = (int)finalPrice, // Convert decimal to int as per model
+                    PaymentType = model.PaymentMethod, // Use PaymentType as per model
+                    SeatName = string.Join(", ", model.SelectedSeats.Select(s => s.Symbol)),
+                    ComboFoodId = comboId > 0 ? comboId : 0, // Set to 0 if no combo selected
+                    UserId = userId
+                };
+
+                await _receiptRepository.AddAsync(receipt);
+
+                // Create tickets for each seat
+                if (model.SelectedSeats != null && model.SelectedSeats.Any())
+                {
+                    foreach (var seat in model.SelectedSeats)
+                    {
+                        var receiptDetail = new ReceiptDetail
+                        {
+                            ReceiptId = receipt.Id,
+                            FilmName = model.FilmTitle,
+                            CinemaName = model.CinemaName,
+                            RoomName = model.RoomName,
+                            CinemaAddress = model.CinemaAddress,
+                            StartTime = model.StartTime,
+                            PricePerSeat = (int)seat.Price,
+                            SeatId = seat.Id,
+                            ScheduleId = model.ScheduleId
+                        };
+                        _context.ReceiptDetails.Add(receiptDetail);
+                    }
+                }
+                await _context.SaveChangesAsync();
+
+                // Handle different payment methods
+                switch (model.PaymentMethod)
+                {
+                    case "momo":
+                        // Redirect to MOMO payment gateway
+                        return RedirectToAction("ProcessMomoPayment", new { receiptId = receipt.Id });
+                    case "paypal":
+                        // Redirect to PayPal payment gateway
+                        return RedirectToAction("ProcessPayPalPayment", new { receiptId = receipt.Id });
+                    case "vnpay":
+                        // Redirect to VNPay payment gateway
+                        return RedirectToAction("ProcessVNPayPayment", new { receiptId = receipt.Id });
+                    case "Cash":
+                    default:
+                        // Cash payment - show success message and redirect to receipt page
+                        TempData["SuccessMessage"] = "Đặt vé thành công! Vui lòng thanh toán tại quầy.";
+                        return RedirectToAction("History", "User");
+                }
             }
-
-            // 2. Tính giá cuối cùng (discount + combo)
-            decimal finalPrice = CalculateFinalPrice(model);
-
-            switch (model.PaymentMethod)
+            catch (Exception ex)
             {
-                case "Cash":
-                    // Thanh toán tại quầy: tạo và lưu luôn
-                    await SaveReceiptAsync(model, finalPrice, userId);
-                    TempData["SuccessMessage"] = "Đặt vé thành công! Vui lòng thanh toán tại quầy.";
-                    return RedirectToAction("History", "User");
-
-                case "momo":
-                    // Chuẩn bị dữ liệu cho callback MOMO
-                    TempData["CheckoutData"] = JsonSerializer.Serialize(new
-                    {
-                        Model = model,
-                        FinalPrice = finalPrice,
-                        UserId = userId
-                    });
-                    return RedirectToAction("ProcessMomoPayment");
-
-                case "paypal":
-                    TempData["CheckoutData"] = JsonSerializer.Serialize(new
-                    {
-                        Model = model,
-                        FinalPrice = finalPrice,
-                        UserId = userId
-                    });
-                    return RedirectToAction("ProcessPayPalPayment");
-
-                case "vnpay":
-                    TempData["CheckoutData"] = JsonSerializer.Serialize(new
-                    {
-                        Model = model,
-                        FinalPrice = finalPrice,
-                        UserId = userId
-                    });
-                    return RedirectToAction("ProcessVNPayPayment");
-
-                default:
-                    TempData["Message"] = "Phương thức thanh toán không hợp lệ.";
-                    return View("Add", model);
+                TempData["Message"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(model);
             }
         }
         // Additional methods for handling payment gateways
-        [HttpPost]
-        [Route("thanh-toan-momo")]
-        public async Task<IActionResult> ProcessMomoPayment()
+        public IActionResult ProcessMomoPayment(int receiptId)
         {
-            // TODO: gọi API MOMO, kiểm tra kết quả  
-            bool paymentSuccess = /* gọi MOMO, nhận kết quả */true;
+            // Implement MOMO payment integration
+            // This is just a placeholder - you'll need to implement actual MOMO API integration
 
-            if (paymentSuccess && TempData["CheckoutData"] != null)
-            {
-                // Deserialize dữ liệu  
-                var payload = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(
-                                    TempData["CheckoutData"]!.ToString()!);
-                var model = JsonSerializer.Deserialize<CheckoutSummaryVM>(
-                                payload["Model"].GetRawText())!;
-                var finalPrice = payload["FinalPrice"].GetDecimal();
-                var userId = payload["UserId"].GetString()!;
-
-                // Lưu Receipt và ReceiptDetails  
-                await SaveReceiptAsync(model, finalPrice, userId);
-
-                TempData["SuccessMessage"] = "Thanh toán MOMO thành công!";
-                return RedirectToAction("History", "User");
-            }
-            else
-            {
-                TempData["Message"] = "Thanh toán MOMO thất bại, vui lòng thử lại.";
-                return RedirectToAction("Add"); // Removed 'model' parameter to fix CS1739  
-            }
+            // After successful payment processing:
+            TempData["SuccessMessage"] = "Thanh toán MOMO thành công!";
+            return RedirectToAction("History", "User");
         }
 
-        [HttpPost]
-        [Route("thanh-toan-paypal")]
         public IActionResult ProcessPayPalPayment(int receiptId)
         {
             // Similar implementation for PayPal
@@ -209,75 +246,12 @@ namespace school_major_project.Controllers
             return RedirectToAction("History", "User");
         }
 
-        [HttpPost]
-        [Route("thanh-toan-vnpay")]
         public IActionResult ProcessVNPayPayment(int receiptId)
         {
             // Similar implementation for VNPay
             // After successful payment processing:
             TempData["SuccessMessage"] = "Thanh toán VNPay thành công!";
             return RedirectToAction("History", "User");
-        }
-        private decimal CalculateFinalPrice(CheckoutSummaryVM model)
-        {
-            decimal price = model.TotalPrice;
-            if (!string.IsNullOrEmpty(model.AppliedPromoCode) && model.AppliedDiscountRate > 0)
-            {
-                price -= price * (decimal)model.AppliedDiscountRate;
-            }
-            if (!string.IsNullOrEmpty(model.ComboIdAndPrice) && model.ComboIdAndPrice != "0-0")
-            {
-                var parts = model.ComboIdAndPrice.Split('-');
-                if (decimal.TryParse(parts[1], out var comboPrice))
-                    price += comboPrice;
-            }
-            return price;
-        }
-
-        // Hàm chung lưu Receipt + ReceiptDetails
-        private async Task SaveReceiptAsync(CheckoutSummaryVM model, decimal finalPrice, string userId)
-        {
-            // Tạo Receipt
-            var receipt = new Receipt
-            {
-                Date = DateTime.Now,
-                TotalPrice = (int)finalPrice,
-                PaymentType = model.PaymentMethod,
-                ComboFoodId = ParseComboId(model.ComboIdAndPrice),
-                UserId = userId,
-                IsPaid = true  // đã qua thanh toán
-            };
-            await _receiptRepository.AddAsync(receipt);
-
-            // Tạo ReceiptDetails
-            foreach (var seat in model.SelectedSeats)
-            {
-                var detail = new ReceiptDetail
-                {
-                    ReceiptId = receipt.Id,
-                    FilmName = model.FilmTitle,
-                    CinemaName = model.CinemaName,
-                    RoomName = model.RoomName,
-                    CinemaAddress = model.CinemaAddress,
-                    StartTime = model.StartTime,
-                    PricePerSeat = (int)seat.Price,
-                    SeatId = Convert.ToInt32(seat.Id),
-                    ScheduleId = model.ScheduleId,
-                    PosterUrl = model.PosterUrl,
-                    SeatName = seat.Symbol
-                };
-                _context.ReceiptDetails.Add(detail);
-            }
-
-            await _context.SaveChangesAsync();
-        }
-
-        private int? ParseComboId(string combo)
-        {
-            if (string.IsNullOrEmpty(combo) || combo == "0-0") return null;
-            var parts = combo.Split('-');
-            if (int.TryParse(parts[0], out var id)) return id;
-            return null;
         }
     }
 
