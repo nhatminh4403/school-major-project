@@ -3,16 +3,11 @@
 @{
     ViewData["Title"] = "Bài viết";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    await Html.RenderPartialAsync("_Preloader");
 }
 
-<div class="preloader">
-    <div class="preloader-inner">
-        <div class="preloader-icon">
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
+
 <!-- ==========Preloader========== -->
 <section class="main-page-header speaker-banner bg_img" data-background="/imgs/img/banner/banner07.jpg"
          style="background-image: url('/imgs/img/banner/banner07.jpg');">

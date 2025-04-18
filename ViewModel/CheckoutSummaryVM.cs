@@ -1,8 +1,4 @@
-﻿using school_major_project.Models;
-using System;
-using System.Collections.Generic;
-
-namespace school_major_project.ViewModel
+﻿namespace school_major_project.ViewModel
 {
     public class CheckoutSummaryVM
     {
@@ -19,7 +15,7 @@ namespace school_major_project.ViewModel
 
 
         public string? AppliedPromoCode { get; set; }
-        public double AppliedDiscountRate { get; set; } 
+        public double AppliedDiscountRate { get; set; }
         public string PromotionCode { get; set; }
         public string PaymentMethod { get; set; }
         public string ComboIdAndPrice { get; set; }

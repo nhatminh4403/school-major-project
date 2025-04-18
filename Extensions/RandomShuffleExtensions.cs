@@ -1,6 +1,6 @@
 ﻿namespace BookingMovieTickets.Extensions
 {
-    public  static class RandomShuffleExtensions
+    public static class RandomShuffleExtensions
     {
         private static Random rng = new Random();
 

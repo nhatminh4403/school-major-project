@@ -56,7 +56,7 @@ namespace school_major_project.Areas.Admin.Controllers
             return View();
         }
 
-        
+
         [Route("chinh-sua/{id}")]
         [HttpPost]
         [ValidateAntiForgeryToken]

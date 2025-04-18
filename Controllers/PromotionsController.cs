@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
@@ -34,9 +33,9 @@ namespace school_major_project.Controllers
             {
                 var userId = _userManager.GetUserId(User);
 
-          
-                currentUser = await _context.Users 
-                                         .Include(u => u.Promotions) 
+
+                currentUser = await _context.Users
+                                         .Include(u => u.Promotions)
                                          .FirstOrDefaultAsync(u => u.Id == userId);
             }
             ViewBag.CurrentUser = currentUser;
@@ -89,7 +88,7 @@ namespace school_major_project.Controllers
         [Route("doi-ma/{code}")]
         public async Task<IActionResult> RedeemByCode(string code)
         {
-            
+
             var promotion = await _promotionRepository.GetByCodeAsync(code);
 
             if (promotion == null)
@@ -97,7 +96,7 @@ namespace school_major_project.Controllers
                 return NotFound(new { message = "Khuyến mãi không tồn tại." });
             }
 
-            return Json(new {Promotion = promotion });
+            return Json(new { Promotion = promotion });
         }
     }
 }

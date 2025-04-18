@@ -24,7 +24,7 @@ namespace school_major_project.Controllers
                 // Thực hiện OCR để trích xuất văn bản
                 string extractedText;
                 using (var engine = new TesseractEngine(_tesseractDataPath,
-                    "vie+eng+fra+por+spa+pol+deu+hun+tur+ita", EngineMode.Default)) 
+                    "vie+eng+fra+por+spa+pol+deu+hun+tur+ita", EngineMode.Default))
                 {
                     using (var img = Pix.LoadFromFile(filePath))
                     {

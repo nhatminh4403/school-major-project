@@ -25,6 +25,7 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="9.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="PayPal" Version="1.9.1" />
     <PackageReference Include="Tesseract" Version="5.2.0" />
     <PackageReference Include="Tesseract.Drawing" Version="5.2.0" />
     <PackageReference Include="ZXing.Net" Version="0.16.10" />
@@ -33,7 +34,6 @@
     <Folder Include="Areas\Admin\Models\" />
     <Folder Include="Migrations\" />
     <Folder Include="PaymentMethods\MoMo\" />
-    <Folder Include="PaymentMethods\PayPal\" />
     <Folder Include="wwwroot\admin\images\blogs\" />
     <Folder Include="wwwroot\admin\images\foods\" />
     <Folder Include="wwwroot\admin\images\seattypes\" />

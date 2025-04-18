@@ -12,7 +12,7 @@ namespace school_major_project.Extensions
         public static T? GetObjectFromJson<T>(this ISession session, string key)
         {
             var value = session.GetString(key);
-            return value == null ? default :  JsonSerializer.Deserialize<T>(value);
+            return value == null ? default : JsonSerializer.Deserialize<T>(value);
         }
     }
 

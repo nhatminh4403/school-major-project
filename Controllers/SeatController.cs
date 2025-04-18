@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.Interfaces;
-using school_major_project.Models;
 using school_major_project.ViewModel;
 
 namespace school_major_project.Controllers
@@ -18,8 +17,8 @@ namespace school_major_project.Controllers
         private readonly ISeatRepository _seatRepository;
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
 
-        public SeatController(ApplicationDbContext context,IScheduleRepository scheduleRepository, 
-            IRoomRepository roomRepository, IFilmRepository filmRepository,ISeatRepository seatRepository,IReceiptDetailsRepository receiptDetailsRepository) : base(context)
+        public SeatController(ApplicationDbContext context, IScheduleRepository scheduleRepository,
+            IRoomRepository roomRepository, IFilmRepository filmRepository, ISeatRepository seatRepository, IReceiptDetailsRepository receiptDetailsRepository) : base(context)
         {
             _context = context;
             _scheduleRepository = scheduleRepository;
@@ -33,7 +32,7 @@ namespace school_major_project.Controllers
         {
             var schedule = await _scheduleRepository.GetByIdAsync(scheduleId);
 
-            if(schedule == null)
+            if (schedule == null)
             {
                 return NotFound();
             }
@@ -64,7 +63,7 @@ namespace school_major_project.Controllers
             }
             var viewModel = new SeatListVM
             {
-                
+
                 Schedule = schedule,
                 SeatsWithStatus = seats.ToList(),
                 SeatsByType = seatsByType,
@@ -78,7 +77,7 @@ namespace school_major_project.Controllers
                 RoomName = room.Name,
                 SelectedScheduleId = scheduleId,
                 SelectedRoomId = room.Id
-                
+
             };
 
             return View(viewModel);

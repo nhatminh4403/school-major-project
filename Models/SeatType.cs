@@ -21,7 +21,7 @@ namespace school_major_project.Models
         public int Price { get; set; }
         [Required]
         [DisplayName("Điểm thưởng")]
-        public int? PointGiving { get; set; }
+        public int PointGiving { get; set; }
         [DisplayName("Hình ảnh mô tả")]
         public string? ImageDescription { get; set; }
 

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace school_major_project.ViewModel
+﻿namespace school_major_project.ViewModel
 {
     public class SelectedSeatInfo
     {

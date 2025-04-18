@@ -42,7 +42,7 @@ namespace school_major_project.ModelServices
 
         public async Task<IEnumerable<Receipt>> GetByUserIdAsync(string userId)
         {
-            return await _context.Receipts.Include(p => p.GetUser).Include(p=>p.ReceiptDetails).Include(p=>p.GetFood).Where(p => p.UserId == userId).ToListAsync();
+            return await _context.Receipts.Include(p => p.GetUser).Include(p => p.ReceiptDetails).Include(p => p.GetFood).Where(p => p.UserId == userId).ToListAsync();
         }
     }
 }

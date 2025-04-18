@@ -34,7 +34,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("FilmsId");
 
-                    b.ToTable("CategoryFilm");
+                    b.ToTable("CategoryFilm", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -182,7 +182,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("UsersId");
 
-                    b.ToTable("PromotionUser");
+                    b.ToTable("PromotionUser", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Blog", b =>
@@ -210,7 +210,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blogs");
+                    b.ToTable("Blogs", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Category", b =>
@@ -227,7 +227,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Cinema", b =>
@@ -252,7 +252,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cinemas");
+                    b.ToTable("Cinemas", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Comment", b =>
@@ -283,7 +283,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Country", b =>
@@ -300,7 +300,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Countries");
+                    b.ToTable("Countries", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Film", b =>
@@ -358,7 +358,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("CountryId");
 
-                    b.ToTable("Films");
+                    b.ToTable("Films", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Food", b =>
@@ -385,7 +385,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Foods");
+                    b.ToTable("Foods", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Promotion", b =>
@@ -418,7 +418,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Promotions");
+                    b.ToTable("Promotions", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Rating", b =>
@@ -452,7 +452,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Ratings", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Receipt", b =>
@@ -489,7 +489,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Receipts");
+                    b.ToTable("Receipts", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.ReceiptDetail", b =>
@@ -547,7 +547,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("SeatId");
 
-                    b.ToTable("ReceiptDetails");
+                    b.ToTable("ReceiptDetails", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Room", b =>
@@ -573,7 +573,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("CinemaId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Schedule", b =>
@@ -599,7 +599,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("RoomId");
 
-                    b.ToTable("Schedules");
+                    b.ToTable("Schedules", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.Seat", b =>
@@ -633,7 +633,7 @@ namespace school_major_project.Migrations
 
                     b.HasIndex("SeatTypeId");
 
-                    b.ToTable("Seats");
+                    b.ToTable("Seats", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.SeatType", b =>
@@ -659,7 +659,7 @@ namespace school_major_project.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SeatTypes");
+                    b.ToTable("SeatTypes", (string)null);
                 });
 
             modelBuilder.Entity("school_major_project.Models.User", b =>

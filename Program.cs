@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Google.Api;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
@@ -6,13 +7,14 @@ using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ModelServices;
+using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+#region Builder Configuration
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -109,6 +111,16 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
     emailConfig["Password"]
 ));
 
+builder.Services.AddTransient<IPayPalService, PayPalService>();
+
+// Add services to the container.
+builder.Services.AddControllersWithViews();
+#endregion
+
+
+
+
+#region Configure Builder App
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -145,3 +157,4 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
+#endregion

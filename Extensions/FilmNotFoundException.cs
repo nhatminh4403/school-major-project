@@ -1,9 +1,9 @@
 ﻿namespace BookingMovieTickets.Extensions
 {
-	public class FilmNotFoundException :Exception
-	{
-		public FilmNotFoundException(string message) : base(message)
-		{
-		}
-	}
+    public class FilmNotFoundException : Exception
+    {
+        public FilmNotFoundException(string message) : base(message)
+        {
+        }
+    }
 }

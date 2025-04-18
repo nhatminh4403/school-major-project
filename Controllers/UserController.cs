@@ -6,7 +6,6 @@ using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ViewModel;
 using System.Drawing;
-using System.Runtime.Versioning;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
@@ -25,7 +24,7 @@ namespace school_major_project.Controllers
         private readonly IReceiptRepository _receiptRepository;
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
         public UserController(ApplicationDbContext context, UserManager<User> userManager,
-            SignInManager<User> signInManager, ILogger<UserController> logger, 
+            SignInManager<User> signInManager, ILogger<UserController> logger,
             IWebHostEnvironment environment, IReceiptDetailsRepository receiptDetailsRepository,
             IReceiptRepository receiptRepository) : base(context)
         {
@@ -174,7 +173,7 @@ namespace school_major_project.Controllers
         public async Task<IActionResult> History()
         {
             var user = await _userManager.GetUserAsync(User);
-            if(user ==null)
+            if (user == null)
             {
                 return NotFound();
             }
