@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "PaymentSuccess";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var message = TempData["PaymentSuccessMessage"] ?? "Thanh toán thành công!";
+    var redirectUrl = Url.Action("History", "User");
+    var seconds = 5;
+}
+<meta http-equiv="refresh" content="@seconds;url=@redirectUrl" />
+<section>
+    <main>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h1>@message</h1>
+                    <p class="countdown">Đang chuyển hướng trong <span>@seconds</span> giây...</p>
+                    <p><a href="@redirectUrl" class="btn btn-primary">Quay lại trang lịch sử</a></p>
+                </div>
+            </div>
+        </div>
+    </main>
+</section>
+
+<script>
+    // Giảm đếm ngược hiển thị
+    (function() {
+        var sec = @seconds;
+        var el = document.querySelector('.countdown');
+        var timer = setInterval(function() {
+            sec--;
+            if (sec <= 0) {
+                clearInterval(timer);
+            } else {
+                el.textContent = sec;
+            }
+        }, 1000);
+    })();
+</script>

@@ -17,7 +17,6 @@ namespace school_major_project.ViewModel
         public string RoomName { get; set; }
         public int ScheduleId { get; set; }
 
-        public List<Promotion> Promotions { get; set; } 
 
         public string? AppliedPromoCode { get; set; }
         public double AppliedDiscountRate { get; set; } 
@@ -29,7 +28,6 @@ namespace school_major_project.ViewModel
         {
             SelectedSeats = new List<SelectedSeatInfo>();
             Categories = new List<string>();
-            Promotions = new List<Promotion>(); // Initialize with Promotion entity
         }
     }
 }

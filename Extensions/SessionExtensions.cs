@@ -1,7 +1,7 @@
 ﻿
 using System.Text.Json;
 
-namespace BookingMovieTickets.Session
+namespace school_major_project.Extensions
 {
     public static class SessionExtensions
     {

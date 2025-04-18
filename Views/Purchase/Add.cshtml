@@ -14,6 +14,7 @@
 
     await Html.RenderPartialAsync("_Preloader"); 
     var Foods = ViewBag.ComboFoods as IEnumerable<school_major_project.Models.Food>;
+    var Promotions = ViewBag.Promotions as IEnumerable<school_major_project.Models.Promotion>;
 }
 
 
@@ -91,9 +92,9 @@
                                     <div class="custom-select-wrapper">
                                         <select asp-for="PromotionCode" id="promotionSelect" class="form-control promotion-select">
                                             <option value="0-0">Chọn khuyến mãi</option>
-                                            @if (Model.Promotions != null && Model.Promotions.Any()) // Check if the list is not null and has items
+                                            @if (Promotions != null && Promotions.Any()) // Check if the list is not null and has items
                                             {
-                                                @foreach (var promo in Model.Promotions) // Looping through List<Promotion>
+                                                @foreach (var promo in Promotions) // Looping through List<Promotion>
                                                 {
                                                     // Access properties directly from the Promotion entity
                                                     <option value="@promo.Code"

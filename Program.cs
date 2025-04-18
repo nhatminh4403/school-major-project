@@ -6,6 +6,7 @@ using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ModelServices;
+using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -42,6 +43,7 @@ builder.Services.AddScoped<ICommentRepository, CommentService>();
 builder.Services.AddScoped<IRatingRepository, RatingService>();
 builder.Services.AddScoped<IFoodRepository, FoodService>();
 builder.Services.AddScoped<IPromotionRepository, PromotionService>();
+builder.Services.AddSingleton<IVnPayService, VnPayService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<ExpiredItemCleanupService>();
