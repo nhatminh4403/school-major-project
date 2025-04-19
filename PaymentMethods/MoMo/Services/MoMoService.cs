@@ -62,9 +62,6 @@ namespace school_major_project.PaymentMethods.MoMo.Services
             var response = await _httpClient.PostAsync(_endpoint, content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
-            Console.WriteLine($"MoMo Response Status Code: {response.StatusCode}"); // Log Status Code
-            Console.WriteLine($"MoMo Response Body: {responseContent}"); // Log Response Body
-
             if (response.IsSuccessStatusCode)
             {
 
@@ -79,35 +76,29 @@ namespace school_major_project.PaymentMethods.MoMo.Services
     string partnerCode, string requestId, string orderId, string orderInfo,
     string orderType, long transId, string message,
     int resultCode, string payType, long amount,
-    string extraData, string signatureFromCallback, long responseTime) // Thêm các tham số cần thiết
+    string extraData, string signatureFromCallback, long responseTime) 
         {
             try
             {
-                // *** XÂY DỰNG LẠI RAW HASH THEO ĐÚNG CHUẨN MOMO RETURN URL ***
-                // Sắp xếp tham số theo thứ tự bảng chữ cái của KEY
-                // Sử dụng các giá trị được truyền vào từ controller
-                var rawHash = "accessKey=" + _accessKey + // AccessKey lấy từ config
+
+                var rawHash = "accessKey=" + _accessKey + 
                               "&amount=" + amount +
                               "&extraData=" + extraData +
                               "&message=" + message +
                               "&orderId=" + orderId +
                               "&orderInfo=" + orderInfo +
                               "&orderType=" + orderType +
-                              "&partnerCode=" + partnerCode + // PartnerCode từ callback
+                              "&partnerCode=" + partnerCode + 
                               "&payType=" + payType +
                               "&requestId=" + requestId +
-                               "&responseTime=" + responseTime + // <<< THÊM nếu MoMo gửi về và yêu cầu cho signature
+                               "&responseTime=" + responseTime +
                               "&resultCode=" + resultCode +
                               "&transId=" + transId;
 
-                // Log để kiểm tra chuỗi hash bạn đang tạo
-                Console.WriteLine($"[ValidateSignature - Callback] Raw Hash: {rawHash}");
+
 
                 var calculatedSignature = ComputeHmacSha256(rawHash, _secretKey);
 
-                // Log để so sánh signature
-                Console.WriteLine($"[ValidateSignature - Callback] Signature from MoMo: {signatureFromCallback}");
-                Console.WriteLine($"[ValidateSignature - Callback] Calculated Signature: {calculatedSignature}");
 
                 // So sánh signature nhận được với signature tính toán
                 return signatureFromCallback == calculatedSignature;

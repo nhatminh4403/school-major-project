@@ -3,7 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.Interfaces;
 using school_major_project.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -13,143 +16,40 @@ namespace school_major_project.Areas.Admin.Controllers
     public class ReceiptsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public ReceiptsController(ApplicationDbContext context)
+        private readonly IReceiptRepository _receiptRepository;
+        public ReceiptsController(ApplicationDbContext context, IReceiptRepository receipt)
         {
             _context = context;
+            _receiptRepository = receipt;
         }
 
         // GET: Admin/Receipts
         [Route("")]
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Receipts.Include(r => r.GetFood).Include(r => r.GetUser);
-            return View(await applicationDbContext.ToListAsync());
+            var receipts = await _receiptRepository.GetAllAsync();
+            return View(receipts);
         }
 
         // GET: Admin/Receipts/Details/5
         [Route("chi-tiet/{id}")]
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var receipt = await _context.Receipts
-                .Include(r => r.GetFood)
-                .Include(r => r.GetUser)
-                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var receipt = await _receiptRepository.GetByIdAsync(id);
             if (receipt == null)
             {
                 return NotFound();
             }
 
-            return View(receipt);
-        }
-
-        // GET: Admin/Receipts/Create
-        [Route("tao-moi")]
-        public IActionResult Create()
-        {
-            ViewData["ComboFoodId"] = new SelectList(_context.Foods, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
-            return View();
-        }
-
-        // POST: Admin/Receipts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Date,TotalPrice,paymentType,seatName,ComboFoodId,UserId")] Receipt receipt)
-        {
-            if (ModelState.IsValid)
+            return Json(new { Receipt = receipt }, new JsonSerializerOptions
             {
-                _context.Add(receipt);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ComboFoodId"] = new SelectList(_context.Foods, "Id", "Id", receipt.ComboFoodId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", receipt.UserId);
-            return View(receipt);
+                ReferenceHandler = ReferenceHandler.Preserve,
+                MaxDepth = 64 // Increase if needed
+            });
         }
 
-        // GET: Admin/Receipts/Edit/5
-        [Route("chinh-sua/{id}")]
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var receipt = await _context.Receipts.FindAsync(id);
-            if (receipt == null)
-            {
-                return NotFound();
-            }
-            ViewData["ComboFoodId"] = new SelectList(_context.Foods, "Id", "Id", receipt.ComboFoodId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", receipt.UserId);
-            return View(receipt);
-        }
-
-        // POST: Admin/Receipts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Date,TotalPrice,paymentType,seatName,ComboFoodId,UserId")] Receipt receipt)
-        {
-            if (id != receipt.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(receipt);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ReceiptExists(receipt.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ComboFoodId"] = new SelectList(_context.Foods, "Id", "Id", receipt.ComboFoodId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", receipt.UserId);
-            return View(receipt);
-        }
-
-        // GET: Admin/Receipts/Delete/5
-        [Route("xoa/{id}")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var receipt = await _context.Receipts.FindAsync(id);
-            if (receipt != null)
-            {
-                _context.Receipts.Remove(receipt);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ReceiptExists(int id)
-        {
-            return _context.Receipts.Any(e => e.Id == id);
-        }
     }
 }

@@ -49,7 +49,7 @@ namespace school_major_project.Controllers
                 {
                     if (await _userManager.IsInRoleAsync(user, "Admin"))
                     {
-                        return RedirectToAction("Index", "Home", new { area = "Admin" });
+                        return RedirectToAction("Index", "AdminHome", new { area = "Admin" });
                     }
                 }
 

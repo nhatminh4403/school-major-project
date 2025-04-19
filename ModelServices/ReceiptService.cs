@@ -14,11 +14,11 @@ namespace school_major_project.ModelServices
         }
         public async Task<IEnumerable<Receipt>> GetAllAsync()
         {
-            return await _context.Receipts.Include(p => p.GetUser).ToListAsync();
+            return await _context.Receipts.Include(p => p.GetUser).Include(p=>p.ReceiptDetails).Include(p=>p.GetFood).ToListAsync();
         }
         public async Task<Receipt> GetByIdAsync(int id)
         {
-            return await _context.Receipts.Include(p => p.GetUser).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Receipts.Include(p => p.GetUser).Include(p => p.ReceiptDetails).Include(p => p.GetFood).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Receipt receipt)
         {

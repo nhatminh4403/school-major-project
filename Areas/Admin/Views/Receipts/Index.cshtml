@@ -122,7 +122,7 @@
 }
 
 
-<section layout:fragment="content">
+<section>
     <main class="main">
         <div class="container-fluid">
             <div class="row">
@@ -162,8 +162,6 @@
                                 </tr>
                             </thead>
 
-
-                            @* th:each="item : ${bookings}" *@
                             <tbody id="bookingTableBody">
                                 @if(Model == null || Model.Count()==0 || !Model.Any())
                                 {
@@ -182,7 +180,7 @@
                                             <div class="main__table-text">@receipt.Id</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text" th:text="${item.user.fullname}">@receipt.GetUser.FullName</div>
+                                            <div class="main__table-text">@receipt.GetUser.FullName</div>
                                         </td>
                                         @foreach (var details in receipt.ReceiptDetails)
                                         {
