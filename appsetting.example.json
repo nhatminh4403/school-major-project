@@ -21,5 +21,20 @@
     "LanguageCode": "",
     "CredentialsPath": ""
   },
+  "PayPal": {
+    "ClientId": "",
+    "ClientSecret": "",
+    "Mode": ""
+  },
+  "VnPay": {
+    "TmnCode": "",
+    "HashSecret": "",
+    "BaseUrl": "",
+    "Version": "",
+    "Command": "",
+    "CurrCode": "",
+    "Locale": "",
+    "PaymentBackReturnUrl": ""
+  },
   "AllowedHosts": "*"
 }

@@ -18,6 +18,9 @@ namespace school_major_project.Models
 
         [Required]
         public bool IsPaid { get; set; } = false;
+
+
+        public string? MoMoTransactionId { get; set; }
         public ICollection<ReceiptDetail>? ReceiptDetails { get; set; }
 
         public int? ComboFoodId { get; set; }

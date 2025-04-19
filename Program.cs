@@ -7,6 +7,7 @@ using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
 using school_major_project.Models;
 using school_major_project.ModelServices;
+using school_major_project.PaymentMethods.MoMo.Services;
 using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
@@ -112,7 +113,8 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 ));
 
 builder.Services.AddTransient<IPayPalService, PayPalService>();
-
+builder.Services.AddHttpClient<IMoMoService, MoMoService>();
+builder.Services.AddScoped<IMoMoService, MoMoService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 #endregion

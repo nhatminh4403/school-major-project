@@ -7,6 +7,8 @@ using school_major_project.Extensions;
 using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
 using school_major_project.Models;
+using school_major_project.PaymentMethods.MoMo.Models;
+using school_major_project.PaymentMethods.MoMo.Services;
 using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay;
 using school_major_project.PaymentMethods.VNPay.Services;
@@ -31,10 +33,11 @@ namespace school_major_project.Controllers
         private readonly IPayPalService _payPalService;
         // Session key constants
         private const string CheckoutSessionKey = "CheckoutData";
-
+        private readonly IMoMoService _momoService;
         public PurchaseController(ApplicationDbContext context, SignInManager<User> signInManager, IPromotionRepository promotionRepository,
             UserManager<User> userManager, IFoodRepository foodRepository, IReceiptRepository receiptRepository,
-            IReceiptDetailsRepository receiptDetailsRepository, IVnPayService vnPayService, IPayPalService payPalService) : base(context)
+            IReceiptDetailsRepository receiptDetailsRepository,
+            IVnPayService vnPayService, IPayPalService payPalService,IMoMoService momoService) : base(context)
         {
             _context = context;
             _signInManager = signInManager;
@@ -45,8 +48,9 @@ namespace school_major_project.Controllers
             _receiptDetailsRepository = receiptDetailsRepository;
             _vnPayService = vnPayService;
             _payPalService = payPalService;
+            _momoService = momoService;
         }
-
+        #region Summary
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(string seatSymbol, decimal totalPrice, DateTime startTime, string filmTitle,
@@ -200,6 +204,7 @@ namespace school_major_project.Controllers
         }
 
 
+        #endregion
 
         #region VNPay
         [Route("thanh-toan-vnpay")]
@@ -443,24 +448,232 @@ namespace school_major_project.Controllers
 
         #region MoMo
         [Route("thanh-toan-momo")]
-        public IActionResult ProcessMomoPayment()
+        [HttpGet]
+        public async Task<IActionResult> ProcessMomoPayment()
         {
             // Get checkout data from session
             var checkoutData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>(CheckoutSessionKey);
 
             if (checkoutData == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy thông tin thanh toán. Vui lòng thử lại.";
+                TempData["PaymentFailMessage"] = "Không tìm thấy thông tin thanh toán. Vui lòng thử lại.";
                 return RedirectToAction("Index", "Home");
             }
 
-            // Implement MoMo payment logic here
-            // ...
 
-            TempData["SuccessMessage"] = "Thanh toán MoMo thành công!";
-            HttpContext.Session.Remove(CheckoutSessionKey);
-            return RedirectToAction("History", "User");
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["LoginMessage"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
+                return RedirectToAction("Login", "Account");
+            }
+
+
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            var returnUrl = $"{baseUrl}/thanh-toan/momo-callback";
+            var notifyUrl = $"{baseUrl}/thanh-toan/momo-ipn";
+            var orderId = DateTime.Now.Ticks.ToString(); // Tạo ID đơn hàng duy nhất
+
+            try
+            {
+                // Tạo yêu cầu thanh toán MoMo
+                var momoRequest = new MoMoPaymentRequest
+                {
+                    OrderId = orderId,
+                    Amount = (long)checkoutData.FinalPrice,
+                    OrderInfo = $"Thanh toan ve xem phim cho {user.FullName}",
+                    RedirectUrl = returnUrl,
+                    IpnUrl = notifyUrl,
+                    ExtraData = "",
+                    Lang = "vi",
+                };
+
+                // Lưu thông tin thanh toán vào session để xử lý callback
+                HttpContext.Session.SetObjectAsJson("PendingCheckoutData", checkoutData);
+
+                // Gọi API MoMo và nhận URL thanh toán
+                var momoResponse = await _momoService.CreatePaymentAsync(momoRequest);
+
+                if (momoResponse.ErrorCode == 0) // Nếu tạo URL thành công
+                {
+                    // Chuyển hướng người dùng đến trang thanh toán MoMo
+                    return Redirect(momoResponse.PayUrl);
+                }
+                else
+                {
+                    TempData["PaymentFailMessage"] = $"Lỗi khi tạo thanh toán MoMo: {momoResponse.Message}";
+                    return RedirectToAction("PaymentFail");
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["PaymentFailMessage"] = $"Lỗi khi tạo thanh toán MoMo: {ex.Message}";
+                return RedirectToAction("PaymentFail");
+            }
+
+            
         }
+
+        [HttpGet]
+        [Route("momo-callback")]
+        public async Task<IActionResult> MomoCallback( [FromQuery] string partnerCode, [FromQuery] string orderId, [FromQuery] string requestId,
+                    [FromQuery] long amount, [FromQuery] string orderInfo, [FromQuery] string orderType,
+                    [FromQuery] long transId, [FromQuery] int resultCode, [FromQuery] string message,
+                    [FromQuery] string payType, [FromQuery] string extraData, [FromQuery] string signature, [FromQuery] long responseTime)
+        {
+            // Kiểm tra kết quả từ MoMo
+            if (resultCode != 0)
+            {
+                TempData["PaymentFailMessage"] = $"Lỗi thanh toán MoMo: {message}";
+                return RedirectToAction("PaymentFail");
+            }
+
+            // Lấy lại thông tin từ Session
+            var checkoutData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>("PendingCheckoutData");
+
+            if (checkoutData == null)
+            {
+                TempData["PaymentFailMessage"] = "Không tìm thấy thông tin giao dịch để xác thực.";
+                return RedirectToAction("PaymentFail");
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    // Xác thực signature từ MoMo nếu cần
+                    bool isValidSignature = await _momoService.ValidateSignature(
+                                   partnerCode, requestId, orderId, orderInfo, orderType, transId, message,
+                                   resultCode, payType, amount, extraData, signature, responseTime);
+                    if (!isValidSignature)
+                    {
+                        Console.WriteLine($"[MomoCallback] Signature validation FAILED. {message}");
+                        TempData["PaymentFailMessage"] = "Chữ ký không hợp lệ. Giao dịch có thể bị giả mạo.";
+                        return RedirectToAction("PaymentFail");
+                    }
+
+                    // Xử lý mã giảm giá nếu có
+                    var user = await _userManager.GetUserAsync(User);
+                    if (user == null)
+                    {
+                        TempData["LoginMessage"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
+                        return RedirectToAction("Login", "Account");
+                    }
+
+                    // Xử lý mã giảm giá nếu có
+                    var ckModel = checkoutData.CheckoutModel;
+                    var promotion = await _promotionRepository.GetByCodeAsync(ckModel.PromotionCode);
+
+                    if (promotion != null)
+                    {
+                        var userprmo = await _context.Users.Include(u => u.Promotions)
+                            .Where(p => p.Promotions.Any(p => p.Id == promotion.Id))
+                            .FirstOrDefaultAsync();
+
+                        if (userprmo != null)
+                        {
+                            user.Promotions.Remove(promotion);
+                        }
+                    }
+
+                    // Tính điểm thưởng
+                    var seatIds = ckModel.SelectedSeats.Select(ss => Convert.ToInt32(ss.Id)).ToList();
+
+                    var seats = await _context.Seats
+                        .Include(s => s.SeatType)
+                        .Where(s => seatIds.Contains(s.SeatId))
+                        .ToListAsync();
+                    var totalPoint = calculatePoints(seats);
+                    user.PointSaving += totalPoint;
+                    await _userManager.UpdateAsync(user);
+
+                    // Tạo Receipt
+                    var receipt = new Receipt
+                    {
+                        Date = DateTime.Now,
+                        TotalPrice = (int)checkoutData.FinalPrice,
+                        PaymentType = "MoMo",
+                        ComboFoodId = ParseComboId(checkoutData.CheckoutModel.ComboIdAndPrice),
+                        UserId = checkoutData.UserId,
+                        IsPaid = true,
+                        MoMoTransactionId = transId.ToString() // Lưu ID giao dịch từ MoMo nếu cần
+                    };
+                    await _receiptRepository.AddAsync(receipt);
+
+                    // Tạo ReceiptDetails
+                    foreach (var seat in checkoutData.CheckoutModel.SelectedSeats)
+                    {
+                        var detail = new ReceiptDetail
+                        {
+                            ReceiptId = receipt.Id,
+                            FilmName = checkoutData.CheckoutModel.FilmTitle,
+                            CinemaName = checkoutData.CheckoutModel.CinemaName,
+                            RoomName = checkoutData.CheckoutModel.RoomName,
+                            CinemaAddress = checkoutData.CheckoutModel.CinemaAddress,
+                            StartTime = checkoutData.CheckoutModel.StartTime,
+                            PricePerSeat = (int)seat.Price,
+                            SeatId = Convert.ToInt32(seat.Id),
+                            ScheduleId = checkoutData.CheckoutModel.ScheduleId,
+                            PosterUrl = checkoutData.CheckoutModel.PosterUrl,
+                            SeatName = seat.Symbol
+                        };
+                        await _receiptDetailsRepository.AddAsync(detail);
+                    }
+
+                    // Lưu xuống database
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    // Xóa session sau khi xử lý xong
+                    HttpContext.Session.Remove("PendingCheckoutData");
+
+                    TempData["SuccessMessage"] = "Thanh toán MoMo thành công!";
+                    return RedirectToAction("PaymentSuccess");
+                }
+                catch (Exception ex)
+                {
+                    // Rollback nếu có lỗi
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"[MomoCallback] Error processing transaction: {ex.ToString()}"); // Log chi tiết lỗi
+                    TempData["PaymentFailMessage"] = $"Có lỗi trong quá trình xử lý giao dịch: {ex.Message}";
+                    return RedirectToAction("PaymentFail");
+                }
+            }
+        }
+
+        [HttpPost]
+        [Route("momo-ipn")]
+        public async Task<IActionResult> MomoIPN([FromBody] MomoIPNRequest request)
+        {
+            try
+            {
+                // Xác thực thông tin từ MoMo IPN
+                bool isValid = await _momoService.ValidateIPNRequest(request);
+                if (!isValid)
+                {
+                    return BadRequest(new { RspCode = "99", Message = "Invalid signature" });
+                }
+
+                // Kiểm tra kết quả thanh toán
+                if (request.ResultCode == 0)
+                {
+                    // Xử lý cập nhật trạng thái đơn hàng nếu cần
+                    // Đây là nơi bạn có thể cập nhật trạng thái thanh toán trong database
+
+                    // Trả về kết quả cho MoMo
+                    return Ok(new { RspCode = "00", Message = "Success" });
+                }
+
+                return Ok(new { RspCode = "99", Message = "Payment failed" });
+            }
+            catch (Exception ex)
+            {
+                // Log lỗi
+                return BadRequest(new { RspCode = "99", Message = "Internal server error" });
+            }
+        }
+
+
         #endregion
 
         #region PayPal
@@ -472,7 +685,7 @@ namespace school_major_project.Controllers
 
             if (checkoutData == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy thông tin thanh toán. Vui lòng thử lại.";
+                TempData["PaymentFailMessage"] = "Không tìm thấy thông tin thanh toán. Vui lòng thử lại.";
                 return RedirectToAction("Index", "Home");
             }
 
@@ -501,7 +714,7 @@ namespace school_major_project.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Lỗi khi tạo thanh toán PayPal: {ex.Message}";
+                TempData["PaymentFailMessage"] = $"Lỗi khi tạo thanh toán PayPal: {ex.Message}";
                 return RedirectToAction("Add", new { model = checkoutData.CheckoutModel });
             }
 
@@ -513,7 +726,7 @@ namespace school_major_project.Controllers
         {
             if (string.IsNullOrEmpty(PaymentId) || string.IsNullOrEmpty(PayerID))
             {
-                TempData["ErrorMessage"] = "Thông tin thanh toán không hợp lệ.";
+                TempData["PaymentFailMessage"] = "Thông tin thanh toán không hợp lệ.";
                 return RedirectToAction("PaymentFail");
             }
 
@@ -522,7 +735,7 @@ namespace school_major_project.Controllers
 
             if (checkoutData == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy thông tin giao dịch để xác thực.";
+                TempData["PaymentFailMessage"] = "Không tìm thấy thông tin giao dịch để xác thực.";
                 return RedirectToAction("PaymentFail");
             }
 
@@ -536,7 +749,7 @@ namespace school_major_project.Controllers
                     // Kiểm tra trạng thái thanh toán
                     if (executedPayment.state.ToLower() != "approved")
                     {
-                        TempData["ErrorMessage"] = "Thanh toán không được chấp nhận.";
+                        TempData["PaymentFailMessage"] = "Thanh toán không được chấp nhận.";
                         return RedirectToAction("PaymentFail");
                     }
 
@@ -630,7 +843,7 @@ namespace school_major_project.Controllers
                         Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
                     }
 
-                    TempData["ErrorMessage"] = $"Có lỗi trong quá trình xử lý giao dịch: {ex.Message}";
+                    TempData["PaymentFailMessage"] = $"Có lỗi trong quá trình xử lý giao dịch: {ex.Message}";
                     return RedirectToAction("PaymentFail");
                 }
             }
@@ -640,7 +853,7 @@ namespace school_major_project.Controllers
         [Route("paypal-cancel")]
         public IActionResult PayPalCancel()
         {
-            TempData["Message"] = "Bạn đã hủy thanh toán qua PayPal.";
+            TempData["PaymentFailMessage"] = "Bạn đã hủy thanh toán qua PayPal.";
             return RedirectToAction("PaymentFail");
         }
 

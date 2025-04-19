@@ -1,4 +1,4 @@
-﻿namespace BookingMovieTickets.Extensions
+﻿namespace school_major_project.Extensions
 {
     public class ErrorHandlingMiddleware
     {
