@@ -9,6 +9,9 @@
     <PackageReference Include="Google.Apis" Version="1.69.0" />
     <PackageReference Include="Google.Apis.Core" Version="1.69.0" />
     <PackageReference Include="Google.Cloud.Dialogflow.V2" Version="4.26.0" />
+    <PackageReference Include="itext7" Version="9.1.0" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" Version="9.1.0" />
+    <PackageReference Include="itext7.pdfhtml" Version="6.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
@@ -37,6 +40,7 @@
     <Folder Include="wwwroot\admin\images\blogs\" />
     <Folder Include="wwwroot\admin\images\foods\" />
     <Folder Include="wwwroot\admin\images\seattypes\" />
+    <Folder Include="wwwroot\admin\tickets\" />
     <Folder Include="wwwroot\cards\" />
     <Folder Include="wwwroot\OCR\Tesseract-OCR\tessdata\script\" />
   </ItemGroup>

@@ -18,7 +18,7 @@ namespace school_major_project.ModelServices
         }
         public async Task<Receipt> GetByIdAsync(int id)
         {
-            return await _context.Receipts.Include(p => p.GetUser).Include(p => p.ReceiptDetails).Include(p => p.GetFood).FirstOrDefaultAsync(p => p.Id == id);
+            return await _context.Receipts.Include(p => p.GetUser).Include(p => p.ReceiptDetails).ThenInclude(rd => rd.Seat).Include(p => p.GetFood).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task AddAsync(Receipt receipt)
         {

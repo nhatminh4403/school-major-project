@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 namespace school_major_project.HelperClass
 {
@@ -24,7 +25,20 @@ namespace school_major_project.HelperClass
             result = result.Replace("đ", "d").Replace("Đ", "D");
             return result;
         }
+        public static bool IsNumeric(string value)
+        {
+            return double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _);
+        }
 
+        // Equivalent to capitalizeName (more idiomatic C# naming)
+        public static string Capitalize(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return name; 
+            }
+            return name.ToUpperInvariant();
+        }
     }
 
 }

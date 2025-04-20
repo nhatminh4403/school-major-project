@@ -115,7 +115,7 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 builder.Services.AddTransient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IMoMoService, MoMoService>();
 builder.Services.AddScoped<IMoMoService, MoMoService>();
-// Add services to the container.
+builder.Services.AddScoped<PrintingTicket>(); 
 builder.Services.AddControllersWithViews();
 #endregion
 

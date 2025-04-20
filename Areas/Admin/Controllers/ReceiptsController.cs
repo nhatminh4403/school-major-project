@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
+using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
 using school_major_project.Models;
-using System.Text.Json.Serialization;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace school_major_project.Areas.Admin.Controllers
 {
@@ -17,13 +16,16 @@ namespace school_major_project.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IReceiptRepository _receiptRepository;
-        public ReceiptsController(ApplicationDbContext context, IReceiptRepository receipt)
+        private readonly PrintingTicket _printingTicket;
+
+        public ReceiptsController(ApplicationDbContext context, IReceiptRepository receipt, PrintingTicket printingTicket)
         {
             _context = context;
             _receiptRepository = receipt;
+            _printingTicket = printingTicket;
         }
 
-        // GET: Admin/Receipts
+         
         [Route("")]
         public async Task<IActionResult> Index()
         {
@@ -31,7 +33,7 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(receipts);
         }
 
-        // GET: Admin/Receipts/Details/5
+         
         [Route("chi-tiet/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -46,10 +48,49 @@ namespace school_major_project.Areas.Admin.Controllers
             return Json(new { Receipt = receipt }, new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve,
-                MaxDepth = 64 // Increase if needed
+                MaxDepth = 64  
             });
         }
 
+        [HttpGet]
+        [Route("in-ve/{id}")]
+        public async Task<IActionResult> GenerateTicketPDFs(int id)
+        {
+            try
+            {
+                var receipt = await _receiptRepository.GetByIdAsync(id);
+                if (receipt == null)
+                {
+                    return NotFound($"Booking with ID {id} not found.");
+                }
+
+                string templatePath = "admin/templates/template-ticket.pdf";
+                string outputDir = "admin/tickets";
+
+                List<string> relativeFilePaths = _printingTicket.GeneratePdfs(receipt, templatePath, outputDir);
+
+                 
+                Console.WriteLine($"PDFs generated successfully: {string.Join(", ", relativeFilePaths)}");
+
+                List<string> publicUrls = relativeFilePaths
+                    .Select(relativeFilePath => Url.Content($"~/{relativeFilePath.Replace('\\', '/')}"))
+                    .ToList();
+
+                 
+                Console.WriteLine($"Public URLs generated: {string.Join(", ", publicUrls)}");
+
+                 
+                return Ok(publicUrls);
+            }
+            catch (Exception ex)
+            {
+                 
+                Console.WriteLine($"Error in GenerateTicketPDFs: {ex.ToString()}");
+
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    new { message = $"Error: {ex.Message}" });
+            }
+        }
 
     }
 }
