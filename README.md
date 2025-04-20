@@ -1,6 +1,6 @@
 > English translation below
 
-# BaAnhEm - Website Đặt Vé Xem Phim
+# BaAnhEm - Website Đặt Vé Xem Phim - Hoàn Thiện
 
 ## Tổng quan dự án
 BaAnhEm là website đặt vé xem phim trực tuyến cho phép người dùng duyệt phim, đặt vé và quản lý đặt vé của họ. Dự án này là phiên bản được phát triển lại từ ngôn ngữ Java sang C# ASP.NET.
