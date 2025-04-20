@@ -11,7 +11,7 @@ using school_major_project.PaymentMethods.MoMo.Services;
 using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
-
+using Microsoft.AspNetCore.Authentication.Google;
 var builder = WebApplication.CreateBuilder(args);
 
 #region Builder Configuration
@@ -96,12 +96,16 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login"; // Đường dẫn trang đăng nhập
         options.ReturnUrlParameter = "returnUrl"; // Tên tham số
+    })
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Google:ClientId"];
+        googleOptions.ClientSecret = builder.Configuration["Google:ClientSecret"];
     });
 var emailConfig = builder.Configuration.GetSection("EmailSettings");
 builder.Services.AddSingleton<IEmailService>(new EmailService(
@@ -115,7 +119,9 @@ builder.Services.AddSingleton<IEmailService>(new EmailService(
 builder.Services.AddTransient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IMoMoService, MoMoService>();
 builder.Services.AddScoped<IMoMoService, MoMoService>();
-builder.Services.AddScoped<PrintingTicket>(); 
+builder.Services.AddScoped<PrintingTicket>();
+builder.Services.AddScoped<GoogleQuery>();
+
 builder.Services.AddControllersWithViews();
 #endregion
 

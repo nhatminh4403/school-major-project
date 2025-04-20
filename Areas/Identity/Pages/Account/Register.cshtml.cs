@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using PayPal.Api.OpenIdConnect;
+using school_major_project.GlobalServices;
 using school_major_project.Models;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -27,13 +29,15 @@ namespace school_major_project.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly GoogleQuery _googleQuery;
         public RegisterModel(
             UserManager<User> userManager,
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
             RoleManager<IdentityRole> roleManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            GoogleQuery googleQuery)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -42,6 +46,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
             _logger = logger;
             _roleManager = roleManager;
             _emailSender = emailSender;
+            _googleQuery = googleQuery;
         }
 
         /// <summary>
@@ -119,7 +124,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
         }
 
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null,  string access_token = null)
         {
             if (!_roleManager.RoleExistsAsync(Role.Role_Customer).GetAwaiter().GetResult())
             {
@@ -137,7 +142,35 @@ namespace school_major_project.Areas.Identity.Pages.Account
             };
             returnUrl ??= Url.Content("~/");
             ReturnUrl = returnUrl;
+
+
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            string clientId = _googleQuery.GetClientId(); 
+            ViewData["GoogleClientId"] = clientId;
+            if (!string.IsNullOrEmpty(access_token))
+            {
+                TokenGoogle data = await GoogleQuery.VerifyTokenGoogle(access_token);
+                if (data.error_description == null)
+                {
+                    var user = await _userManager.FindByEmailAsync(data.email);
+                    if (user == null)
+                    {
+                        // Tạo tài khoản mới
+                        var result = await _userManager.CreateAsync(new User { Email = data.email, FullName = data.email, PhoneNumber = data.email });
+                        if (result.Succeeded)
+                            user = await _userManager.FindByEmailAsync(data.email);
+                    }
+
+                    // Đăng nhập người dùng
+                    if (user != null)
+                    {
+                        await _signInManager.SignInAsync(user, false);
+                        return LocalRedirect(returnUrl);
+                    }
+                }
+            }
+            return Page();
+
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)

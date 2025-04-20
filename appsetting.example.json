@@ -36,5 +36,17 @@
     "Locale": "",
     "PaymentBackReturnUrl": ""
   },
+  "MOMO": {
+    "AccessKey": "",
+    "SecretKey": "",
+    "PartnerCode": "",
+    "Language": "vi",
+    "Endpoint": "https://test-payment.momo.vn/v2/gateway/api/create/",//test
+    "RequestType": ""
+  },
+  "Google": {
+    "ClientId": "",
+    "ClientSecret": ""
+  },
   "AllowedHosts": "*"
 }

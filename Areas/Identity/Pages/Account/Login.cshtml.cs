@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PayPal.Api.OpenIdConnect;
+using school_major_project.GlobalServices;
 using school_major_project.Models;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace school_major_project.Areas.Identity.Pages.Account
 {
@@ -15,11 +18,14 @@ namespace school_major_project.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
+        private readonly UserManager<User> _userManager;
+        private readonly GoogleQuery _googleQuery;
+        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger, UserManager<User> userManager, GoogleQuery googleQuery)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _userManager = userManager;
+            _googleQuery = googleQuery;
         }
 
         /// <summary>
@@ -78,7 +84,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
             public bool RememberMe { get; set; }
         }
 
-        public async Task OnGetAsync(string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null, string access_token = null)
         {
             if (!string.IsNullOrEmpty(ErrorMessage))
             {
@@ -93,6 +99,35 @@ namespace school_major_project.Areas.Identity.Pages.Account
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
+
+            string clientId = _googleQuery.GetClientId();
+            ViewData["GoogleClientId"] = clientId;
+
+            if (!string.IsNullOrEmpty(access_token))
+            {
+                TokenGoogle data = await GoogleQuery.VerifyTokenGoogle(access_token);
+                if (data.error_description == null)
+                {
+                    var user = await _userManager.FindByEmailAsync(data.email);
+                    if (user == null)
+                    {
+                        // tạo tài khoản.
+                        var result = await _userManager.CreateAsync(new User { UserName = data.email, Email = data.email, FullName = data.email, PhoneNumber = data.email });
+                        Debug.WriteLine("create user: " + result.Succeeded);
+                        Debug.WriteLine("create user log: " + result.Errors.FirstOrDefault()?.Description);
+                        if (result.Succeeded)
+                            user = await _userManager.FindByEmailAsync(data.email);
+                    }
+
+                    // tạo sesion cho user.
+                    if (user != null)
+                    {
+                        await _signInManager.SignInAsync(user, false);
+                        return LocalRedirect(returnUrl);
+                    }
+                }
+            }
+            return Page();
         }
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
