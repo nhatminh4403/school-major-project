@@ -1,10 +1,9 @@
 ﻿@using school_major_project.Areas.Admin.Data
 @using school_major_project.HelperClass
-@model AccountVM
+@model IEnumerable<AccountVM>
 @{
     ViewData["Title"] = "Quản lý người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    var users = Model.Users;
 }
 
 
@@ -23,7 +22,7 @@
 
                 <div class="col-12">
                     <div class="main__table-wrap">
-                        <table class="main__table">
+                        <table class="main__table" id="account_table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -34,29 +33,70 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var user in users)
+                                @foreach (var user in Model)
                                 {
                                     <tr>
                                         <td>
-                                            <div class="main__table-text">@user.Id</div>
+                                            <div class="main__table-text">@user.User.Id</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text">@user.FullName</div>
+                                            <div class="main__table-text">@user.User.FullName</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text">@user.Email</div>
+                                            <div class="main__table-text">@user.User.Email</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text">@user.PhoneNumber</div>
+                                            @if (user.User.PhoneNumber == null)
+                                            {
+                                                <div class="main__table-text">Chưa cập nhật</div>
+                                            }
+                                            else
+                                            {
+                                                <div class="main__table-text">@user.User.PhoneNumber</div>
+                                            }
                                         </td>
                                         <td>
                                             <div class="main__table-btns">
-                                                <a asp-action="Details" asp-controller="Account" asp-route-name="@user.FullName.RemoveDiacritics()"
+                                                <a asp-action="Details" asp-controller="Account" asp-route-name="@user.User.FullName.RemoveDiacritics()"
                                                    class="main__table-btn main__table-btn--view">
                                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                                                         <path d="M21.92,11.6C19.9,6.91,16.1,4,12,4S4.1,6.91,2.08,11.6a1,1,0,0,0,0,.8C4.1,17.09,7.9,20,12,20s7.9-2.91,9.92-7.6A1,1,0,0,0,21.92,11.6ZM12,18c-3.17,0-6.17-2.29-7.9-6C5.83,8.29,8.83,6,12,6s6.17,2.29,7.9,6C18.17,15.71,15.17,18,12,18ZM12,8a4,4,0,1,0,4,4A4,4,0,0,0,12,8Zm0,6a2,2,0,1,1,2-2A2,2,0,0,1,12,14Z" />
                                                     </svg>
                                                 </a>
+                                                @if (user.User.LockoutEnd.HasValue && user.User.LockoutEnd > DateTimeOffset.UtcNow)
+                                                {
+                                                    <a class="lock-out-time" href="javascript:void(0)" onclick="showLockoutDetails('@user.LockoutEnd')">
+                                                        Vô hiệu hóa đến: @user.User.LockoutEnd.Value.ToString("dd/MM/yyyy HH:mm")
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <button class="main__table-btn main__table-btn--view"
+                                                            onclick="showDisableAccountModal('@user.User.Id')">
+                                                        <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                             viewBox="0 0 330 330" xml:space="preserve">
+                                                        <g id="XMLID_509_">
+                                                        <path id="XMLID_510_" d="M65,330h200c8.284,0,15-6.716,15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85
+		                                                                S80,38.131,80,85v45H65c-8.284,0-15,6.716-15,15v170C50,323.284,56.716,330,65,330z M180,234.986V255c0,8.284-6.716,15-15,15
+		                                                                s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986c0-13.785,11.215-25,25-25s25,11.215,25,25
+		                                                                C190,223.162,186.068,230.421,180,234.986z M110,85c0-30.327,24.673-55,55-55s55,24.673,55,55v45H110V85z" />
+                                                                                              </g>
+                                                                                             </svg>
+                                                    </button>
+                                                }
+
+                                                @* <a asp-action="Details" asp-controller="Account" asp-route-name="@user.User.FullName.RemoveDiacritics()"
+                                                   class="main__table-btn main__table-btn--view">
+                                                    <svg fill="#000000" height="800px" width="800px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                         viewBox="0 0 330 330" xml:space="preserve">
+                                                    <g id="XMLID_509_">
+                                                    <path id="XMLID_510_" d="M65,330h200c8.284,0,15-6.716,15-15V145c0-8.284-6.716-15-15-15h-15V85c0-46.869-38.131-85-85-85
+		                                                                S80,38.131,80,85v45H65c-8.284,0-15,6.716-15,15v170C50,323.284,56.716,330,65,330z M180,234.986V255c0,8.284-6.716,15-15,15
+		                                                                s-15-6.716-15-15v-20.014c-6.068-4.565-10-11.824-10-19.986c0-13.785,11.215-25,25-25s25,11.215,25,25
+		                                                                C190,223.162,186.068,230.421,180,234.986z M110,85c0-30.327,24.673-55,55-55s55,24.673,55,55v45H110V85z" />
+                                                                              </g>
+                                                                             </svg>
+                                                </a> *@
                                             </div>
                                         </td>
                                     </tr>
@@ -74,9 +114,108 @@
 </section>
 
 @section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.min.css" rel="stylesheet">
+
     <style>
         section {
             user-select: none;
         }
+
+        .lock-out-time{
+            text-decoration: none;
+            color: white;
+
+        }
+
+            .lock-out-time:hover {
+                color: #cccccc;
+            }
     </style>
-}                                }
+}
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.3/dist/sweetalert2.all.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#account_table').DataTable();
+        });
+
+        function showLockoutDetails(lockoutEnd) {
+            Swal.fire({
+                title: 'Thông tin vô hiệu hóa',
+                text: 'Tài khoản sẽ được kích hoạt lại vào: ' + new Date(lockoutEnd).toLocaleString(),
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+        }
+
+        function showDisableAccountModal(userId) {
+            Swal.fire({
+                title: 'Chọn thời gian vô hiệu hóa',
+                html: `
+                            <button class="btn btn-primary" onclick="disableAccount('${userId}', 7)">7 ngày</button>
+                            <button class="btn btn-primary" onclick="disableAccount('${userId}', 30)">30 ngày</button>
+                            <button class="btn btn-danger" onclick="disableAccount('${userId}', -1)">Vĩnh viễn</button>
+                            <br><br>
+                            <label><input type="checkbox" id="customDurationCheckbox"> Tùy chọn thời gian vô hiệu hóa</label>
+                            <br><br>
+                            <input type="number" id="customDuration" placeholder="Số ngày" style="display: none;" class="form-control">
+                        `,
+                showCancelButton: true,
+                showConfirmButton: true,
+                preConfirm: () => {
+                    // Collect the custom duration value if the checkbox is checked
+                    let days = $('input[name="customDuration"]').val();
+                    if ($('#customDurationCheckbox').is(':checked')) {
+                        return days;
+                    }
+                    return null;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let customDays = result.value;
+                    if (customDays) {
+                        disableAccount(userId, customDays);
+                    }
+                }
+            });
+
+            $('#customDurationCheckbox').change(function () {
+                if (this.checked) {
+                    $('#customDuration').show();
+                } else {
+                    $('#customDuration').hide();
+                }
+            });
+        }
+
+        function disableAccount(userId, days) {
+            if (days === -1) {
+                days = null; // Vô hiệu hóa vĩnh viễn
+            } else if ($('#customDurationCheckbox').is(':checked')) {
+                days = $('#customDuration').val();
+            }
+
+
+            $.ajax({
+                url: '/admin/nguoi-dung/khoa-tai-khoan',
+                type: 'POST',
+                data: { userId: userId, days: days },
+                success: function (result) {
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Tài khoản đã được vô hiệu hóa.',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload(); // Tải lại trang sau khi nhấp OK
+                        }
+                    });
+                },
+                error: function (error) {
+                    Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi vô hiệu hóa tài khoản.', 'error');
+                }
+            });
+        }
+    </script>
+}

@@ -28,11 +28,18 @@ namespace school_major_project.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
             var users = await _userManager.GetUsersInRoleAsync("Customer");
-            AccountVM accountVM = new AccountVM
+            var customerAccount = new List<AccountVM>();
+            foreach(var user in users)
             {
-                Users = users,
-            };
-            return View(accountVM);
+                var account = new AccountVM
+                {
+                    User = user,
+                    LockoutEnd = user.LockoutEnd
+                };
+                customerAccount.Add(account);
+            }
+
+            return View(customerAccount);
         }
 
         // GET: UserController/Details/5
@@ -41,50 +48,55 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             var users = await _userManager.GetUsersInRoleAsync("Customer");
             var user = users.ToList().FirstOrDefault(u => u.FullName.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
+            if(user == null)
+            {
+                return NotFound();
+            }
             AccountVM accountVM = new AccountVM
             {
-                Users = users,
-                User = user,
+                
+                User = user,LockoutEnd = user.LockoutEnd
             };
             return View(accountVM);
         }
 
-        // GET: UserController/Edit/5
-        [Route("chinh-sua/{id}")]
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
-
-
-        [Route("chinh-sua/{id}")]
+        [Route("khoa-tai-khoan")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> LockAccount(string userId, int? days)
         {
-            try
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
-            catch
+            if (days.HasValue)
             {
-                return View();
+                if (days.Value == -1)
+                {
+                    user.LockoutEnd = DateTimeOffset.MaxValue;
+                }
+                else if (days.Value == 0)  
+                {
+                    user.LockoutEnd = null; 
+                }
+                else
+                {
+                    user.LockoutEnd = DateTimeOffset.UtcNow.AddDays(days.Value);  
+                }
             }
-        }
+            else
+            {
+                user.LockoutEnd = DateTimeOffset.MaxValue;  
+            }
 
-        [HttpPost]
-        [Route("xoa/{id}")]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            user.LockoutEnabled = true;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
             {
-                return RedirectToAction(nameof(Index));
+                return Ok();
             }
-            catch
-            {
-                return View();
-            }
+            return BadRequest("Không thể khóa tài khoản này");
         }
     }
 }
