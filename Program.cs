@@ -1,5 +1,4 @@
-﻿using Google.Api;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.DataAccess;
@@ -11,7 +10,6 @@ using school_major_project.PaymentMethods.MoMo.Services;
 using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
-using Microsoft.AspNetCore.Authentication.Google;
 var builder = WebApplication.CreateBuilder(args);
 
 #region Builder Configuration

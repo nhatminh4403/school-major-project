@@ -14,7 +14,7 @@ namespace school_major_project.ModelServices
         }
         public async Task<IEnumerable<Receipt>> GetAllAsync()
         {
-            return await _context.Receipts.Include(p => p.GetUser).Include(p=>p.ReceiptDetails).Include(p=>p.GetFood).ToListAsync();
+            return await _context.Receipts.Include(p => p.GetUser).Include(p => p.ReceiptDetails).Include(p => p.GetFood).ToListAsync();
         }
         public async Task<Receipt> GetByIdAsync(int id)
         {

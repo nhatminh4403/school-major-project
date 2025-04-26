@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
-using PayPal.Api.OpenIdConnect;
 using school_major_project.GlobalServices;
 using school_major_project.Models;
 using System.ComponentModel;
@@ -124,7 +123,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
         }
 
 
-        public async Task<IActionResult> OnGetAsync(string returnUrl = null,  string access_token = null)
+        public async Task<IActionResult> OnGetAsync(string returnUrl = null, string access_token = null)
         {
             if (!_roleManager.RoleExistsAsync(Role.Role_Customer).GetAwaiter().GetResult())
             {
@@ -145,7 +144,7 @@ namespace school_major_project.Areas.Identity.Pages.Account
 
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            string clientId = _googleQuery.GetClientId(); 
+            string clientId = _googleQuery.GetClientId();
             ViewData["GoogleClientId"] = clientId;
             if (!string.IsNullOrEmpty(access_token))
             {

@@ -76,19 +76,19 @@ namespace school_major_project.PaymentMethods.MoMo.Services
     string partnerCode, string requestId, string orderId, string orderInfo,
     string orderType, long transId, string message,
     int resultCode, string payType, long amount,
-    string extraData, string signatureFromCallback, long responseTime) 
+    string extraData, string signatureFromCallback, long responseTime)
         {
             try
             {
 
-                var rawHash = "accessKey=" + _accessKey + 
+                var rawHash = "accessKey=" + _accessKey +
                               "&amount=" + amount +
                               "&extraData=" + extraData +
                               "&message=" + message +
                               "&orderId=" + orderId +
                               "&orderInfo=" + orderInfo +
                               "&orderType=" + orderType +
-                              "&partnerCode=" + partnerCode + 
+                              "&partnerCode=" + partnerCode +
                               "&payType=" + payType +
                               "&requestId=" + requestId +
                                "&responseTime=" + responseTime +

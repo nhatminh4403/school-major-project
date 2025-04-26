@@ -14,7 +14,6 @@ using school_major_project.PaymentMethods.VNPay;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.ViewModel;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace school_major_project.Controllers
 {
@@ -37,7 +36,7 @@ namespace school_major_project.Controllers
         public PurchaseController(ApplicationDbContext context, SignInManager<User> signInManager, IPromotionRepository promotionRepository,
             UserManager<User> userManager, IFoodRepository foodRepository, IReceiptRepository receiptRepository,
             IReceiptDetailsRepository receiptDetailsRepository,
-            IVnPayService vnPayService, IPayPalService payPalService,IMoMoService momoService) : base(context)
+            IVnPayService vnPayService, IPayPalService payPalService, IMoMoService momoService) : base(context)
         {
             _context = context;
             _signInManager = signInManager;
@@ -511,12 +510,12 @@ namespace school_major_project.Controllers
                 return RedirectToAction("PaymentFail");
             }
 
-            
+
         }
 
         [HttpGet]
         [Route("momo-callback")]
-        public async Task<IActionResult> MomoCallback( [FromQuery] string partnerCode, [FromQuery] string orderId, [FromQuery] string requestId,
+        public async Task<IActionResult> MomoCallback([FromQuery] string partnerCode, [FromQuery] string orderId, [FromQuery] string requestId,
                     [FromQuery] long amount, [FromQuery] string orderInfo, [FromQuery] string orderType,
                     [FromQuery] long transId, [FromQuery] int resultCode, [FromQuery] string message,
                     [FromQuery] string payType, [FromQuery] string extraData, [FromQuery] string signature, [FromQuery] long responseTime)

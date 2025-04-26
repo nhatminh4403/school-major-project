@@ -29,7 +29,7 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             var users = await _userManager.GetUsersInRoleAsync("Customer");
             var customerAccount = new List<AccountVM>();
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 var account = new AccountVM
                 {
@@ -48,14 +48,15 @@ namespace school_major_project.Areas.Admin.Controllers
         {
             var users = await _userManager.GetUsersInRoleAsync("Customer");
             var user = users.ToList().FirstOrDefault(u => u.FullName.RemoveDiacritics().Equals(name, StringComparison.OrdinalIgnoreCase));
-            if(user == null)
+            if (user == null)
             {
                 return NotFound();
             }
             AccountVM accountVM = new AccountVM
             {
-                
-                User = user,LockoutEnd = user.LockoutEnd
+
+                User = user,
+                LockoutEnd = user.LockoutEnd
             };
             return View(accountVM);
         }
@@ -75,18 +76,18 @@ namespace school_major_project.Areas.Admin.Controllers
                 {
                     user.LockoutEnd = DateTimeOffset.MaxValue;
                 }
-                else if (days.Value == 0)  
+                else if (days.Value == 0)
                 {
-                    user.LockoutEnd = null; 
+                    user.LockoutEnd = null;
                 }
                 else
                 {
-                    user.LockoutEnd = DateTimeOffset.UtcNow.AddDays(days.Value);  
+                    user.LockoutEnd = DateTimeOffset.UtcNow.AddDays(days.Value);
                 }
             }
             else
             {
-                user.LockoutEnd = DateTimeOffset.MaxValue;  
+                user.LockoutEnd = DateTimeOffset.MaxValue;
             }
 
             user.LockoutEnabled = true;

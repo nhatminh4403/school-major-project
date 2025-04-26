@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using PayPal.Api.OpenIdConnect;
 using school_major_project.GlobalServices;
 using school_major_project.Models;
 using System.ComponentModel.DataAnnotations;

@@ -35,7 +35,7 @@ namespace school_major_project.HelperClass
         {
             if (string.IsNullOrEmpty(name))
             {
-                return name; 
+                return name;
             }
             return name.ToUpperInvariant();
         }

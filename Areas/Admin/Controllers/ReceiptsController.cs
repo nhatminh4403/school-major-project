@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using school_major_project.DataAccess;
 using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
-using school_major_project.Models;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -25,7 +24,7 @@ namespace school_major_project.Areas.Admin.Controllers
             _printingTicket = printingTicket;
         }
 
-         
+
         [Route("")]
         public async Task<IActionResult> Index()
         {
@@ -33,7 +32,7 @@ namespace school_major_project.Areas.Admin.Controllers
             return View(receipts);
         }
 
-         
+
         [Route("chi-tiet/{id}")]
         public async Task<IActionResult> Details(int id)
         {
@@ -48,7 +47,7 @@ namespace school_major_project.Areas.Admin.Controllers
             return Json(new { Receipt = receipt }, new JsonSerializerOptions
             {
                 ReferenceHandler = ReferenceHandler.Preserve,
-                MaxDepth = 64  
+                MaxDepth = 64
             });
         }
 
@@ -69,22 +68,22 @@ namespace school_major_project.Areas.Admin.Controllers
 
                 List<string> relativeFilePaths = _printingTicket.GeneratePdfs(receipt, templatePath, outputDir);
 
-                 
+
                 Console.WriteLine($"PDFs generated successfully: {string.Join(", ", relativeFilePaths)}");
 
                 List<string> publicUrls = relativeFilePaths
                     .Select(relativeFilePath => Url.Content($"~/{relativeFilePath.Replace('\\', '/')}"))
                     .ToList();
 
-                 
+
                 Console.WriteLine($"Public URLs generated: {string.Join(", ", publicUrls)}");
 
-                 
+
                 return Ok(publicUrls);
             }
             catch (Exception ex)
             {
-                 
+
                 Console.WriteLine($"Error in GenerateTicketPDFs: {ex.ToString()}");
 
                 return StatusCode(StatusCodes.Status500InternalServerError,

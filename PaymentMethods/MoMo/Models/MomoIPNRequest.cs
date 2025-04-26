@@ -15,7 +15,7 @@
         public long ResponseTime { get; set; }
         public string ExtraData { get; set; }
         public string Signature { get; set; }
-        public string IpnUrl { get; set; } 
+        public string IpnUrl { get; set; }
     }
 
 }

@@ -1,23 +1,18 @@
-﻿using iText.Barcodes;
-using iText.Forms;
+﻿using iText.Forms;
 using iText.Forms.Fields;
 using iText.IO.Font;
 using iText.IO.Font.Constants;
 using iText.IO.Image;
 using iText.Kernel.Colors;
 using iText.Kernel.Font;
-using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Canvas;
-using iText.Kernel.Pdf.Xobject;
-using Microsoft.IdentityModel.Tokens;
 using school_major_project.HelperClass;
 using school_major_project.Models;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Text.RegularExpressions;
-using ZXing.Common;
 using ZXing;
+using ZXing.Common;
 
 namespace school_major_project.GlobalServices
 {
@@ -33,26 +28,26 @@ namespace school_major_project.GlobalServices
 
         public PrintingTicket(IWebHostEnvironment hostingEnvironment)
         {
-            _hostingEnvironment = hostingEnvironment;  
+            _hostingEnvironment = hostingEnvironment;
         }
 
 
         private byte[] BitmapToByteArray(Bitmap image)
         {
             using var ms = new MemoryStream();
-             
+
             image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
             return ms.ToArray();
         }
 
         private string GenerateSerialNumber(string seatSymbol)
         {
-             
+
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-             
+
             string timeComponent = (timestamp % 10000).ToString("D4");
 
-             
+
             string cleanedSeatSymbol = System.Text.RegularExpressions.Regex.Replace(seatSymbol, "[^A-Za-z0-9]", "");
             string seatComponent;
             if (cleanedSeatSymbol.Length >= 2)
@@ -64,29 +59,29 @@ namespace school_major_project.GlobalServices
                 seatComponent = cleanedSeatSymbol.PadLeft(2, '0');
             }
 
-             
+
             string randomComponent = _random.Next(0, 100).ToString("D2");
 
-             
+
             return $"{timeComponent}-{seatComponent}-{randomComponent}";
         }
         private string GetAbsolutePath(string relativePath)
         {
-             
-             
+
+
             if (relativePath.StartsWith("/"))
             {
                 relativePath = relativePath.Substring(1);
             }
-             
-             
+
+
             return System.IO.Path.Combine(_hostingEnvironment.WebRootPath, relativePath);
-             
-             
+
+
         }
         private PdfFont LoadFont(PdfDocument document)
         {
-             
+
             string montserratPathRelative = "admin/fonts/Montserrat/Montserrat-Regular.otf";
             string montserratPathAbsolute = GetAbsolutePath(montserratPathRelative);
 
@@ -95,7 +90,7 @@ namespace school_major_project.GlobalServices
                 if (File.Exists(montserratPathAbsolute))
                 {
                     Console.WriteLine("Montserrat font found");
-                     
+
                     return PdfFontFactory.CreateFont(montserratPathAbsolute, PdfEncodings.IDENTITY_H, PdfFontFactory.EmbeddingStrategy.PREFER_EMBEDDED);
                 }
                 Console.WriteLine($"Montserrat font not found at: {montserratPathAbsolute}");
@@ -103,10 +98,10 @@ namespace school_major_project.GlobalServices
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading Montserrat font: {ex.Message}");
-                 
+
             }
 
-             
+
             string robotoPathRelative = "admin/fonts/RobotoSlab/static/RobotoSlab-Regular.ttf";
             string robotoPathAbsolute = GetAbsolutePath(robotoPathRelative);
             try
@@ -121,10 +116,10 @@ namespace school_major_project.GlobalServices
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading RobotoSlab font: {ex.Message}");
-                 
+
             }
 
-             
+
             string timesPathRelative = "admin/fonts/Times New Roman/times new roman.ttf";
             string timesPathAbsolute = GetAbsolutePath(timesPathRelative);
             try
@@ -149,21 +144,21 @@ namespace school_major_project.GlobalServices
             foreach (var fieldName in acroForm.GetAllFormFields().Keys)
             {
                 PdfFormField field = acroForm.GetField(fieldName);
-                if (field != null)  
+                if (field != null)
                 {
-                     
-                     
-                    field.SetFont(font).SetFontSize(12);  
 
-                     
-                     
 
-                     
+                    field.SetFont(font).SetFontSize(12);
+
+
+
+
+
                     field.SetColor(ColorConstants.BLACK);
                 }
             }
-             
-             
+
+
         }
         public byte[] FillPdf(string templatePathAbsolute, Receipt receipt, ReceiptDetail detail)
         {
@@ -197,7 +192,7 @@ namespace school_major_project.GlobalServices
                     {
                         byte[] barcodeBytes = BitmapToByteArray(barcodeBitmap);
                         ImageData barcodeImageData = ImageDataFactory.Create(barcodeBytes);
-                         
+
                         PdfPage page = document.GetPage(1);
                         iText.Kernel.Geom.Rectangle pageSize = page.GetPageSize();
                         float x = pageSize.GetRight() - BARCODE_WIDTH - MARGIN;
@@ -205,7 +200,7 @@ namespace school_major_project.GlobalServices
                         float imageY = y + TEXT_MARGIN + FONT_SIZE;
                         PdfCanvas canvas = new PdfCanvas(page);
                         canvas.AddImageFittedIntoRectangle(barcodeImageData, new iText.Kernel.Geom.Rectangle(x, imageY, BARCODE_WIDTH, BARCODE_HEIGHT), false);
-                         
+
                         PdfFont textFont = PdfFontFactory.CreateFont(StandardFonts.COURIER);
                         float textWidth = textFont.GetWidth(serialNumber, FONT_SIZE);
                         float textX = x + (BARCODE_WIDTH - textWidth) / 2;
@@ -215,22 +210,22 @@ namespace school_major_project.GlobalServices
                 }
                 else
                 {
-                   Console.WriteLine("Seat symbol is missing for ReceiptDetail ID: {ReceiptDetailId}. Skipping barcode generation.", detail.Id);
+                    Console.WriteLine("Seat symbol is missing for ReceiptDetail ID: {ReceiptDetailId}. Skipping barcode generation.", detail.Id);
                 }
 
 
-                 
+
                 FillFormFields(acroForm, receipt, detail, customFont);
 
-            }  
+            }
 
             return outputMemoryStream.ToArray();
 
         }
 
-           
 
-        
+
+
 
         private string SeparateRoomName(string roomName)
         {
@@ -238,17 +233,17 @@ namespace school_major_project.GlobalServices
             string[] firstPartOfName = roomName.Split('-');
             if (firstPartOfName.Length == 0) return "";
             string[] getRoomNumberParts = firstPartOfName[0].Trim().Split(' ');
-             
+
             return getRoomNumberParts.LastOrDefault(StringHelper.IsNumeric) ?? "N/A";
         }
 
         private void FillFormFields(PdfAcroForm acroForm, Receipt receipt, ReceiptDetail detail, PdfFont font)
         {
-             
+
             SetField(acroForm, "movie_name", StringHelper.Capitalize(StringHelper.RemoveDiacritics(detail.FilmName)), font);
             SetField(acroForm, "location1", StringHelper.Capitalize(StringHelper.RemoveDiacritics(detail.CinemaName)), font);
             SetField(acroForm, "location2", StringHelper.Capitalize(StringHelper.RemoveDiacritics(detail.CinemaName)), font);
-            SetField(acroForm, "theatre_name", "BA ANH EM", font);  
+            SetField(acroForm, "theatre_name", "BA ANH EM", font);
             SetField(acroForm, "ticket_id1", detail.Id.ToString(), font);
             SetField(acroForm, "ticket_id2", detail.Id.ToString(), font);
 
@@ -261,7 +256,7 @@ namespace school_major_project.GlobalServices
             SetField(acroForm, "room2", roomNumber, font);
 
 
-             
+
             string formattedDate = detail.StartTime?.ToString("dd-MM-yyyy HH:mm") ?? string.Empty;
             SetField(acroForm, "date_booked1", formattedDate, font);
             SetField(acroForm, "date_booked2", formattedDate, font);
@@ -271,7 +266,7 @@ namespace school_major_project.GlobalServices
 
         }
 
-         
+
         private void SetField(PdfAcroForm acroForm, string fieldName, string value, PdfFont font)
         {
             PdfFormField field = acroForm.GetField(fieldName);
@@ -287,15 +282,15 @@ namespace school_major_project.GlobalServices
             }
         }
 
-         
+
         public List<string> GeneratePdfs(Receipt receipt, string templatePathRelative, string outputDirectoryRelative)
         {
             List<string> pdfFilePaths = new List<string>();
-            string templatePathAbsolute = GetAbsolutePath(templatePathRelative); 
+            string templatePathAbsolute = GetAbsolutePath(templatePathRelative);
             string outputDirAbsolute = GetAbsolutePath(outputDirectoryRelative);
 
             if (!File.Exists(templatePathAbsolute))
-            { 
+            {
                 throw new FileNotFoundException("Ticket template PDF not found.", templatePathAbsolute);
             }
             if (!Directory.Exists(outputDirAbsolute)) { try { Directory.CreateDirectory(outputDirAbsolute); } catch (Exception ex) { /* ... log error and throw ... */ throw new IOException($"Could not create output directory: {outputDirAbsolute}", ex); } }
@@ -303,14 +298,14 @@ namespace school_major_project.GlobalServices
 
             try
             {
-                 
+
 
                 if (receipt.ReceiptDetails == null || !receipt.ReceiptDetails.Any())
                 { /* ... log warning, return empty list ... */
                     return pdfFilePaths;
                 }
 
-                 
+
                 foreach (ReceiptDetail detail in receipt.ReceiptDetails)
                 {
                     if (detail.Seat == null || string.IsNullOrEmpty(detail.SeatName))
@@ -319,16 +314,16 @@ namespace school_major_project.GlobalServices
                     }
 
 
-                     
+
                     byte[] pdfBytes = FillPdf(templatePathAbsolute, receipt, detail);
 
-                     
+
                     string timestamp = DateTime.Now.ToString("ddMMyyyy_HHmmss");
                     string safeSeatSymbol = System.Text.RegularExpressions.Regex.Replace(detail.SeatName, "[^A-Za-z0-9_-]", "_");
                     string fileName = $"ticket_{receipt.Id}_{safeSeatSymbol}_{timestamp}.pdf";
                     string filePathAbsolute = System.IO.Path.Combine(outputDirAbsolute, fileName);
 
-                    File.WriteAllBytes(filePathAbsolute, pdfBytes);  
+                    File.WriteAllBytes(filePathAbsolute, pdfBytes);
 
                     string relativeFilePath = System.IO.Path.Combine(outputDirectoryRelative, fileName).Replace('\\', '/');
                     pdfFilePaths.Add(relativeFilePath);

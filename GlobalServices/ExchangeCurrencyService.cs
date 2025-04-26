@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-
-namespace school_major_project.GlobalServices
+﻿namespace school_major_project.GlobalServices
 {
     public static class ExchangeCurrencyService
     {
-        private const string ApiUrl = "https://api.exchangerate-api.com/v4/latest/USD"; // Replace with your API URL
+        private const string ApiUrl = "https://api.exchangerate-api.com/v4/latest/USD";
 
-        private const string FromCurrency = "VND"; 
+        private const string FromCurrency = "VND";
         private const string ToCurrency = "USD";
         public static async Task<decimal> ConvertCurrency(long amount)
         {
@@ -17,7 +15,7 @@ namespace school_major_project.GlobalServices
                 {
                     ExchangeRates exchangeRates = await httpClient.GetFromJsonAsync<ExchangeRates>(ApiUrl);
 
-                    if(exchangeRates == null || !exchangeRates.Rates.ContainsKey(ToCurrency))
+                    if (exchangeRates == null || !exchangeRates.Rates.ContainsKey(ToCurrency))
                     {
                         throw new Exception("Invalid currency code");
                     }
@@ -33,11 +31,9 @@ namespace school_major_project.GlobalServices
             }
         }
 
-        private  class ExchangeRates
+        private class ExchangeRates
         {
-            public  Dictionary<string, decimal> Rates { get; set; }
+            public Dictionary<string, decimal> Rates { get; set; }
         }
-
-
     }
 }
