@@ -2,12 +2,8 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ISeatTypeRepository
+    public interface ISeatTypeRepository : IModelRepository<SeatType>
     {
-        Task<IEnumerable<SeatType>> GetAllSeatTypeAsync();
-        Task<SeatType> GetByIdAsync(int id);
-        Task AddAsync(SeatType seat);
-        Task UpdateAsync(SeatType seat);
-        Task DeleteAsync(int id);
+
     }
 }

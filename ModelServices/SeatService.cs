@@ -14,7 +14,7 @@ namespace school_major_project.ModelServices
         {
             _context = context;
         }
-        public async Task<IEnumerable<Seat>> GetAllSeatAsync()
+        public async Task<IEnumerable<Seat>> GetAllAsync()
         {
             return await _context.Seats.Include(p => p.SeatType).ToListAsync();
         }

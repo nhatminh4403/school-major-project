@@ -54,7 +54,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("tao-moi")]
         public async Task<IActionResult> Create()
         {
-            var rooms = await _roomRepository.GetAllRoomAsync();
+            var rooms = await _roomRepository.GetAllAsync();
             var films = await _filmRepository.GetAllAsync();
             var viewModel = new AddingScheduleVM();
 
@@ -72,7 +72,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("tao-moi-tu-phim/{filmId}")]
         public async Task<IActionResult> CreateFromFilm(int filmId)
         {
-            var rooms = await _roomRepository.GetAllRoomAsync();
+            var rooms = await _roomRepository.GetAllAsync();
             var films = await _filmRepository.GetAllAsync();
             var viewModel = new AddingScheduleVM();
 
@@ -104,7 +104,7 @@ namespace school_major_project.Areas.Admin.Controllers
             {
                 ViewData["Title"] = "Tạo Lịch Chiếu Mới";
 
-                var rooms = await _roomRepository.GetAllRoomAsync();
+                var rooms = await _roomRepository.GetAllAsync();
                 var films = await _filmRepository.GetAllAsync();
 
                 viewModel.RoomList = new SelectList(rooms.Select(r => new

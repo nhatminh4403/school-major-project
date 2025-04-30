@@ -2,13 +2,8 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IFilmRepository
+    public interface IFilmRepository : IModelRepository<Film>
     {
-        Task<IEnumerable<Film>> GetAllAsync();
-        Task<Film> GetByIdAsync(int id);
-        Task AddAsync(Film film);
-        Task UpdateAsync(Film film);
-        Task DeleteAsync(int id);
 
         Task<Film> GetByName(string name);
         Task<List<string>> GetActorsListByFilmId(int filmId);

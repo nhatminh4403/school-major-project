@@ -11,7 +11,6 @@ namespace school_major_project.Controllers
     [AllowAnonymous]
     public class ChatbotController : Controller
     {
-        //private const string _googleProjectId = "movie-vaqw";
         private readonly string _googleProjectId;
         private readonly string _languageCode;
         private readonly SessionsClient _sessionsClient;
@@ -36,7 +35,6 @@ namespace school_major_project.Controllers
             {
 
                 _languageCode = "en-US";
-                Console.WriteLine("Warning: Dialogflow Language Code ('Dialogflow:LanguageCode') not found in appsettings.json. Defaulting to 'en-US'.");
             }
             if (string.IsNullOrEmpty(relativeCredentialsPath))
             {
@@ -59,12 +57,9 @@ namespace school_major_project.Controllers
                 var credentials = GoogleCredential.FromFile(absoluteCredentialPath)
                                       .CreateScoped(SessionsClient.DefaultScopes);
                 _sessionsClient = new SessionsClientBuilder { Credential = credentials }.Build();
-                Console.WriteLine($"Dialogflow SessionsClient initialized successfully for project '{_googleProjectId}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"FATAL ERROR: Failed to initialize Dialogflow SessionsClient: {ex.Message}");
-
                 throw new InvalidOperationException("Failed to initialize Dialogflow client. Check credentials and configuration.", ex);
             }
         }
@@ -94,7 +89,6 @@ namespace school_major_project.Controllers
                 QueryInput queryInput;
                 if (!string.IsNullOrWhiteSpace(request.EventName))
                 {
-                    Console.WriteLine($"Processing EVENT: {request.EventName} for session: {request.SessionId}");
                     queryInput = new QueryInput
                     {
                         Event = new EventInput
@@ -106,7 +100,6 @@ namespace school_major_project.Controllers
                 }
                 else
                 {
-                    Console.WriteLine($"Processing TEXT: '{request.Message}' for session: {request.SessionId}");
                     queryInput = new QueryInput
                     {
                         Text = new TextInput
@@ -124,12 +117,10 @@ namespace school_major_project.Controllers
                 };
 
                 DetectIntentResponse response = await _sessionsClient.DetectIntentAsync(detectIntentRequest);
-                Console.WriteLine($"DetectIntent successful. Intent: {response.QueryResult?.Intent?.DisplayName}");
 
                 List<string> botReplies = new List<string>();
                 if (response.QueryResult?.FulfillmentMessages != null && response.QueryResult.FulfillmentMessages.Any())
                 {
-                    Console.WriteLine($"Found {response.QueryResult.FulfillmentMessages.Count} fulfillment messages.");
                     foreach (var msg in response.QueryResult.FulfillmentMessages)
                     {
                         if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Text)
@@ -137,7 +128,6 @@ namespace school_major_project.Controllers
                             var texts = msg.Text.Text_.Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
                             if (texts.Any())
                             {
-                                Console.WriteLine($"Adding text message(s): {string.Join(" | ", texts)}");
                                 botReplies.AddRange(texts);
                             }
                         }
@@ -145,11 +135,11 @@ namespace school_major_project.Controllers
                 }
                 else
                 {
-                    Console.WriteLine("No structured FulfillmentMessages found.");
+                    botReplies.Add("No structured FulfillmentMessages found. " +
+                        "Please check your Dialogflow intent configuration.");
                 }
                 if (!botReplies.Any() && !string.IsNullOrWhiteSpace(response.QueryResult?.FulfillmentText))
                 {
-                    Console.WriteLine($"Using FulfillmentText fallback: '{response.QueryResult.FulfillmentText}'");
                     botReplies.Add(response.QueryResult.FulfillmentText);
                 }
 
@@ -158,16 +148,11 @@ namespace school_major_project.Controllers
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("------ DIALOGFLOW SENDMESSAGE ERROR ------");
-                Console.Error.WriteLine($"Timestamp: {DateTime.UtcNow}");
-                Console.Error.WriteLine($"SessionId: {request?.SessionId}");
-                Console.Error.WriteLine($"Exception Type: {ex.GetType().FullName}");
-                Console.Error.WriteLine($"Message: {ex.Message}");
+                
                 Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
-                if (ex.InnerException != null)
-                    Console.Error.WriteLine("------ END DIALOGFLOW SENDMESSAGE ERROR ------");
 
-                return StatusCode(500, new { replies = new List<string> { "Xin lỗi, tôi gặp lỗi nội bộ khi xử lý yêu cầu." } });
+                return StatusCode(500, new { replies = new List<string>
+                { "Xin lỗi, tôi gặp lỗi nội bộ khi xử lý yêu cầu." } });
             }
         }
 

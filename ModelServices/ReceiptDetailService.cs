@@ -30,5 +30,19 @@ namespace school_major_project.ModelServices
             await _context.ReceiptDetails.AddAsync(receiptDetail);
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateAsync(ReceiptDetail receiptDetail)
+        {
+            _context.ReceiptDetails.Update(receiptDetail);
+            await _context.SaveChangesAsync();
+        }
+        public async Task DeleteAsync(int id)
+        {
+            var receiptDetail = await GetByIdAsync(id);
+            if (receiptDetail != null)
+            {
+                _context.ReceiptDetails.Remove(receiptDetail);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

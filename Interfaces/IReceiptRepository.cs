@@ -2,13 +2,9 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IReceiptRepository
+    public interface IReceiptRepository : IModelRepository<Receipt>
     {
-        Task<IEnumerable<Receipt>> GetAllAsync();
-        Task<Receipt> GetByIdAsync(int id);
-        Task AddAsync(Receipt receipt);
-        Task UpdateAsync(Receipt receipt);
-        Task DeleteAsync(int id);
+
 
         Task<IEnumerable<Receipt>> GetByUserIdAsync(string userId);
     }

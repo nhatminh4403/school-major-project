@@ -35,7 +35,7 @@ namespace school_major_project.Areas.Admin.Controllers
         [Route("")]
         public async Task<IActionResult> Index(string sortOrder)
         {
-            var rooms = await _roomRepository.GetAllRoomAsync();
+            var rooms = await _roomRepository.GetAllAsync();
 
             rooms = sortOrder switch
             {

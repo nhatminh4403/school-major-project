@@ -2,12 +2,8 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface ICountryRepository
+    public interface ICountryRepository : IModelRepository<Country>
     {
-        Task<IEnumerable<Country>> GetAllAsync();
-        Task<Country> GetByIdAsync(int id);
-        Task AddAsync(Country filmCategory);
-        Task UpdateAsync(Country filmCategory);
-        Task DeleteAsync(int id);
+
     }
 }

@@ -12,7 +12,7 @@ namespace school_major_project.ModelServices
         {
             _context = context;
         }
-        public async Task<IEnumerable<SeatType>> GetAllSeatTypeAsync()
+        public async Task<IEnumerable<SeatType>> GetAllAsync()
         {
             return await _context.SeatTypes.Include(p => p.Seats).ToListAsync();
         }

@@ -12,7 +12,7 @@ namespace school_major_project.ModelServices
         {
             _context = context;
         }
-        public async Task<IEnumerable<Room>> GetAllRoomAsync()
+        public async Task<IEnumerable<Room>> GetAllAsync()
         {
             return await _context.Rooms.Include(p => p.Cinema).Include(p => p.Schedules).ToListAsync();
         }

@@ -33,7 +33,7 @@ namespace school_major_project.Areas.Admin.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var types = await _seatTypeRepository.GetAllSeatTypeAsync();
+            var types = await _seatTypeRepository.GetAllAsync();
             return View(types);
         }
 

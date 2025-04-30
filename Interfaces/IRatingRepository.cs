@@ -2,13 +2,9 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IRatingRepository
+    public interface IRatingRepository : IModelRepository<Rating>
     {
-        Task<IEnumerable<Rating>> GetAllAsync();
-        Task<Rating> GetByIdAsync(int id);
-        Task AddAsync(Rating rating);
-        Task UpdateAsync(Rating rating);
-        Task DeleteAsync(int id);
+
         Task<bool> HasUserRated(string userId, int filmId);
     }
 }

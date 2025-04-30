@@ -2,13 +2,9 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IModelRepository<Room>
     {
-        Task<IEnumerable<Room>> GetAllRoomAsync();
-        Task<Room> GetByIdAsync(int id);
-        Task AddAsync(Room theatreRoom);
-        Task UpdateAsync(Room theatreRoom);
-        Task DeleteAsync(int id);
+
         Task<Room> GetByScheduleIdAsync(int id);
     }
 }

@@ -223,23 +223,26 @@
                         <div class="pagination-area text-center">
                             @if (Model.CurrentPage > 1)
                             {
-                                <a href="javascript:void(0)"
-                                   onclick="goToPage(@(Model.CurrentPage - 1))"
-                                   class="prev-next">Previous</a>
+                                <a asp-controller="Films"
+                                   asp-action="FilmsByCountry"
+                                   asp-route-page="@(Model.CurrentPage - 1)"
+                                   class="prev-next">Trang trước</a>
                             }
 
                             @for (int i = startPage; i <= endPage; i++)
                             {
-                                <a href="javascript:void(0)"
-                                   onclick="goToPage(@i)"
+                                <a asp-controller="Films"
+                                   asp-action="FilmsByCountry"
+                                   asp-route-page="@i"
                                    class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
                             }
 
                             @if (Model.CurrentPage < Model.TotalPages)
                             {
-                                <a href="javascript:void(0)"
-                                   onclick="goToPage(@(Model.CurrentPage + 1))"
-                                   class="prev-next">Next</a>
+                                <a asp-controller="Films"
+                                   asp-action="FilmsByCountry"
+                                   asp-route-page="@(Model.CurrentPage + 1)"
+                                   class="prev-next">Trang tiếp theo</a>
                             }
                         </div>
 

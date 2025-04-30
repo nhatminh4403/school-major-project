@@ -2,12 +2,10 @@
 
 namespace school_major_project.Interfaces
 {
-    public interface IReceiptDetailsRepository
+    public interface IReceiptDetailsRepository : IModelRepository<ReceiptDetail>
     {
-        Task<IEnumerable<ReceiptDetail>> GetAllAsync();
-        Task<ReceiptDetail> GetByIdAsync(int id);
+
         Task<IEnumerable<ReceiptDetail>> FindByScheduleId(int scheduleId);
 
-        Task AddAsync(ReceiptDetail receiptDetail);
     }
 }
