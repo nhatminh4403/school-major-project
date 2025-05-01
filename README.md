@@ -194,12 +194,44 @@ cd school_major_project
 ## Project Structure
 ```
 school_major_project/
+├── Areas/
+│   ├── Admin/
+│   │   ├── Controllers/
+│   │   ├── Data/
+│   │   ├── HelperClasses/
+│   │   ├── Models/
+│   │   └── Views/
+│   └── Identity/
+│       └── Pages/
+│           └── Account/
+│               ├── _ValidationScriptsPartial.cshtml
+│               ├── _ViewImports.cshtml
+│               └── _ViewStart.cshtml
 ├── Controllers/
+├── Credentials/
+├── DataAccess/
+├── DTO/
+├── Extensions/
+├── GlobalServices/
+├── HelperClass/
+├── Interfaces/
+├── Migrations/
 ├── Models/
+├── ModelServices/
+├── PaymentMethods/
+├── ViewComponents/
+├── ViewModel/
 ├── Views/
-├── Services/
-├── Data/
-└── wwwroot/
+├── wwwroot/
+├── x64/
+├── x86/
+├── .gitattributes
+├── .gitignore
+├── appsettings.example.json
+├── appsettings.json
+├── Program.cs
+└── README.md
+
 ```
 
 ## Contributing
