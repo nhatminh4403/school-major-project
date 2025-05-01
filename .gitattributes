@@ -2,10 +2,22 @@
 # Set default behavior to automatically normalize line endings.
 ###############################################################################
 * text=auto
-*.html linguist-detectable=false
+###############################################################################
+# Linguist settings to detect C# as main language
+###############################################################################
 *.cs linguist-detectable=true
-**/wwwroot/libs/** linguist-vendored
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+*.json linguist-detectable=false
+*.ts linguist-detectable=false
 
+# Ignore libraries and static assets
+wwwroot/libs/** linguist-vendored
+node_modules/** linguist-vendored
+bin/** linguist-vendored
+obj/** linguist-vendored
+migrations/** linguist-generated
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
