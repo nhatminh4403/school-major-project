@@ -697,15 +697,13 @@ namespace school_major_project.Controllers
                 decimal totalPriceUSD = await ExchangeCurrencyService.ConvertCurrency((long)checkoutData.FinalPrice);
                 totalPriceUSD = Math.Round(totalPriceUSD, 2);
 
-                // Tạo thanh toán PayPal và lấy URL chuyển hướng
                 var paymentUrl = _payPalService.CreatePayment(
                     totalPriceUSD,
-                    "USD", // PayPal yêu cầu mã tiền tệ phải là USD hoặc các loại tiền tệ được hỗ trợ
+                    "USD", 
                     returnUrl,
                     cancelUrl
                 );
 
-                // Lưu thông tin thanh toán vào session để xử lý callback
                 HttpContext.Session.SetObjectAsJson("PendingCheckoutData", checkoutData);
 
                 // Chuyển hướng người dùng đến trang thanh toán PayPal

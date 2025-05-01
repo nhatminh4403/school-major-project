@@ -1,11 +1,20 @@
 ﻿namespace school_major_project.GlobalServices
 {
-    public static class ExchangeCurrencyService
+    public sealed class ExchangeCurrencyService
     {
-        private const string ApiUrl = "https://api.exchangerate-api.com/v4/latest/USD";
+        private static readonly Lazy<ExchangeCurrencyService> _instance =
+      new Lazy<ExchangeCurrencyService>(() => new ExchangeCurrencyService());
 
+        private static readonly HttpClient _httpClient = new HttpClient();
+        private const string ApiUrl = "https://api.exchangerate-api.com/v4/latest/USD";
         private const string FromCurrency = "VND";
         private const string ToCurrency = "USD";
+
+        private ExchangeCurrencyService() { }
+
+        public static ExchangeCurrencyService Instance => _instance.Value;
+
+
         public static async Task<decimal> ConvertCurrency(long amount)
         {
 

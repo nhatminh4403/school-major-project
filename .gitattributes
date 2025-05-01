@@ -63,3 +63,4 @@
 #*.RTF   diff=astextplain
 *.html linguist-detectable=false
 *.cs linguist-detectable=true
+**/wwwroot/libs/** linguist-vendored
