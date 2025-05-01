@@ -174,4 +174,4 @@ school_major_project/
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Contact
-Your Name - nhatminh4403@gmail.com
+Phạm Trần Nhật Minh - nhatminh4403@gmail.com
