@@ -85,7 +85,7 @@ school_major_project/
 Mọi đóng góp đều được hoan nghênh! Hãy tự nhiên tạo Pull Request.
 
 ## Liên hệ
-Tên của bạn - nhatminh4403@gmail.com
+Phạm Trần Nhật Minh - nhatminh4403@gmail.com
 
 ---
 
@@ -94,7 +94,7 @@ Tên của bạn - nhatminh4403@gmail.com
 ## Project Overview
 BaAnhEm is a movie ticket booking website that allows users to browse movies, book tickets, and manage their bookings online. This project is a C# ASP.NET implementation of a previously developed Java-based project.
 
-> **Note:** This project is currently under development
+> **Note:** This project is finished
 
 ## Reference Project
 This project is a C# ASP.NET implementation based on the original Java project - a school major project that I contributed to and implemented. You can find the original project here:
