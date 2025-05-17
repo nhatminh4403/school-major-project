@@ -30,7 +30,6 @@ namespace school_major_project.HelperClass
             return double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _);
         }
 
-        // Equivalent to capitalizeName (more idiomatic C# naming)
         public static string Capitalize(string name)
         {
             if (string.IsNullOrEmpty(name))
