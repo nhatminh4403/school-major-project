@@ -7,7 +7,7 @@ namespace school_major_project.Controllers
 {
     public class OCRController : Controller
     {
-        private readonly string _tesseractDataPath = @"E:\C#\project\school-major-project\wwwroot\OCR\Tesseract-OCR\tessdata";
+        private readonly string _tesseractDataPath = @"E:\Csharp\project\school-major-project\wwwroot\OCR\Tesseract-OCR\tessdata";
         [HttpPost]
         public IActionResult ExtractStudentInfo(IFormFile file)
         {
