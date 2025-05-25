@@ -7,7 +7,7 @@
 ###############################################################################
 *.cs linguist-detectable=true
 *.html linguist-detectable=false
-*.css linguist-detectable=false
+*.css linguist-detectable=true
 *.js linguist-detectable=false
 *.json linguist-detectable=false
 *.ts linguist-detectable=false
