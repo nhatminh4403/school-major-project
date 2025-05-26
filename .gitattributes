@@ -10,7 +10,7 @@
 *.js linguist-detectable=true
 *.json linguist-detectable=false
 *.ts linguist-detectable=false
-
+*.html linguist-generated
 # Ignore libraries and static assets
 wwwroot/libs/** linguist-vendored
 node_modules/** linguist-vendored
