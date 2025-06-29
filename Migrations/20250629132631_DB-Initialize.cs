@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace school_major_project.Migrations
 {
     /// <inheritdoc />
-    public partial class dbInit : Migration
+    public partial class DBInitialize : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -356,8 +357,9 @@ namespace school_major_project.Migrations
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalPrice = table.Column<int>(type: "int", nullable: false),
                     PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SeatName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ComboFoodId = table.Column<int>(type: "int", nullable: false),
+                    IsPaid = table.Column<bool>(type: "bit", nullable: false),
+                    MoMoTransactionId = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ComboFoodId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
@@ -373,8 +375,7 @@ namespace school_major_project.Migrations
                         name: "FK_Receipts_Foods_ComboFoodId",
                         column: x => x.ComboFoodId,
                         principalTable: "Foods",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -519,9 +520,11 @@ namespace school_major_project.Migrations
                     FilmName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CinemaName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoomName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PosterUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CinemaAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PricePerSeat = table.Column<int>(type: "int", nullable: false),
+                    SeatName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ReceiptId = table.Column<int>(type: "int", nullable: false),
                     SeatId = table.Column<int>(type: "int", nullable: false),
                     ScheduleId = table.Column<int>(type: "int", nullable: false)

@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.AspNetCore.Http;
 namespace school_major_project.PaymentMethods.VNPay.Services
 {
     public interface IVnPayService

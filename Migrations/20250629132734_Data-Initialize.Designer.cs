@@ -12,15 +12,15 @@ using school_major_project.DataAccess;
 namespace school_major_project.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250407085522_dbInit")]
-    partial class dbInit
+    [Migration("20250629132734_Data-Initialize")]
+    partial class DataInitialize
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -466,17 +466,19 @@ namespace school_major_project.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ComboFoodId")
+                    b.Property<int?>("ComboFoodId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("PaymentType")
-                        .IsRequired()
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MoMoTransactionId")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("SeatName")
+                    b.Property<string>("PaymentType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -516,6 +518,10 @@ namespace school_major_project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PosterUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("PricePerSeat")
                         .HasColumnType("int");
 
@@ -531,6 +537,10 @@ namespace school_major_project.Migrations
 
                     b.Property<int>("SeatId")
                         .HasColumnType("int");
+
+                    b.Property<string>("SeatName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -877,9 +887,7 @@ namespace school_major_project.Migrations
                 {
                     b.HasOne("school_major_project.Models.Food", "GetFood")
                         .WithMany("Receipt")
-                        .HasForeignKey("ComboFoodId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ComboFoodId");
 
                     b.HasOne("school_major_project.Models.User", "GetUser")
                         .WithMany("Receipts")
