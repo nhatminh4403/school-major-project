@@ -10,7 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
             case 'warning': backgroundColor = "linear-gradient(to right, #ffc371, #ff5f6d)"; break;
             case 'info': default: backgroundColor = "linear-gradient(to right, #007bff, #0056b3)"; break;
         }
-        Toastify({ text: message, duration: 3000, close: true, gravity: "top", position: "right", stopOnFocus: true, style: { background: backgroundColor } }).showToast();
+        Toastify({
+            text: message, duration: 3000, close: true, gravity: "top", position: "right", stopOnFocus: true, style: { background: backgroundColor }
+        }).showToast();
     }
 
     // Hàm tạo HTML cho card phòng chiếu mới
@@ -25,6 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     <div class="room-card-info">
                         <i class="fas fa-chair"></i>
                         <span>Số ghế: ${roomData.seats ? roomData.seats.length : 0}</span>
+                    </div>
+                    <div class="room-card-info">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>Điện thoại: ${roomData.phone || 'Chưa cập nhật'}</span>
                     </div>
                     <div class="room-card-status ${roomData.isActive ? 'active' : 'inactive'}">
                         <i class="fas ${roomData.isActive ? 'fa-check-circle' : 'fa-times-circle'}"></i>
@@ -126,50 +132,50 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 body: formData
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    showToast("Thêm phòng mới thành công!", 'success');
-                    
-                    // Tạo card phòng mới và thêm vào grid
-                    const roomsGrid = document.querySelector(`#tab-${cinemaId} .rooms-grid`);
-                    if (roomsGrid) {
-                        // Nếu chưa có phòng nào, xóa thông báo "Chưa có phòng chiếu nào"
-                        const emptyMessage = document.querySelector(`#tab-${cinemaId} .rooms-empty`);
-                        if (emptyMessage) {
-                            emptyMessage.remove();
-                        }
-                        
-                        // Thêm card phòng mới vào đầu grid
-                        roomsGrid.insertAdjacentHTML('afterbegin', createRoomCardHtml(data.room));
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                } else {
-                    showToast(data.message || "Có lỗi xảy ra khi thêm phòng mới.", 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast("Có lỗi xảy ra khi thêm phòng mới.", 'error');
-            })
-            .finally(() => {
-                this.disabled = false;
-                this.innerHTML = originalButtonText;
-            });
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showToast("Thêm phòng mới thành công!", 'success');
+
+                        // Tạo card phòng mới và thêm vào grid
+                        const roomsGrid = document.querySelector(`#tab-${cinemaId} .rooms-grid`);
+                        if (roomsGrid) {
+                            // Nếu chưa có phòng nào, xóa thông báo "Chưa có phòng chiếu nào"
+                            const emptyMessage = document.querySelector(`#tab-${cinemaId} .rooms-empty`);
+                            if (emptyMessage) {
+                                emptyMessage.remove();
+                            }
+
+                            // Thêm card phòng mới vào đầu grid
+                            roomsGrid.insertAdjacentHTML('afterbegin', createRoomCardHtml(data.room));
+                        }
+                    } else {
+                        showToast(data.message || "Có lỗi xảy ra khi thêm phòng mới.", 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast("Có lỗi xảy ra khi thêm phòng mới.", 'error');
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = originalButtonText;
+                });
         });
     });
 
     // Xử lý xóa phòng chiếu
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (event.target.closest('.room-card-actions .delete')) {
             event.preventDefault();
             const deleteLink = event.target.closest('.room-card-actions .delete');
             const roomId = deleteLink.getAttribute('data-room-id');
-            
+
             if (roomId) {
                 // Hiển thị modal xác nhận xóa
                 const modalId = `#modal-delete-room-${roomId}`;
@@ -182,12 +188,12 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Xử lý xóa rạp phim
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (event.target.closest('.cinema-details-delete')) {
             event.preventDefault();
             const deleteLink = event.target.closest('.cinema-details-delete');
             const modalId = deleteLink.getAttribute('data-target');
-            
+
             if (modalId) {
                 $(modalId).modal('show');
             }

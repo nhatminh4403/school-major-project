@@ -72,8 +72,8 @@ namespace school_major_project.Controllers
                 Film = film,
                 Room = room,
                 Cinema = room.Cinema,
-                CinemaAddress = room.Cinema.Location,
-                CinemaName = room.Cinema.Name,
+                CinemaAddress = room.Cinema.CinemaAddress,
+                CinemaName = room.Cinema.CinemaName,
                 RoomName = room.Name,
                 SelectedScheduleId = scheduleId,
                 SelectedRoomId = room.Id

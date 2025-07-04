@@ -209,8 +209,6 @@ namespace school_major_project.Controllers
                     { EncodeHintType.CHARACTER_SET, "UTF-8" }
                 };
 
-
-
                 bitMatrix = qRCodeWriter.encode(
                     $"BOOKING-{qrData}",
                     BarcodeFormat.QR_CODE,

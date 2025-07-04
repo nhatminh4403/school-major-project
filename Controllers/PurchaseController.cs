@@ -14,6 +14,7 @@ using school_major_project.PaymentMethods.VNPay;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.ViewModel;
 using System.Text.Json;
+using school_major_project.HelperClass;
 
 namespace school_major_project.Controllers
 {
@@ -30,13 +31,15 @@ namespace school_major_project.Controllers
         private readonly IReceiptDetailsRepository _receiptDetailsRepository;
         private readonly IVnPayService _vnPayService;
         private readonly IPayPalService _payPalService;
+        private readonly IMoMoService _momoService;
+        private readonly IEmailService _emailService;
+        private readonly ITicketService _ticketService;
         // Session key constants
         private const string CheckoutSessionKey = "CheckoutData";
-        private readonly IMoMoService _momoService;
         public PurchaseController(ApplicationDbContext context, SignInManager<User> signInManager, IPromotionRepository promotionRepository,
             UserManager<User> userManager, IFoodRepository foodRepository, IReceiptRepository receiptRepository,
             IReceiptDetailsRepository receiptDetailsRepository,
-            IVnPayService vnPayService, IPayPalService payPalService, IMoMoService momoService) : base(context)
+            IVnPayService vnPayService, IPayPalService payPalService, IMoMoService momoService, IEmailService emailService, ITicketService ticketService) : base(context)
         {
             _context = context;
             _signInManager = signInManager;
@@ -48,6 +51,8 @@ namespace school_major_project.Controllers
             _vnPayService = vnPayService;
             _payPalService = payPalService;
             _momoService = momoService;
+            _emailService = emailService;
+            _ticketService = ticketService;
         }
         #region Summary
         [HttpPost]
@@ -56,7 +61,6 @@ namespace school_major_project.Controllers
                                                 string poster, List<string> category, string cinemaName,
                                                 string cinemaAddress, string roomName, int scheduleId)
         {
-            // --- Deserialize Seats (same as before) ---
             List<SelectedSeatInfo> selectedSeatsList = new List<SelectedSeatInfo>();
             if (!string.IsNullOrEmpty(seatSymbol))
             {
@@ -82,7 +86,6 @@ namespace school_major_project.Controllers
 
             if (!string.IsNullOrEmpty(userId))
             {
-                // Eagerly load the Promotions navigation property
                 var currentUser = await _context.Users
                                           .Include(u => u.Promotions)
                                           .FirstOrDefaultAsync(u => u.Id == userId);
@@ -99,7 +102,6 @@ namespace school_major_project.Controllers
             }
 
             var comboFoods = await _foodRepository.GetAllAsync();
-            // --- Create ViewModel ---
             var checkoutViewModel = new CheckoutSummaryVM
             {
                 SelectedSeats = selectedSeatsList,
@@ -128,7 +130,6 @@ namespace school_major_project.Controllers
                 return View("Add", model);
             }
 
-            // 1. Lấy user hiện tại
             var userId = _userManager.GetUserId(User);
             if (userId == null)
             {
@@ -136,10 +137,8 @@ namespace school_major_project.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // 2. Tính giá cuối cùng (discount + combo)
             decimal finalPrice = CalculateFinalPrice(model);
 
-            // Store checkout data in session
             var checkoutData = new CheckoutSessionData
             {
                 CheckoutModel = model,
@@ -152,38 +151,8 @@ namespace school_major_project.Controllers
             switch (model.PaymentMethod.ToLower())
             {
                 case "cash":
-
-                    var checkoutSessionData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>(CheckoutSessionKey);
-                    var ckModel = checkoutSessionData.CheckoutModel;
-                    var promotion = await _promotionRepository.GetByCodeAsync(ckModel.PromotionCode);
-                    var user = await _userManager.GetUserAsync(User);
-                    var seatIds = ckModel.SelectedSeats.Select(ss => Convert.ToInt32(ss.Id)).ToList();
-
-                    var seats = await _context.Seats
-                        .Include(s => s.SeatType)
-                        .Where(s => seatIds.Contains(s.SeatId))
-                        .ToListAsync();
-
-                    if (user == null)
-                    {
-                        TempData["LoginMessage"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
-                        return RedirectToAction("Login", "Account");
-                    }
-                    if (promotion != null)
-                    {
-                        var userprmo = await _context.Users.Include(u => u.Promotions).Where(p => p.Promotions.Any(p => p.Id == promotion.Id)).FirstOrDefaultAsync();
-                        if (userprmo != null)
-                        {
-                            user.Promotions.Remove(promotion);
-
-                        }
-                    }
-
-                    // Tính điểm thưởng
-                    var totalPoint = calculatePoints(seats);
-                    user.PointSaving += totalPoint;
-                    await _userManager.UpdateAsync(user);
-                    await SaveReceiptAsync(model, finalPrice, userId);
+                    var receipt = await _ticketService.CreateReceiptAndDetailsAsync(model, finalPrice, userId);
+                    await _ticketService.SendTicketEmailAsync(await _userManager.GetUserAsync(User), receipt, model, finalPrice);
                     TempData["PaymentSuccessMessage"] = "Đặt vé thành công! Vui lòng thanh toán tại quầy.";
                     return RedirectToAction("PaymentSuccess", "Purchase");
 
@@ -209,7 +178,6 @@ namespace school_major_project.Controllers
         [Route("thanh-toan-vnpay")]
         public async Task<IActionResult> ProcessVNPayPayment()
         {
-            // Get checkout data from session
             var checkoutData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>(CheckoutSessionKey);
 
             if (checkoutData == null)
@@ -220,7 +188,6 @@ namespace school_major_project.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
-            // Tạo thông tin cho thanh toán VNPay, nhưng CHƯA lưu vào database
             var vnPayModel = new VnPaymentRequestModel
             {
                 Price = (double)checkoutData.FinalPrice,
@@ -230,10 +197,8 @@ namespace school_major_project.Controllers
                 OrderId = new Random().Next(1000, 10000)
             };
 
-            // Lưu thông tin vào session để sử dụng sau khi VNPay callback
             HttpContext.Session.SetObjectAsJson("PendingCheckoutData", checkoutData);
 
-            // Tạo URL thanh toán VNPay
             var paymentUrl = _vnPayService.CreatePaymentUrl(HttpContext, vnPayModel);
 
             return Redirect(paymentUrl);
@@ -250,7 +215,6 @@ namespace school_major_project.Controllers
                 return RedirectToAction("PaymentFail");
             }
 
-            // Lấy lại thông tin từ Session
             var checkoutData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>("PendingCheckoutData");
 
             if (checkoutData == null)
@@ -263,7 +227,6 @@ namespace school_major_project.Controllers
             {
                 try
                 {
-                    // Xử lý mã giảm giá nếu có
                     var user = await _userManager.GetUserAsync(User);
                     if (user == null)
                     {
@@ -271,71 +234,12 @@ namespace school_major_project.Controllers
                         return RedirectToAction("Login", "Account");
                     }
 
-                    // Xử lý mã giảm giá nếu có
                     var ckModel = checkoutData.CheckoutModel;
-                    var promotion = await _promotionRepository.GetByCodeAsync(ckModel.PromotionCode);
+                    var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
+                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
 
-                    if (promotion != null)
-                    {
-                        var userprmo = await _context.Users.Include(u => u.Promotions)
-                            .Where(p => p.Promotions.Any(p => p.Id == promotion.Id))
-                            .FirstOrDefaultAsync();
-
-                        if (userprmo != null)
-                        {
-                            user.Promotions.Remove(promotion);
-                        }
-                    }
-
-                    // Tính điểm thưởng
-                    var seatIds = ckModel.SelectedSeats.Select(ss => Convert.ToInt32(ss.Id)).ToList();
-
-                    var seats = await _context.Seats
-                        .Include(s => s.SeatType)
-                        .Where(s => seatIds.Contains(s.SeatId))
-                        .ToListAsync();
-                    var totalPoint = calculatePoints(seats);
-                    user.PointSaving += totalPoint;
-                    await _userManager.UpdateAsync(user);
-
-
-                    // Tạo Receipt
-                    var receipt = new Receipt
-                    {
-                        Date = DateTime.Now,
-                        TotalPrice = (int)checkoutData.FinalPrice,
-                        PaymentType = "VNPay",
-                        ComboFoodId = ParseComboId(checkoutData.CheckoutModel.ComboIdAndPrice),
-                        UserId = checkoutData.UserId,
-                        IsPaid = true // Đánh dấu đã thanh toán vì đã nhận được xác nhận từ VNPay
-                    };
-                    await _receiptRepository.AddAsync(receipt);
-
-                    // Tạo ReceiptDetails
-                    foreach (var seat in checkoutData.CheckoutModel.SelectedSeats)
-                    {
-                        var detail = new ReceiptDetail
-                        {
-                            ReceiptId = receipt.Id,
-                            FilmName = checkoutData.CheckoutModel.FilmTitle,
-                            CinemaName = checkoutData.CheckoutModel.CinemaName,
-                            RoomName = checkoutData.CheckoutModel.RoomName,
-                            CinemaAddress = checkoutData.CheckoutModel.CinemaAddress,
-                            StartTime = checkoutData.CheckoutModel.StartTime,
-                            PricePerSeat = (int)seat.Price,
-                            SeatId = Convert.ToInt32(seat.Id),
-                            ScheduleId = checkoutData.CheckoutModel.ScheduleId,
-                            PosterUrl = checkoutData.CheckoutModel.PosterUrl,
-                            SeatName = seat.Symbol
-                        };
-                        await _receiptDetailsRepository.AddAsync(detail);
-                    }
-
-                    // Lưu xuống database
-                    await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    // Xóa session sau khi xử lý xong
                     HttpContext.Session.Remove("PendingCheckoutData");
 
                     TempData["SuccessMessage"] = "Thanh toán VNPay thành công!";
@@ -343,9 +247,7 @@ namespace school_major_project.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Rollback nếu có lỗi
                     await transaction.RollbackAsync();
-                    // TODO: Log chi tiết lỗi ở đây
                     TempData["ErrorMessage"] = "Có lỗi trong quá trình xử lý giao dịch.";
                     return RedirectToAction("PaymentFail");
                 }
@@ -354,7 +256,6 @@ namespace school_major_project.Controllers
         #endregion
 
         #region Other Helper Methods
-        // Hàm chung tính giá sau giảm giá & combo
         private decimal CalculateFinalPrice(CheckoutSummaryVM model)
         {
             decimal price = model.TotalPrice;
@@ -371,10 +272,8 @@ namespace school_major_project.Controllers
             return price;
         }
 
-        // Hàm chung lưu Receipt + ReceiptDetails - now returns the created receipt
         private async Task<Receipt> SaveReceiptAsync(CheckoutSummaryVM model, decimal finalPrice, string userId)
         {
-            // Tạo Receipt
             var receipt = new Receipt
             {
                 Date = DateTime.Now,
@@ -382,11 +281,10 @@ namespace school_major_project.Controllers
                 PaymentType = model.PaymentMethod,
                 ComboFoodId = ParseComboId(model.ComboIdAndPrice),
                 UserId = userId,
-                IsPaid = model.PaymentMethod != "Cash" // Chỉ đánh dấu đã thanh toán nếu không phải thanh toán tiền mặt
+                IsPaid = model.PaymentMethod != "Cash" 
             };
             await _receiptRepository.AddAsync(receipt);
 
-            // Tạo ReceiptDetails
             foreach (var seat in model.SelectedSeats)
             {
                 var detail = new ReceiptDetail
@@ -419,7 +317,6 @@ namespace school_major_project.Controllers
         }
         private long calculatePoints(List<Seat> seats)
         {
-            // Giả sử mỗi ghế có 10 điểm
             long totalPoint = 0L;
             foreach (var seat in seats)
             {
@@ -520,14 +417,12 @@ namespace school_major_project.Controllers
                     [FromQuery] long transId, [FromQuery] int resultCode, [FromQuery] string message,
                     [FromQuery] string payType, [FromQuery] string extraData, [FromQuery] string signature, [FromQuery] long responseTime)
         {
-            // Kiểm tra kết quả từ MoMo
             if (resultCode != 0)
             {
                 TempData["PaymentFailMessage"] = $"Lỗi thanh toán MoMo: {message}";
                 return RedirectToAction("PaymentFail");
             }
 
-            // Lấy lại thông tin từ Session
             var checkoutData = HttpContext.Session.GetObjectFromJson<CheckoutSessionData>("PendingCheckoutData");
 
             if (checkoutData == null)
@@ -540,7 +435,6 @@ namespace school_major_project.Controllers
             {
                 try
                 {
-                    // Xác thực signature từ MoMo nếu cần
                     bool isValidSignature = await _momoService.ValidateSignature(
                                    partnerCode, requestId, orderId, orderInfo, orderType, transId, message,
                                    resultCode, payType, amount, extraData, signature, responseTime);
@@ -551,7 +445,6 @@ namespace school_major_project.Controllers
                         return RedirectToAction("PaymentFail");
                     }
 
-                    // Xử lý mã giảm giá nếu có
                     var user = await _userManager.GetUserAsync(User);
                     if (user == null)
                     {
@@ -559,71 +452,12 @@ namespace school_major_project.Controllers
                         return RedirectToAction("Login", "Account");
                     }
 
-                    // Xử lý mã giảm giá nếu có
                     var ckModel = checkoutData.CheckoutModel;
-                    var promotion = await _promotionRepository.GetByCodeAsync(ckModel.PromotionCode);
+                    var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
+                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
 
-                    if (promotion != null)
-                    {
-                        var userprmo = await _context.Users.Include(u => u.Promotions)
-                            .Where(p => p.Promotions.Any(p => p.Id == promotion.Id))
-                            .FirstOrDefaultAsync();
-
-                        if (userprmo != null)
-                        {
-                            user.Promotions.Remove(promotion);
-                        }
-                    }
-
-                    // Tính điểm thưởng
-                    var seatIds = ckModel.SelectedSeats.Select(ss => Convert.ToInt32(ss.Id)).ToList();
-
-                    var seats = await _context.Seats
-                        .Include(s => s.SeatType)
-                        .Where(s => seatIds.Contains(s.SeatId))
-                        .ToListAsync();
-                    var totalPoint = calculatePoints(seats);
-                    user.PointSaving += totalPoint;
-                    await _userManager.UpdateAsync(user);
-
-                    // Tạo Receipt
-                    var receipt = new Receipt
-                    {
-                        Date = DateTime.Now,
-                        TotalPrice = (int)checkoutData.FinalPrice,
-                        PaymentType = "MoMo",
-                        ComboFoodId = ParseComboId(checkoutData.CheckoutModel.ComboIdAndPrice),
-                        UserId = checkoutData.UserId,
-                        IsPaid = true,
-                        MoMoTransactionId = transId.ToString() // Lưu ID giao dịch từ MoMo nếu cần
-                    };
-                    await _receiptRepository.AddAsync(receipt);
-
-                    // Tạo ReceiptDetails
-                    foreach (var seat in checkoutData.CheckoutModel.SelectedSeats)
-                    {
-                        var detail = new ReceiptDetail
-                        {
-                            ReceiptId = receipt.Id,
-                            FilmName = checkoutData.CheckoutModel.FilmTitle,
-                            CinemaName = checkoutData.CheckoutModel.CinemaName,
-                            RoomName = checkoutData.CheckoutModel.RoomName,
-                            CinemaAddress = checkoutData.CheckoutModel.CinemaAddress,
-                            StartTime = checkoutData.CheckoutModel.StartTime,
-                            PricePerSeat = (int)seat.Price,
-                            SeatId = Convert.ToInt32(seat.Id),
-                            ScheduleId = checkoutData.CheckoutModel.ScheduleId,
-                            PosterUrl = checkoutData.CheckoutModel.PosterUrl,
-                            SeatName = seat.Symbol
-                        };
-                        await _receiptDetailsRepository.AddAsync(detail);
-                    }
-
-                    // Lưu xuống database
-                    await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    // Xóa session sau khi xử lý xong
                     HttpContext.Session.Remove("PendingCheckoutData");
 
                     TempData["SuccessMessage"] = "Thanh toán MoMo thành công!";
@@ -631,9 +465,8 @@ namespace school_major_project.Controllers
                 }
                 catch (Exception ex)
                 {
-                    // Rollback nếu có lỗi
                     await transaction.RollbackAsync();
-                    Console.WriteLine($"[MomoCallback] Error processing transaction: {ex.ToString()}"); // Log chi tiết lỗi
+                    Console.WriteLine($"[MomoCallback] Error processing transaction: {ex.ToString()}"); 
                     TempData["PaymentFailMessage"] = $"Có lỗi trong quá trình xử lý giao dịch: {ex.Message}";
                     return RedirectToAction("PaymentFail");
                 }
@@ -646,20 +479,15 @@ namespace school_major_project.Controllers
         {
             try
             {
-                // Xác thực thông tin từ MoMo IPN
                 bool isValid = await _momoService.ValidateIPNRequest(request);
                 if (!isValid)
                 {
                     return BadRequest(new { RspCode = "99", Message = "Invalid signature" });
                 }
 
-                // Kiểm tra kết quả thanh toán
                 if (request.ResultCode == 0)
                 {
-                    // Xử lý cập nhật trạng thái đơn hàng nếu cần
-                    // Đây là nơi bạn có thể cập nhật trạng thái thanh toán trong database
 
-                    // Trả về kết quả cho MoMo
                     return Ok(new { RspCode = "00", Message = "Success" });
                 }
 
@@ -667,7 +495,6 @@ namespace school_major_project.Controllers
             }
             catch (Exception ex)
             {
-                // Log lỗi
                 return BadRequest(new { RspCode = "99", Message = "Internal server error" });
             }
         }
@@ -750,7 +577,6 @@ namespace school_major_project.Controllers
                         return RedirectToAction("PaymentFail");
                     }
 
-                    // Xử lý mã giảm giá nếu có
                     var user = await _userManager.GetUserAsync(User);
                     if (user == null)
                     {
@@ -758,70 +584,12 @@ namespace school_major_project.Controllers
                         return RedirectToAction("Login", "Account");
                     }
 
-                    // Xử lý mã giảm giá nếu có
                     var ckModel = checkoutData.CheckoutModel;
-                    var promotion = await _promotionRepository.GetByCodeAsync(ckModel.PromotionCode);
+                    var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
+                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
 
-                    if (promotion != null)
-                    {
-                        var userprmo = await _context.Users.Include(u => u.Promotions)
-                            .Where(p => p.Promotions.Any(p => p.Id == promotion.Id))
-                            .FirstOrDefaultAsync();
-
-                        if (userprmo != null)
-                        {
-                            user.Promotions.Remove(promotion);
-                        }
-                    }
-
-                    // Tính điểm thưởng
-                    var seatIds = ckModel.SelectedSeats.Select(ss => Convert.ToInt32(ss.Id)).ToList();
-
-                    var seats = await _context.Seats
-                        .Include(s => s.SeatType)
-                        .Where(s => seatIds.Contains(s.SeatId))
-                        .ToListAsync();
-                    var totalPoint = calculatePoints(seats);
-                    user.PointSaving += totalPoint;
-                    await _userManager.UpdateAsync(user);
-
-                    // Tạo Receipt
-                    var receipt = new Receipt
-                    {
-                        Date = DateTime.Now,
-                        TotalPrice = (int)checkoutData.FinalPrice,
-                        PaymentType = "PayPal",
-                        ComboFoodId = ParseComboId(checkoutData.CheckoutModel.ComboIdAndPrice),
-                        UserId = checkoutData.UserId,
-                        IsPaid = true
-                    };
-                    await _receiptRepository.AddAsync(receipt);
-
-                    // Tạo ReceiptDetails
-                    foreach (var seat in checkoutData.CheckoutModel.SelectedSeats)
-                    {
-                        var detail = new ReceiptDetail
-                        {
-                            ReceiptId = receipt.Id,
-                            FilmName = checkoutData.CheckoutModel.FilmTitle,
-                            CinemaName = checkoutData.CheckoutModel.CinemaName,
-                            RoomName = checkoutData.CheckoutModel.RoomName,
-                            CinemaAddress = checkoutData.CheckoutModel.CinemaAddress,
-                            StartTime = checkoutData.CheckoutModel.StartTime,
-                            PricePerSeat = (int)seat.Price,
-                            SeatId = Convert.ToInt32(seat.Id),
-                            ScheduleId = checkoutData.CheckoutModel.ScheduleId,
-                            PosterUrl = checkoutData.CheckoutModel.PosterUrl,
-                            SeatName = seat.Symbol
-                        };
-                        await _receiptDetailsRepository.AddAsync(detail);
-                    }
-
-                    // Lưu xuống database
-                    await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    // Xóa session sau khi xử lý xong
                     HttpContext.Session.Remove("PendingCheckoutData");
 
                     TempData["SuccessMessage"] = "Thanh toán PayPal thành công!";
@@ -874,7 +642,6 @@ namespace school_major_project.Controllers
 
     }
 
-    // Class to store checkout data in session
     public class CheckoutSessionData
     {
         public CheckoutSummaryVM CheckoutModel { get; set; }

@@ -36,7 +36,7 @@ namespace school_major_project.GlobalServices
         {
             using var ms = new MemoryStream();
 
-            image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+            image.Save(ms, ImageFormat.Png);
             return ms.ToArray();
         }
 

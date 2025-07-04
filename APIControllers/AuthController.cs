@@ -44,7 +44,7 @@ namespace school_major_project.APIControllers
     }
     public class LoginViewModel
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+        public string? Username { get; set; }
+        public string? Password { get; set; }
     }
 }

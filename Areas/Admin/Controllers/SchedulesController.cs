@@ -61,7 +61,7 @@ namespace school_major_project.Areas.Admin.Controllers
             viewModel.RoomList = new SelectList(rooms.Select(r => new
             {
                 r.Id,
-                DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+                DisplayText = $"{(r.Cinema != null ? r.Cinema.CinemaName : "N/A")} - {r.Name}"
             }), "Id", "DisplayText");
 
             viewModel.FilmList = new SelectList(films, "Id", "Name");
@@ -79,7 +79,7 @@ namespace school_major_project.Areas.Admin.Controllers
             viewModel.RoomList = new SelectList(rooms.Select(r => new
             {
                 r.Id,
-                DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+                DisplayText = $"{(r.Cinema != null ? r.Cinema.CinemaName : "N/A")} - {r.Name}"
             }), "Id", "DisplayText");
 
             viewModel.FilmList = new SelectList(films, "Id", "Name", filmId);
@@ -110,7 +110,7 @@ namespace school_major_project.Areas.Admin.Controllers
                 viewModel.RoomList = new SelectList(rooms.Select(r => new
                 {
                     r.Id,
-                    DisplayText = $"{(r.Cinema != null ? r.Cinema.Name : "N/A")} - {r.Name}"
+                    DisplayText = $"{(r.Cinema != null ? r.Cinema.CinemaName : "N/A")} - {r.Name}"
                 }), "Id", "DisplayText", viewModel.Schedule.RoomId);
 
                 viewModel.FilmList = new SelectList(films, "Id", "Name", viewModel.Schedule.FilmId);

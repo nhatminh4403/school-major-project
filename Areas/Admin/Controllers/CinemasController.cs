@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Type;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using school_major_project.Areas.Admin.Data;
@@ -80,8 +81,9 @@ namespace school_major_project.Areas.Admin.Controllers
                 return Json(new
                 {
                     id = cinema.Id,
-                    name = cinema.Name,
-                    address = cinema.Location,
+                    name = cinema.CinemaName,
+                    address = cinema.CinemaAddress,
+                    PhoneNumber = cinema.CinemaPhoneNumber,
                     map = cinema.Map
                 });
             }
@@ -142,9 +144,10 @@ namespace school_major_project.Areas.Admin.Controllers
                 try
                 {
                     var currentCinema = await _cinemaRepository.GetByIdAsync(id);
-                    currentCinema.Location = cinema.Location;
+                    currentCinema.CinemaAddress = cinema.CinemaAddress;
                     currentCinema.Map = cinema.Map;
-                    currentCinema.Name = cinema.Name;
+                    currentCinema.CinemaName = cinema.CinemaName;
+                    currentCinema.CinemaPhoneNumber = cinema.CinemaPhoneNumber;
                     await _cinemaRepository.UpdateAsync(currentCinema);
 
                 }

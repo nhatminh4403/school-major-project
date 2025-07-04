@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using school_major_project.Configuration;
 using school_major_project.DataAccess;
 using school_major_project.GlobalServices;
 using school_major_project.Interfaces;
@@ -11,7 +13,6 @@ using school_major_project.PaymentMethods.MoMo.Services;
 using school_major_project.PaymentMethods.PayPal;
 using school_major_project.PaymentMethods.VNPay.Services;
 using school_major_project.Services;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -121,14 +122,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-var emailConfig = builder.Configuration.GetSection("EmailSettings");
-builder.Services.AddSingleton<IEmailService>(new EmailService(
-    emailConfig["SmtpServer"],
-    int.Parse(emailConfig["SmtpPort"]),
-    emailConfig["FromEmail"],
-    emailConfig["Username"],
-    emailConfig["Password"]
-));
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddTransient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IMoMoService, MoMoService>();
@@ -136,6 +131,8 @@ builder.Services.AddScoped<IMoMoService, MoMoService>();
 builder.Services.AddScoped<PrintingTicket>();
 builder.Services.AddScoped<GoogleQuery>();
 builder.Services.AddScoped<JwtTokenService>();
+
+builder.Services.AddScoped<school_major_project.Interfaces.ITicketService, school_major_project.ModelServices.TicketService>();
 
 builder.Services.AddControllersWithViews();
 

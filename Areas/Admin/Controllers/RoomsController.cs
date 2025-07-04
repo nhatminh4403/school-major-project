@@ -232,9 +232,9 @@ namespace school_major_project.Areas.Admin.Controllers
                         id = room.Id,
                         name = room.Name,
 
-                        cinemaLocation = cinema.Location,
+                        cinemaLocation = cinema.CinemaAddress,
                         cinemaMap = cinema.Map,
-
+                        cinemaPhone = cinema.CinemaPhoneNumber,
                         detailsUrl = Url.Action("Details", "Rooms", new { area = "Admin", id = room.Id }),
                         editUrl = Url.Action("Edit", "Rooms", new { area = "Admin", id = room.Id })
                     }

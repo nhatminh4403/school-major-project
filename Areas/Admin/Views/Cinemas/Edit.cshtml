@@ -27,21 +27,30 @@
                         <div class="row">
                             <div class="col-12">
 
-                                <label class="form-check-label" style="color: white" asp-for="Name">@Html.DisplayNameFor(Model => Model.Name)</label>
-                                <input type="text" class="form__input" placeholder="Nhập @Html.DisplayNameFor(Model => Model.Name)"
-                                       asp-for="Name" required aria-required="true" />
-                                <span asp-validation-for="Name" class="text-danger"></span>
+                                <label class="form-check-label" style="color: white" asp-for="CinemaName">@Html.DisplayNameFor(Model => Model.CinemaName)</label>
+                                <input type="text" class="form__input" placeholder="Nhập @Html.DisplayNameFor(Model => Model.CinemaName)"
+                                       asp-for="CinemaName" required aria-required="true" />
+                                <span asp-validation-for="CinemaName" class="text-danger"></span>
 
 
                             </div>
                             <div class="col-12">
 
-                                <label class="form-check-label" style="color: white" asp-for="Location">@Html.DisplayNameFor(Model => Model.Location)</label>
-                                <input type="text" class="form__input" placeholder="Nhập @Html.DisplayNameFor(Model => Model.Location)"
-                                       asp-for="Location" required aria-required="true" />
-                                <span asp-validation-for="Location" class="text-danger"></span>
+                                <label class="form-check-label" style="color: white" asp-for="CinemaAddress">@Html.DisplayNameFor(Model => Model.CinemaAddress)</label>
+                                <input type="text" class="form__input" placeholder="Nhập @Html.DisplayNameFor(Model => Model.CinemaAddress)"
+                                       asp-for="CinemaAddress" required aria-required="true" />
+                                <span asp-validation-for="CinemaAddress" class="text-danger"></span>
 
                             </div>
+                            <div class="col-12">
+
+                                <label class="form-check-label" style="color: white" asp-for="CinemaPhoneNumber">@Html.DisplayNameFor(Model => Model.CinemaPhoneNumber)</label>
+                                <input type="text" class="form__input" placeholder="Nhập @Html.DisplayNameFor(Model => Model.CinemaPhoneNumber)"
+                                       asp-for="CinemaPhoneNumber" required aria-required="true" />
+                                <span asp-validation-for="CinemaPhoneNumber" class="text-danger"></span>
+
+                            </div>
+
                             <div class="col-12">
 
                                 <label class="form-check-label" style="color: white" asp-for="Map">@Html.DisplayNameFor(Model => Model.Map)</label>

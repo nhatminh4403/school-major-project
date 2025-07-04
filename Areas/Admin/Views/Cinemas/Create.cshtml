@@ -27,13 +27,16 @@
                             <div class="col-12">
                                 <div class="row">
                                     <div class="col-6">
-                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.Name)"
-                                               asp-for="Name" required />
+                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.CinemaName)"
+                                               asp-for="CinemaName" required />
                                     </div>
                                     <div class="col-6">
-                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.Location)"
-                                               asp-for="Location" required />
+                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.CinemaAddress)"
+                                               asp-for="CinemaAddress" required />
                                     </div>
+                                    <div class="col-12">
+                                        <input type="text" class="form__input" placeholder="@Html.DisplayNameFor(Model=> Model.CinemaPhoneNumber)"
+                                               asp-for="CinemaPhoneNumber" required />
                                     <div class="col-12">
                                         <input type="text" class="form__input" placeholder="Bản đồ hiển thị" asp-for="Map"
                                                placeholder="@Html.DisplayNameFor(Model=> Model.Map)" name="map" required />

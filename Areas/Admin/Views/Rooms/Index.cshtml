@@ -31,6 +31,7 @@
                                         <a asp-action="Index" class="thead-sort" asp-route-sortOrder="id_desc">RẠP ↓</a>
                                     </th>
                                     <th>ĐỊA CHỈ</th>
+                                    <th>SỐ ĐIỆN THOẠI</th>
                                     <th>MÔ TẢ</th>
                                     <th>HÀNH ĐỘNG</th>
                                 </tr>
@@ -46,10 +47,13 @@
                                             <div class="main__table-text">@room.Name</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text">@room.Cinema.Name</div>
+                                            <div class="main__table-text">@room.Cinema.CinemaName</div>
                                         </td>
                                         <td>
-                                            <div class="main__table-text">@room.Cinema.Location</div>
+                                            <div class="main__table-text">@room.Cinema.CinemaAddress</div>
+                                        </td>
+                                        <td>
+                                            <div class="main__table-text">@room.Cinema.CinemaPhoneNumber</div>
                                         </td>
                                         <td>
                                             <div class="main__table-text">@room.Description</div>

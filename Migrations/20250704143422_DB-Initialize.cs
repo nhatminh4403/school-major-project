@@ -91,8 +91,9 @@ namespace school_major_project.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CinemaName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CinemaAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CinemaPhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Map = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>

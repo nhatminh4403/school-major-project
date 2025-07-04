@@ -27,14 +27,14 @@
                 {
                     <li class="nav-item" role="presentation">
                         <a href="#tab-@cinema.Id"
-                        id="cinema-tab-@cinema.Id"
-                        class="nav-link @(Model.SelectedCinema?.Id == cinema.Id ? "active" : "")"
-                        data-cinema-id="@cinema.Id"
-                        data-bs-toggle="tab"
-                        role="tab"
-                        aria-controls="tab-@cinema.Id"
-                        aria-selected="@(Model.SelectedCinema?.Id == cinema.Id ? "true" : "false")">
-                            @cinema.Name
+                           id="cinema-tab-@cinema.Id"
+                           class="nav-link @(Model.SelectedCinema?.Id == cinema.Id ? "active" : "")"
+                           data-cinema-id="@cinema.Id"
+                           data-bs-toggle="tab"
+                           role="tab"
+                           aria-controls="tab-@cinema.Id"
+                           aria-selected="@(Model.SelectedCinema?.Id == cinema.Id ? "true" : "false")">
+                            @cinema.CinemaName
                         </a>
                     </li>
                 }
@@ -46,12 +46,12 @@
             @foreach (var cinema in Model.Cinemas)
             {
                 <div class="tab-pane fade @(Model.SelectedCinema?.Id == cinema.Id ? "show active" : "")"
-                id="tab-@cinema.Id"
-                role="tabpanel"
-                aria-labelledby="cinema-tab-@cinema.Id">
+                     id="tab-@cinema.Id"
+                     role="tabpanel"
+                     aria-labelledby="cinema-tab-@cinema.Id">
                     <div class="cinema-details-container mb-4">
                         <div class="cinema-details-header">
-                            <h3><i class="fas fa-film"></i> @cinema.Name</h3>
+                            <h3><i class="fas fa-film"></i> @cinema.CinemaName</h3>
                             <div class="cinema-details-actions">
                                 <button id="quick-create-room-@cinema.Id" class="btn quick-create-room" data-cinema-id="@cinema.Id">
                                     <i class="fas fa-plus"></i> Thêm phòng mới
@@ -59,7 +59,7 @@
                                 <a asp-action="Edit" asp-route-id="@cinema.Id" class="cinema-details-edit">
                                     <i class="fas fa-edit"></i> Sửa
                                 </a>
-                                <a href="#" class="cinema-details-delete" data-cinema-id="@cinema.Id" data-cinema-name="@cinema.Name">
+                                <a href="#" class="cinema-details-delete" data-cinema-id="@cinema.Id" data-cinema-name="@cinema.CinemaName">
                                     <i class="fas fa-trash"></i> Xóa
                                 </a>
                             </div>
@@ -75,10 +75,10 @@
                                         </div>
                                         <div class="cinema-details-location">
                                             <i class="fas fa-map-marker-alt"></i>
-                                            <span>@cinema.Location</span>
+                                            <span>@cinema.CinemaAddress</span>
                                         </div>
                                         <div class="cinema-details-location">
-                                            <i class="fa-solid fa-map"></i>        
+                                            <i class="fa-solid fa-map"></i>
                                             <span>@cinema.Map</span>
                                         </div>
                                     </div>
@@ -105,7 +105,7 @@
                                                         <i class="fas fa-chair"></i>
                                                         <span>Số ghế: @(room.Seats?.Count() ?? 0)</span>
                                                     </div>
-                                                   
+
                                                 </div>
                                                 <div class="room-card-actions">
                                                     <a asp-controller="Rooms" asp-action="Details" asp-route-id="@room.Id" class="view">
@@ -180,7 +180,10 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js" integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastify-js/1.6.1/toastify.js"
+            integrity="sha512-MnKz2SbnWiXJ/e0lSfSzjaz9JjJXQNb2iykcZkEY2WOzgJIWVqJBFIIPidlCjak0iTH2bt2u1fHQ4pvKvBYy6Q=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"></script>
     <script src="~/js/admin/js/cinema.js"></script>
 
 }

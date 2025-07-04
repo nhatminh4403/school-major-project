@@ -11,10 +11,14 @@ namespace school_major_project.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         [Required]
-        public string Name { get; set; }
+        public string CinemaName { get; set; }
         [DisplayName("Địa chỉ rạp")]
         [Required]
-        public string Location { get; set; }
+        public string CinemaAddress { get; set; }
+        [DisplayName("Số điện thoại")]
+        [Required]
+        [DataType(DataType.PhoneNumber)]
+        public string CinemaPhoneNumber { get; set; }
 
         [Required]
         [DisplayName("Địa chỉ trên Map")]
