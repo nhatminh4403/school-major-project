@@ -72,7 +72,7 @@ namespace school_major_project.Controllers
                 catch (JsonException ex)
                 {
                     TempData["ErrorMessage"] = "Có lỗi xảy ra khi xử lý thông tin ghế đã chọn.";
-                    return BadRequest("Invalid seat data format.");
+                    return BadRequest($"Invalid seat data format.{ex.Message}");
                 }
             }
             if (selectedSeatsList.Count == 0)
@@ -152,7 +152,6 @@ namespace school_major_project.Controllers
             {
                 case "cash":
                     var receipt = await _ticketService.CreateReceiptAndDetailsAsync(model, finalPrice, userId);
-                    await _ticketService.SendTicketEmailAsync(await _userManager.GetUserAsync(User), receipt, model, finalPrice);
                     TempData["PaymentSuccessMessage"] = "Đặt vé thành công! Vui lòng thanh toán tại quầy.";
                     return RedirectToAction("PaymentSuccess", "Purchase");
 
@@ -187,12 +186,16 @@ namespace school_major_project.Controllers
             }
 
             var user = await _userManager.GetUserAsync(User);
-
+            if(user == null)
+            {
+                TempData["LoginMessage"] = "Vui lòng đăng nhập để thực hiện thanh toán.";
+                return RedirectToAction("Login", "Account");
+            }
             var vnPayModel = new VnPaymentRequestModel
             {
                 Price = (double)checkoutData.FinalPrice,
                 CreatedDate = DateTime.Now,
-                Description = $"Thanh toán vé xem phim cho {user.FullName}",
+                Description = $"Thanh toán vé xem phim cho {user?.FullName}",
                 FullName = user.FullName,
                 OrderId = new Random().Next(1000, 10000)
             };
@@ -236,8 +239,6 @@ namespace school_major_project.Controllers
 
                     var ckModel = checkoutData.CheckoutModel;
                     var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
-                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
-
                     await transaction.CommitAsync();
 
                     HttpContext.Session.Remove("PendingCheckoutData");
@@ -248,7 +249,7 @@ namespace school_major_project.Controllers
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    TempData["ErrorMessage"] = "Có lỗi trong quá trình xử lý giao dịch.";
+                    TempData["ErrorMessage"] = $"Có lỗi trong quá trình xử lý giao dịch. Lỗi: {ex.Message}";
                     return RedirectToAction("PaymentFail");
                 }
             }
@@ -454,8 +455,6 @@ namespace school_major_project.Controllers
 
                     var ckModel = checkoutData.CheckoutModel;
                     var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
-                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
-
                     await transaction.CommitAsync();
 
                     HttpContext.Session.Remove("PendingCheckoutData");
@@ -495,7 +494,7 @@ namespace school_major_project.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { RspCode = "99", Message = "Internal server error" });
+                return BadRequest(new { RspCode = "99", Message = $"Internal server error. Message: {ex.Message}" });
             }
         }
 
@@ -586,8 +585,6 @@ namespace school_major_project.Controllers
 
                     var ckModel = checkoutData.CheckoutModel;
                     var receipt = await _ticketService.CreateReceiptAndDetailsAsync(ckModel, checkoutData.FinalPrice, checkoutData.UserId);
-                    await _ticketService.SendTicketEmailAsync(user, receipt, ckModel, checkoutData.FinalPrice);
-
                     await transaction.CommitAsync();
 
                     HttpContext.Session.Remove("PendingCheckoutData");

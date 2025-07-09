@@ -8,7 +8,7 @@ namespace school_major_project.Interfaces
 {
     public interface ITicketService
     {
-        Task<Receipt> CreateReceiptAndDetailsAsync(CheckoutSummaryVM model, decimal finalPrice, string userId);
+        Task<Receipt> CreateReceiptAndDetailsAsync(CheckoutSummaryVM model, decimal finalPrice, string userId, bool sendEmail = true);
         Task SendTicketEmailAsync(User user, Receipt receipt, CheckoutSummaryVM model, decimal finalPrice);
     }
 } 

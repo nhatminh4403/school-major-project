@@ -132,7 +132,7 @@ builder.Services.AddScoped<PrintingTicket>();
 builder.Services.AddScoped<GoogleQuery>();
 builder.Services.AddScoped<JwtTokenService>();
 
-builder.Services.AddScoped<school_major_project.Interfaces.ITicketService, school_major_project.ModelServices.TicketService>();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 builder.Services.AddControllersWithViews();
 
