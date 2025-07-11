@@ -15,9 +15,9 @@ namespace school_major_project.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IReceiptRepository _receiptRepository;
-        private readonly PrintingTicket _printingTicket;
+        private readonly PrintingTicketService _printingTicket;
 
-        public ReceiptsController(ApplicationDbContext context, IReceiptRepository receipt, PrintingTicket printingTicket)
+        public ReceiptsController(ApplicationDbContext context, IReceiptRepository receipt, PrintingTicketService printingTicket)
         {
             _context = context;
             _receiptRepository = receipt;

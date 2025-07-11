@@ -51,6 +51,8 @@ builder.Services.AddSingleton<IVnPayService, VnPayService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddHostedService<ExpiredItemCleanupService>();
+builder.Services.AddHostedService<ScheduleRangeService>();
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(20);
@@ -128,11 +130,12 @@ builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IPayPalService, PayPalService>();
 builder.Services.AddHttpClient<IMoMoService, MoMoService>();
 builder.Services.AddScoped<IMoMoService, MoMoService>();
-builder.Services.AddScoped<PrintingTicket>();
+builder.Services.AddScoped<PrintingTicketService>();
 builder.Services.AddScoped<GoogleQuery>();
 builder.Services.AddScoped<JwtTokenService>();
-
 builder.Services.AddScoped<ITicketService, TicketService>();
+
+
 
 builder.Services.AddControllersWithViews();
 
