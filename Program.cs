@@ -41,7 +41,6 @@ builder.Services.AddScoped<IReceiptDetailsRepository, ReceiptDetailService>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleService>();
 builder.Services.AddScoped<ISeatRepository, SeatService>();
 builder.Services.AddScoped<ICountryRepository, CountryService>();
-builder.Services.AddScoped<ISeatRepository, SeatService>();
 builder.Services.AddScoped<IBlogRepository, BlogService>();
 builder.Services.AddScoped<ICommentRepository, CommentService>();
 builder.Services.AddScoped<IRatingRepository, RatingService>();
@@ -108,7 +107,6 @@ builder.Services.AddAuthentication(options =>
 {
     options.LoginPath = "/Account/Login";
     options.AccessDeniedPath = "/Account/AccessDenied";
-    // ... các option khác nếu cần
 })
 .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
 {

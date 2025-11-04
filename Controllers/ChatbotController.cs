@@ -1,9 +1,11 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Cloud.Dialogflow.V2;
+using Google.Protobuf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using school_major_project.DataAccess;
+using System.Text.Json;
 
 
 namespace school_major_project.Controllers
@@ -70,7 +72,6 @@ namespace school_major_project.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> SendMessage([FromBody] ChatRequest request)
         {
@@ -86,76 +87,52 @@ namespace school_major_project.Controllers
             try
             {
                 var sessionName = new SessionName(_googleProjectId, request.SessionId);
-                QueryInput queryInput;
-                if (!string.IsNullOrWhiteSpace(request.EventName))
-                {
-                    queryInput = new QueryInput
-                    {
-                        Event = new EventInput
-                        {
-                            Name = request.EventName,
-                            LanguageCode = _languageCode
-                        }
-                    };
-                }
-                else
-                {
-                    queryInput = new QueryInput
-                    {
-                        Text = new TextInput
-                        {
-                            Text = request.Message,
-                            LanguageCode = _languageCode
-                        }
-                    };
-                }
+                QueryInput queryInput = !string.IsNullOrWhiteSpace(request.EventName)
+                    ? new QueryInput { Event = new EventInput { Name = request.EventName, LanguageCode = _languageCode } }
+                    : new QueryInput { Text = new TextInput { Text = request.Message, LanguageCode = _languageCode } };
 
-                var detectIntentRequest = new DetectIntentRequest
+                var response = await _sessionsClient.DetectIntentAsync(new DetectIntentRequest
                 {
                     SessionAsSessionName = sessionName,
                     QueryInput = queryInput
-                };
+                });
 
-                DetectIntentResponse response = await _sessionsClient.DetectIntentAsync(detectIntentRequest);
+                var queryResult = response.QueryResult;
+                var botReplies = new List<string>();
+                JsonElement? payload = null; // Variable to hold our payload
 
-                List<string> botReplies = new List<string>();
-                if (response.QueryResult?.FulfillmentMessages != null && response.QueryResult.FulfillmentMessages.Any())
+                if (queryResult?.FulfillmentMessages != null)
                 {
-                    foreach (var msg in response.QueryResult.FulfillmentMessages)
+                    foreach (var msg in queryResult.FulfillmentMessages)
                     {
                         if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Text)
                         {
-                            var texts = msg.Text.Text_.Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
-                            if (texts.Any())
-                            {
-                                botReplies.AddRange(texts);
-                            }
+                            botReplies.AddRange(msg.Text.Text_.Where(t => !string.IsNullOrWhiteSpace(t)));
+                        }
+
+                        // --- THIS IS THE NEW CODE ---
+                        if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Payload)
+                        {
+                            string payloadJson = JsonFormatter.Default.Format(msg.Payload);
+                            payload = JsonSerializer.Deserialize<JsonElement>(payloadJson);
                         }
                     }
                 }
-                else
+
+                if (!botReplies.Any() && payload == null && !string.IsNullOrWhiteSpace(queryResult?.FulfillmentText))
                 {
-                    botReplies.Add("No structured FulfillmentMessages found. " +
-                        "Please check your Dialogflow intent configuration.");
-                }
-                if (!botReplies.Any() && !string.IsNullOrWhiteSpace(response.QueryResult?.FulfillmentText))
-                {
-                    botReplies.Add(response.QueryResult.FulfillmentText);
+                    botReplies.Add(queryResult.FulfillmentText);
                 }
 
-                Console.WriteLine($"Returning {botReplies.Count} replies.");
-                return Ok(new { replies = botReplies });
+                // Return both text replies AND the payload
+                return Ok(new { replies = botReplies, payload });
             }
             catch (Exception ex)
             {
-                
                 Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
-
-                return StatusCode(500, new { replies = new List<string>
-                { "Xin lỗi, tôi gặp lỗi nội bộ khi xử lý yêu cầu." } });
+                return StatusCode(500, new { replies = new List<string> { "Xin lỗi, tôi gặp lỗi nội bộ khi xử lý yêu cầu." } });
             }
         }
-
         public class ChatRequest
         {
             public string Message { get; set; }
