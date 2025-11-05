@@ -3,8 +3,10 @@ using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using school_major_project.DataAccess;
 using school_major_project.Extensions;
 using school_major_project.Interfaces;
+using System.Text.Json;
 
 namespace school_major_project.APIControllers
 {
@@ -12,92 +14,123 @@ namespace school_major_project.APIControllers
     [ApiController]
     public class DialogflowWebhookController : ControllerBase
     {
-
         private readonly ICategoryRepository _categoryRepository;
         private readonly ILogger<DialogflowWebhookController> _logger;
+        private static readonly JsonParser JsonParser = new JsonParser(JsonParser.Settings.Default.WithIgnoreUnknownFields(true));
+        private readonly ApplicationDbContext _applicationDbContext;
 
-        public DialogflowWebhookController(ICategoryRepository categoryRepository, ILogger<DialogflowWebhookController> logger)
+        public DialogflowWebhookController(ICategoryRepository categoryRepository, ILogger<DialogflowWebhookController> logger, ApplicationDbContext applicationDbContext)
         {
             _categoryRepository = categoryRepository;
             _logger = logger;
+            _applicationDbContext = applicationDbContext;
         }
+
         [HttpGet]
         public IActionResult Get()
         {
             return Ok(new { text = "success" });
         }
+
         [HttpPost]
         public async Task<ContentResult> HandleWebhook()
         {
-            // Official way to parse the JSON request from Dialogflow
-            var parser = new JsonParser(JsonParser.Settings.Default.WithIgnoreUnknownFields(true));
             WebhookRequest request;
             using (var reader = new StreamReader(Request.Body))
             {
-                request = parser.Parse<WebhookRequest>(await reader.ReadToEndAsync());
+                var body = await reader.ReadToEndAsync();
+                _logger.LogInformation("Webhook request body: {Body}", body);
+                request = JsonParser.Parse<WebhookRequest>(body);
             }
 
-            // Create a response object
-            var response = new WebhookResponse();
+            var intentName = request.QueryResult.Intent.DisplayName;
+            _logger.LogInformation("Intent received: {IntentName}", intentName);
 
-            // Check which intent was triggered
-            if (request.QueryResult.Intent.DisplayName == "suggest category")
+            WebhookResponse response = new WebhookResponse();
+
+            if (intentName == "suggest category")
             {
-                // Query the database for the top 5 movie categories
-                var categories = await _categoryRepository.GetAllAsync();
-                var getRandomCategoriesForAnswer = categories.Shuffle().Take(5);
-                // Create the JSON payload structure dynamically
-                var payload = new Struct();
+                // Get categories from database
+                var categories = _applicationDbContext.Categories
+                    .Select(c => c.CategoryDescription)
+                    .Take(5)
+                    .ToList();
 
-                // 1. Create the 'options' array for the chips
-                var chipsOptionsList = new ListValue();
-                foreach (var category in getRandomCategoriesForAnswer)
+                _logger.LogInformation("Found {Count} categories", categories.Count);
+
+                if (categories.Any())
                 {
-                    var chip = new Struct();
-                    chip.Fields.Add("text", Value.ForString(category.CategoryDescription));
-                    chipsOptionsList.Values.Add(Value.ForStruct(chip));
+                    // Add a text message first
+                    response.FulfillmentMessages.Add(new Intent.Types.Message
+                    {
+                        Text = new Intent.Types.Message.Types.Text
+                        {
+                            Text_ = { "Dưới đây là các danh mục khóa học:" }
+                        }
+                    });
+
+                    // Create chip options array
+                    var chipOptions = categories.Select(name => new
+                    {
+                        text = name
+                    }).ToArray();
+
+                    // Create the rich content structure correctly
+                    var richContentStructure = new
+                    {
+                        richContent = new[]
+                        {
+                            new object[]
+                            {
+                                new
+                                {
+                                    type = "info",
+                                    title = "Chọn danh mục khóa học",
+                                    subtitle = "Nhấp vào một trong các tùy chọn bên dưới"
+                                },
+                                new
+                                {
+                                    type = "chips",
+                                    options = chipOptions
+                                }
+                            }
+                        }
+                    };
+
+                    // Serialize to JSON
+                    var jsonPayload = JsonSerializer.Serialize(richContentStructure);
+                    _logger.LogInformation("Payload JSON: {Json}", jsonPayload);
+
+                    // Parse to Protobuf Struct
+                    var payloadStruct = Struct.Parser.ParseJson(jsonPayload);
+
+                    // Add payload message
+                    response.FulfillmentMessages.Add(new Intent.Types.Message
+                    {
+                        Payload = payloadStruct
+                    });
                 }
-
-                // 2. Create the 'chips' object
-                var chipsStruct = new Struct();
-                chipsStruct.Fields.Add("type", Value.ForString("chips"));
-                //chipsStruct.Fields.Add("options", Value.ForList(chipsOptionsList));
-
-                // 3. Create the 'info' object for the title
-
-                // With this line:
-                chipsStruct.Fields.Add("options", Value.ForList(chipsOptionsList.Values.ToArray()));
-                var infoStruct = new Struct();
-                infoStruct.Fields.Add("type", Value.ForString("info"));
-                infoStruct.Fields.Add("title", Value.ForString("Bạn muốn xem thể loại phim nào?"));
-                infoStruct.Fields.Add("subtitle", Value.ForString("Chọn một thể loại từ CSDL của chúng tôi:"));
-
-                // 4. Create the 'richContent' array and add the info and chips
-                var richContentList = new ListValue();
-                richContentList.Values.Add(Value.ForStruct(infoStruct));
-                richContentList.Values.Add(Value.ForStruct(chipsStruct));
-
-                // 5. Add 'richContent' to the main payload
-                payload.Fields.Add("richContent", Value.ForList(richContentList.Values.ToArray()));
-
-                // Add the fully constructed payload to the fulfillment message
-                response.FulfillmentMessages.Add(new Intent.Types.Message
+                else
                 {
-                    Payload = payload
-                });
+                    response.FulfillmentText = "Xin lỗi, hiện tại không có danh mục nào.";
+                }
             }
             else
             {
-                // Handle other intents or provide a default response
-                response.FulfillmentText = "Sorry, I am not sure how to handle that intent via webhook yet.";
+                response.FulfillmentText = "Xin lỗi, tôi không hiểu yêu cầu của bạn.";
             }
 
-            // Convert the response to a JSON string and return it
-            string responseJson = response.ToString();
+            // Use JsonFormatter to convert response to JSON properly
+            var formatter = new JsonFormatter(JsonFormatter.Settings.Default);
+            var jsonResponse = formatter.Format(response);
+
+            _logger.LogInformation("Webhook response: {Response}", jsonResponse);
+
             return new ContentResult
             {
-                Content = responseJson,
-                ContentType = "application/json"
+                Content = jsonResponse,
+                ContentType = "application/json",
+                StatusCode = 200
             };
         }
     }

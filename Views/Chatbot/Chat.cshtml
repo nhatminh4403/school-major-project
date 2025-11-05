@@ -19,55 +19,86 @@
         background-color: #f1f1f1;
         margin-right: 40px;
     }
+
+    .category-list {
+        background-color: #f1f1f1;
+        padding: 10px;
+        border-radius: 5px;
+        margin-right: 40px;
+        margin-bottom: 10px;
+    }
+
+    .category-item {
+        display: block;
+        padding: 10px 15px;
+        margin: 5px 0;
+        background-color: white;
+        border: 1px solid #1976d2;
+        border-radius: 5px;
+        color: #1976d2;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s;
+        text-align: left;
+    }
+
+        .category-item:hover {
+            background-color: #1976d2;
+            color: white;
+        }
 </style>
 <h2>Chat with our Bot</h2>
 
 <div id="chatbox" style="height: 400px; width: 500px; border: 1px solid #ccc; overflow-y: scroll; padding: 10px; margin-bottom: 10px;">
     <!-- Chat messages will appear here -->
-    <div class="message bot">Bot: Hello! How can I help you today?</div>
+    <div class="message bot">Bot: Xin chào! Tôi có thể giúp gì cho bạn?</div>
 </div>
 
 <div id="userInput">
-    <input type="text" id="message" placeholder="Type your message..." style="width: 400px; padding: 8px;" />
-    <button id="sendBtn" style="padding: 8px;">Send</button>
+    <input type="text" id="message" placeholder="Nhập nội dung..." style="width: 400px; padding: 8px;" />
+    <button id="sendBtn" style="padding: 8px;">Gửi</button>
 </div>
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
-            let sessionId = sessionStorage.getItem('chatbotSessionId');
+
+            // Generate or retrieve a unique session ID for this user session
+            let sessionId = localStorage.getItem('chatbotSessionId');
             if (!sessionId) {
                 sessionId = generateGuid();
-                sessionStorage.setItem('chatbotSessionId', sessionId);
+                localStorage.setItem('chatbotSessionId', sessionId);
             }
-
-            // Event handler for dynamically created suggestion chips
-            $('#chatbox').on('click', '.suggestion-chip', function() {
-                const suggestionText = $(this).text();
-                appendMessage('You', suggestionText); // Show what user clicked
-                sendRequest(suggestionText);       // Send it to the bot
-            });
+            console.log("Chat Session ID:", sessionId);
 
             $('#sendBtn').click(sendMessage);
             $('#message').keypress(function (e) {
-                if (e.which === 13) { sendMessage(); return false; }
+                if (e.which === 13) {
+                    sendMessage();
+                    return false; // Prevents form submission
+                }
             });
 
             function sendMessage() {
                 const messageText = $('#message').val().trim();
-                if (!messageText) return;
+                if (!messageText) {
+                    return;
+                }
 
-                appendMessage('You', messageText); // Change sender to 'You' for clarity
+                appendMessage('user', messageText);
                 $('#message').val('');
-                sendRequest(messageText);
+
+                sendMessageToBot(messageText);
             }
 
-            // Central function for sending data to the backend
-            function sendRequest(message) {
-                 const chatRequest = { message: message, sessionId: sessionId };
+            function sendMessageToBot(messageText) {
+                const chatRequest = {
+                    message: messageText,
+                    sessionId: sessionId
+                };
 
-                 appendMessage('Bot', 'Bot: Typing...');
-                 let thinkingMessage = $('#chatbox .message').last();
+                // Show a "thinking" message and remove it when the response arrives
+                const thinkingMessage = appendMessage('bot', 'Đang suy nghĩ...');
 
                 $.ajax({
                     url: '@Url.Action("SendMessage", "Chatbot")',
@@ -75,96 +106,141 @@
                     contentType: 'application/json',
                     data: JSON.stringify(chatRequest),
                     success: function (response) {
-                        thinkingMessage.remove();
+                        console.log("Response received:", response);
+                        thinkingMessage.remove(); // Remove the "thinking..." message
 
-                        // --- THIS IS THE CORRECTED LOGIC ---
-
-                        // 1. Handle regular text replies
                         if (response && response.replies && response.replies.length > 0) {
-                            response.replies.forEach(reply => {
-                                appendMessage('Bot', 'Bot: ' + reply);
+                            response.replies.forEach(function(reply) {
+                                console.log("Processing reply:", reply);
+
+                                // Check if the reply is a string that starts with '{' indicating it might be JSON
+                                if (typeof reply === 'string' && reply.trim().startsWith('{')) {
+                                    try {
+                                        const parsedReply = JSON.parse(reply);
+                                        // Check if the parsed object has a 'richContent' property
+                                        if (parsedReply.richContent && Array.isArray(parsedReply.richContent)) {
+                                            console.log("Found richContent:", parsedReply.richContent);
+                                            renderRichContent(parsedReply.richContent);
+                                        } else {
+                                           // It was valid JSON but not the rich content we expected
+                                           appendMessage('bot', reply);
+                                        }
+                                    } catch (e) {
+                                        console.error("JSON parse error:", e);
+                                        // If parsing fails, it's just a regular text message
+                                        appendMessage('bot', reply);
+                                    }
+                                } else {
+                                    // It's not a JSON string, so treat it as a plain text reply
+                                    appendMessage('bot', reply);
+                                }
                             });
+                        } else {
+                            appendMessage('bot', 'Xin lỗi, tôi không nhận được phản hồi hợp lệ.');
                         }
-
-                        // 2. Handle the custom payload for buttons
-                        if(response && response.payload) {
-                            handlePayload(response.payload);
-                        }
-
-                        // Fallback if nothing was received
-                        if ((!response.replies || response.replies.length === 0) && !response.payload) {
-                            appendMessage('Bot', "Bot: Sorry, I don't have a response for that.");
-                        }
-
                     },
                     error: function (xhr, status, error) {
-                         thinkingMessage.remove();
-                         console.error("Error sending message:", status, error, xhr.responseText);
-                         appendMessage('Bot', 'Bot: Oops! Something went wrong connecting to me.');
+                        thinkingMessage.remove();
+                        console.error("Error sending message:", status, error, xhr.responseText);
+                        appendMessage('bot', 'Rất tiếc! Đã xảy ra lỗi khi kết nối.');
                     }
                 });
             }
 
-            // Function to render buttons from the payload
-            function handlePayload(payload) {
-                if (payload.richContent && Array.isArray(payload.richContent)) {
-                    payload.richContent.forEach(item => {
-                        // Display the title/subtitle first
-                        if (item.type === 'info' && item.title) {
-                            appendMessage('Bot', 'Bot: ' + item.title + (item.subtitle ? ' ' + item.subtitle : ''));
-                        }
-                        // Then render the clickable chips
-                        else if (item.type === 'chips' && item.options) {
-                             let chipsHtml = '<div class="suggestion-chips">';
-                             item.options.forEach(option => {
-                                 chipsHtml += `<button class="suggestion-chip">${escapeHtml(option.text)}</button>`;
-                             });
-                             chipsHtml += '</div>';
-                             $('#chatbox').append(chipsHtml);
-                        }
-                    });
-                     $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
-                }
-            }
+            function renderRichContent(richContentArray) {
+                console.log("Rendering rich content:", richContentArray);
 
-            function appendMessage(sender, text) {
-                // For styling, keep sender as 'user' or 'bot' in the class
-                const messageClass = sender.toLowerCase() === 'you' ? 'user' : 'bot';
-                const messageDiv = `<div class="message ${messageClass}">${escapeHtml(text)}</div>`;
-                $('#chatbox').append(messageDiv);
+                // The richContent is an array of sections, iterate over it
+                richContentArray.forEach(function(section) {
+                    console.log("Processing section:", section);
+
+                    let infoTitle = '';
+                    let infoSubtitle = '';
+                    let chipOptions = [];
+
+                    // Each section is an array of elements (like 'info', 'chips')
+                    if(Array.isArray(section)){
+                        section.forEach(function(element) {
+                            console.log("Processing element:", element);
+
+                            if (element.type === 'info') {
+                                infoTitle = element.title || '';
+                                infoSubtitle = element.subtitle || '';
+                            }
+                            else if (element.type === 'chips' && element.options) {
+                                chipOptions = element.options;
+                            }
+                        });
+                    }
+
+                    // If we found any valid content, render it as a list
+                    if (infoTitle || infoSubtitle || chipOptions.length > 0) {
+                        renderCategoryList(infoTitle, infoSubtitle, chipOptions);
+                    }
+                });
+
                 $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
             }
 
+            function renderCategoryList(title, subtitle, options) {
+                let listHtml = '<div class="message bot">'; // Wrap in a bot message container
+                listHtml += '<div class="category-list">';
+
+                if (title) {
+                    listHtml += '<strong>' + escapeHtml(title) + '</strong>';
+                }
+                if (subtitle) {
+                    listHtml += '<div style="font-size: 0.9em; margin-bottom: 10px;">' + escapeHtml(subtitle) + '</div>';
+                }
+
+                options.forEach(function(option) {
+                    // Use a button or styled div for better accessibility and interaction
+                    listHtml += '<button class="category-item" data-text="' + escapeHtml(option.text) + '">' +
+                                escapeHtml(option.text) +
+                                '</button>';
+                });
+
+                listHtml += '</div></div>';
+                $('#chatbox').append(listHtml);
+
+                // Add a single delegated click handler for efficiency
+                $('#chatbox').off('click', '.category-item').on('click', '.category-item', function() {
+                    const categoryText = $(this).data('text');
+                    appendMessage('user', categoryText); // Show what the user "clicked"
+                    sendMessageToBot(categoryText); // Send the selection to the bot
+                });
+            }
+
+            function appendMessage(sender, text) {
+                const messageClass = sender === 'user' ? 'user' : 'bot';
+                const safeText = escapeHtml(text);
+                const messageDiv = `<div class="message ${messageClass}">${safeText}</div>`;
+                $('#chatbox').append(messageDiv);
+                $('#chatbox').scrollTop($('#chatbox')[0].scrollHeight);
+                return $('#chatbox .message').last(); // Return the element for reference
+            }
+
             function generateGuid() {
-                function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
+                function s4() {
+                    return Math.floor((1 + Math.random()) * 0x10000)
+                        .toString(16)
+                        .substring(1);
+                }
                 return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
             }
 
             function escapeHtml(unsafe) {
-                return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+                if (typeof unsafe !== 'string') {
+                    return unsafe;
+                }
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
             }
+
         });
     </script>
-
-    <!-- You can add these styles to your main CSS file or keep them here -->
-    <style>
-        .suggestion-chips {
-            padding: 5px 10px;
-            text-align: left;
-        }
-
-        .suggestion-chip {
-            background-color: #f0f0f0;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            padding: 8px 12px;
-            margin: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-            .suggestion-chip:hover {
-                background-color: #e0e0e0;
-            }
-    </style>
 }

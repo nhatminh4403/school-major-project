@@ -103,18 +103,21 @@ namespace school_major_project.Controllers
 
                 if (queryResult?.FulfillmentMessages != null)
                 {
-                    foreach (var msg in queryResult.FulfillmentMessages)
+                    foreach (var msg in response.QueryResult.FulfillmentMessages)
                     {
                         if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Text)
                         {
-                            botReplies.AddRange(msg.Text.Text_.Where(t => !string.IsNullOrWhiteSpace(t)));
+                            var texts = msg.Text.Text_.Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+                            if (texts.Any())
+                            {
+                                botReplies.AddRange(texts);
+                            }
                         }
-
-                        // --- THIS IS THE NEW CODE ---
-                        if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Payload)
+                        else if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Payload)
                         {
-                            string payloadJson = JsonFormatter.Default.Format(msg.Payload);
-                            payload = JsonSerializer.Deserialize<JsonElement>(payloadJson);
+
+                            var payloadJson = msg.Payload.ToString();
+                            botReplies.Add(payloadJson); 
                         }
                     }
                 }
