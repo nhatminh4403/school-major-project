@@ -29,8 +29,8 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     border-radius: 8px;
     position: absolute;
-    bottom: 65px;
-    right: 0;
+    bottom: 0;
+    right: 65px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -39,7 +39,6 @@
     transform: translateY(15px) scale(0.98);
     transform-origin: bottom right;
     transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0s linear 0.25s;
-    
 }
 
     #chat-interface.open {

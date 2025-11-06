@@ -17,8 +17,8 @@ namespace school_major_project.Controllers
         private readonly string _languageCode;
         private readonly SessionsClient _sessionsClient;
         private readonly ApplicationDbContext _applicationDbContext;
-
-        public ChatbotController(IConfiguration configuration, ApplicationDbContext context)
+        private readonly ILogger<ChatbotController> _logger;
+        public ChatbotController(IConfiguration configuration, ApplicationDbContext context, ILogger<ChatbotController> logger)
         {
             _applicationDbContext = context;
 
@@ -64,6 +64,8 @@ namespace school_major_project.Controllers
             {
                 throw new InvalidOperationException("Failed to initialize Dialogflow client. Check credentials and configuration.", ex);
             }
+
+            _logger = logger;
         }
 
 
@@ -115,9 +117,12 @@ namespace school_major_project.Controllers
                         }
                         else if (msg.MessageCase == Intent.Types.Message.MessageOneofCase.Payload)
                         {
-
                             var payloadJson = msg.Payload.ToString();
-                            botReplies.Add(payloadJson); 
+                            using (JsonDocument doc = JsonDocument.Parse(payloadJson))
+                            {
+                                payload = doc.RootElement.Clone(); // Clone to use outside the using block
+                            }
+                            _logger.LogInformation("payload: {payload}",payloadJson);
                         }
                     }
                 }
@@ -127,7 +132,6 @@ namespace school_major_project.Controllers
                     botReplies.Add(queryResult.FulfillmentText);
                 }
 
-                // Return both text replies AND the payload
                 return Ok(new { replies = botReplies, payload });
             }
             catch (Exception ex)

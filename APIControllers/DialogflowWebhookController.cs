@@ -51,11 +51,13 @@ namespace school_major_project.APIControllers
             if (intentName == "suggest category")
             {
                 // Get categories from database
-                var categories = _applicationDbContext.Categories
-                    .Select(c => c.CategoryDescription)
-                    .Take(5)
-                    .ToList();
+                //var categories = _applicationDbContext.Categories
+                //    .Select(c => c.CategoryDescription)
+                //    .Take(2)
+                //    .ToList();
 
+                var categoryList = await _categoryRepository.GetAllAsync();
+                var categories = categoryList.Select(category => category.CategoryDescription).Shuffle().Take(2).ToList();    
                 _logger.LogInformation("Found {Count} categories", categories.Count);
 
                 if (categories.Any())

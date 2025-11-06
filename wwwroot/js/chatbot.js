@@ -5,196 +5,284 @@
     const chatBox = $('#chatbox');
     const messageInput = $('#chat-message-input');
     const sendButton = $('#chat-send-button');
-    const chatCloseButton = $('#chat-close-button'); 
+    const chatCloseButton = $('#chat-close-button');
     // -----------------------------------------------------------------------------------
 
     // --- Session ID Management ---
     let sessionId = sessionStorage.getItem('chatbotSessionId');
     if (!sessionId) {
-        sessionId = generateGuid(); // Use a simple GUID generator
+        sessionId = generateGuid();
         sessionStorage.setItem('chatbotSessionId', sessionId);
     }
     console.log("Chat Session ID:", sessionId);
 
-    // --- *** NEW: Trigger Welcome Intent on Load *** ---
+    // --- Trigger Welcome Intent on Load ---
     triggerWelcomeIntent();
-    // -----------------------------------------------
 
     // --- Event Handlers ---
     chatToggleButton.click(function () {
-        chatInterface.toggleClass('open'); // Toggle visibility using the class
-        // Optional: Re-trigger welcome only if chat is opened AND empty
-        // if (chatInterface.hasClass('open') && chatBox.children('.message.bot').length <= 1) { // Check if only initial connecting message exists
-        //    triggerWelcomeIntent();
-        // }
+        chatInterface.toggleClass('open');
         if (chatInterface.hasClass('open')) {
             scrollToBottom();
-            messageInput.focus(); // Focus input when chat opens
+            messageInput.focus();
         }
     });
 
     sendButton.click(sendMessage);
     messageInput.keypress(function (e) {
-        if (e.which === 13) { // Enter key pressed
+        if (e.which === 13) {
             sendMessage();
-            return false; // Prevent default form submission behavior
+            return false;
         }
     });
     chatCloseButton.click(function () {
-        chatInterface.removeClass('open'); // Simply hide the chat interface
+        chatInterface.removeClass('open');
     });
-    // --- *** NEW: Function to Trigger Welcome Intent *** ---
+
+    // --- Trigger Welcome Intent ---
     function triggerWelcomeIntent() {
         console.log("Triggering Welcome Intent for session:", sessionId);
-
-        // Optional: Clear previous bot messages if desired when triggering welcome
-        // chatBox.find('.message.bot').remove(); // Uncomment to clear history on welcome
-
-        // Display connecting indicator (replaces the initial hardcoded message)
-        chatBox.html(''); // Clear chatbox before showing connecting
-        appendMessage('bot', 'Bot: Connecting...'); // Use appendMessage for consistency
+        chatBox.html('');
+        appendMessage('bot', 'Bot: Connecting...');
         let connectingMessage = chatBox.children('.message').last();
 
         const chatRequest = {
-            eventName: "WELCOME", // Send the event name
+            eventName: "WELCOME",
             sessionId: sessionId
         };
 
         $.ajax({
-            url: '/Chatbot/SendMessage', // Adjust area if needed
+            url: '/Chatbot/SendMessage',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(chatRequest),
-            // --- Headers for AntiForgeryToken (Uncomment if needed) ---
-            // headers: {
-            //     'RequestVerificationToken': antiForgeryToken
-            // },
-            // ------------------------------------------------------
             success: function (response) {
-                if (connectingMessage) connectingMessage.remove(); // Remove connecting indicator
-                // Use the new handler
+                if (connectingMessage) connectingMessage.remove();
                 handleBotResponse(response);
             },
             error: function (xhr, status, error) {
-                if (connectingMessage) connectingMessage.remove(); // Remove connecting indicator
+                if (connectingMessage) connectingMessage.remove();
                 console.error("Error triggering welcome intent:", status, error, xhr.responseText);
-                // Try to parse error response if backend sends one
                 try {
                     const errorResponse = JSON.parse(xhr.responseText);
                     if (errorResponse && errorResponse.replies && errorResponse.replies.length > 0) {
-                        handleBotResponse(errorResponse); // Display structured error
+                        handleBotResponse(errorResponse);
                         return;
                     }
-                } catch (e) { /* Ignore parse error */ }
-                // Fallback generic error
+                } catch (e) { }
                 appendMessage('bot', 'Bot: Oops! Could not connect.');
             }
         });
     }
-    // ----------------------------------------------------
 
-
-    // --- Core Chat Logic (Text Messages) ---
+    // --- Core Chat Logic ---
     function sendMessage() {
         const messageText = messageInput.val().trim();
         if (!messageText) {
-            return; // Don't send empty messages
+            return;
         }
 
-        appendMessage('user', messageText); // Display user message immediately
-        messageInput.val(''); // Clear input field
+        appendMessage('user', messageText);
+        messageInput.val('');
 
-        // *** Send 'message' field for regular text ***
         const chatRequest = {
-            message: messageText, // Send the text message
+            message: messageText,
             sessionId: sessionId
         };
 
-        // Optional: Show thinking indicator
         appendMessage('bot', 'Bot: Thinking...');
         let thinkingMessage = chatBox.children('.message').last();
 
         $.ajax({
-            url: '/Chatbot/SendMessage', // Adjust area if needed
+            url: '/Chatbot/SendMessage',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(chatRequest),
-            // --- Headers for AntiForgeryToken (Uncomment if needed) ---
-            // headers: {
-            //     'RequestVerificationToken': antiForgeryToken
-            // },
-            // ------------------------------------------------------
             success: function (response) {
-                if (thinkingMessage) thinkingMessage.remove(); // Remove thinking indicator
-                // *** Use the new handler ***
+                if (thinkingMessage) thinkingMessage.remove();
                 handleBotResponse(response);
-                // ***************************
             },
             error: function (xhr, status, error) {
-                if (thinkingMessage) thinkingMessage.remove(); // Remove thinking indicator
+                if (thinkingMessage) thinkingMessage.remove();
                 console.error("Error sending message:", status, error, xhr.responseText);
-                // Try to parse error response if backend sends one
                 try {
                     const errorResponse = JSON.parse(xhr.responseText);
                     if (errorResponse && errorResponse.replies && errorResponse.replies.length > 0) {
-                        handleBotResponse(errorResponse); // Display structured error
+                        handleBotResponse(errorResponse);
                         return;
                     }
-                } catch (e) { /* Ignore parse error */ }
-                // Fallback generic error
+                } catch (e) { }
                 appendMessage('bot', 'Bot: Oops! Error sending message.');
             },
             complete: function () {
-                messageInput.focus(); // Keep focus on input
+                messageInput.focus();
             }
         });
     }
 
-    // --- *** NEW: Centralized function to handle bot responses *** ---
+    // --- *** UPDATED: Handle both text replies AND rich content payload *** ---
     function handleBotResponse(response) {
+        console.log("Full response:", response);
+
+        // Handle text replies
         if (response && response.replies && Array.isArray(response.replies) && response.replies.length > 0) {
-            // Loop through the replies array and append each message
             response.replies.forEach(reply => {
-                if (reply) { // Check if reply string is not null/empty
-                    appendMessage('bot',  reply);
+                if (reply) {
+                    appendMessage('bot', reply);
                 }
             });
-        } else {
-            // Handle cases where response is invalid or replies array is empty
-            appendMessage('bot', 'Bot: Sorry, I didn\'t get a valid response.');
-            console.log("Received invalid or empty response:", response); // Log for debugging
         }
-        scrollToBottom(); // Scroll after processing all replies
+
+        // Handle rich content payload
+        if (response && response.payload) {
+            console.log("Payload received:", response.payload);
+
+            // Check if payload has richContent property
+            if (response.payload.richContent && Array.isArray(response.payload.richContent)) {
+                console.log("Found richContent:", response.payload.richContent);
+                renderRichContent(response.payload.richContent);
+            }
+        }
+
+        // Show error if neither replies nor payload exist
+        if ((!response.replies || response.replies.length === 0) && !response.payload) {
+            appendMessage('bot', 'Bot: Sorry, I didn\'t get a valid response.');
+            console.log("Received invalid or empty response:", response);
+        }
+
+        scrollToBottom();
     }
-    // --------------------------------------------------------------
 
+    // --- Render Rich Content (Chips) ---
+    function renderRichContent(richContentArray) {
+        console.log("Rendering rich content:", richContentArray);
 
-    // --- Utility Functions (Keep as they were) ---
+        richContentArray.forEach(function (section) {
+            console.log("Processing section:", section);
+
+            let infoTitle = '';
+            let infoSubtitle = '';
+            let chipOptions = [];
+
+            if (Array.isArray(section)) {
+                section.forEach(function (element) {
+                    console.log("Processing element:", element);
+
+                    if (element.type === 'info') {
+                        infoTitle = element.title || '';
+                        infoSubtitle = element.subtitle || '';
+                    }
+                    else if (element.type === 'chips' && element.options) {
+                        chipOptions = element.options;
+                    }
+                });
+            }
+
+            if (infoTitle || infoSubtitle || chipOptions.length > 0) {
+                renderCategoryList(infoTitle, infoSubtitle, chipOptions);
+            }
+        });
+
+        scrollToBottom();
+    }
+
+    function renderCategoryList(title, subtitle, options) {
+        let listHtml = '<div class="message bot">';
+        listHtml += '<div class="category-list">';
+
+        if (title) {
+            listHtml += '<strong>' + escapeHtml(title) + '</strong>';
+        }
+        if (subtitle) {
+            listHtml += '<div style="font-size: 0.9em; margin-bottom: 10px;">' + escapeHtml(subtitle) + '</div>';
+        }
+
+        options.forEach(function (option) {
+            listHtml += '<button class="category-item" data-text="' + escapeHtml(option.text) + '">' +
+                escapeHtml(option.text) +
+                '</button>';
+        });
+
+        listHtml += '</div></div>';
+        chatBox.append(listHtml);
+
+        // Delegate click handler for category items
+        chatBox.off('click', '.category-item').on('click', '.category-item', function () {
+            const categoryText = $(this).data('text');
+
+            // Convert category name to URL-friendly format (remove diacritics)
+            const urlFriendlyName = removeDiacritics(categoryText);
+
+            // Navigate to the category page
+            window.location.href = '/phim-theo-the-loai/' + urlFriendlyName + '/trang-1';
+        });
+    }
+    function removeDiacritics(str) {
+        return str.normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/đ/g, 'd')
+            .replace(/Đ/g, 'D')
+            .replace(/\s+/g, '-')
+            .toLowerCase();
+    }
+
+    // Helper function to send message programmatically (for chip clicks)
+    function sendMessageToBot(messageText) {
+        const chatRequest = {
+            message: messageText,
+            sessionId: sessionId
+        };
+
+        appendMessage('bot', 'Bot: Thinking...');
+        let thinkingMessage = chatBox.children('.message').last();
+
+        $.ajax({
+            url: '/Chatbot/SendMessage',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(chatRequest),
+            success: function (response) {
+                if (thinkingMessage) thinkingMessage.remove();
+                handleBotResponse(response);
+            },
+            error: function (xhr, status, error) {
+                if (thinkingMessage) thinkingMessage.remove();
+                console.error("Error sending message:", status, error);
+                appendMessage('bot', 'Bot: Oops! Error sending message.');
+            }
+        });
+    }
+
+    // --- Utility Functions ---
     function appendMessage(sender, text) {
         const messageClass = sender === 'user' ? 'user' : 'bot';
-        // Basic HTML escaping
-        const escapedText = $('<div>').text(text).html(); // Use jQuery's text() to escape HTML
+        const escapedText = escapeHtml(text);
         const messageDiv = `<div class="message ${messageClass}">${escapedText}</div>`;
         chatBox.append(messageDiv);
-        // scrollToBottom(); // Moved scrolling to after handling all replies in handleBotResponse
     }
 
     function scrollToBottom() {
-        // Use setTimeout to ensure DOM has updated after appending messages
         setTimeout(() => {
             chatBox.scrollTop(chatBox[0].scrollHeight);
         }, 0);
     }
 
-    // Simple GUID generator
     function generateGuid() {
-        function s4() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); }
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     }
 
-    // Optional: Pre-scroll if chat is already open on page load (might be redundant now welcome intent clears)
-    // if (chatInterface.hasClass('open')) {
-    //     scrollToBottom();
-    // }
-
+    function escapeHtml(unsafe) {
+        if (typeof unsafe !== 'string') {
+            return unsafe;
+        }
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 });
