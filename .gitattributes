@@ -16,6 +16,7 @@
 # Ignore libraries and static assets
 wwwroot/libs/** linguist-vendored
 node_modules/** linguist-vendored
+wwwroot/OCR/** linguist-vendored
 bin/** linguist-vendored
 obj/** linguist-vendored
 migrations/** linguist-generated
