@@ -5,6 +5,8 @@
 ###############################################################################
 # Linguist settings to detect C# as main language
 ###############################################################################
+*.cs linguist-detectable=true
+
 *.html linguist-vendored
 *.css linguist-detectable=false
 *.js linguist-detectable=true
