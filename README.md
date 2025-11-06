@@ -113,9 +113,6 @@ school_major_project/
 
 ```
 
-## Đóng góp
-Mọi đóng góp đều được hoan nghênh! Hãy tự nhiên tạo Pull Request.
-
 ## Liên hệ
 Phạm Trần Nhật Minh - nhatminh4403@gmail.com
 
